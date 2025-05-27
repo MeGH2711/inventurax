@@ -19,10 +19,10 @@ app.use(session({
     store: MongoStore.create({
         mongoUrl: 'mongodb://localhost:27017/inventura',
         collectionName: 'sessions',
-        ttl: 24 * 60 * 60 // session TTL in seconds
+        ttl: 24 * 60 * 60
     }),
     cookie: {
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000
     }
 }));
 
