@@ -104,7 +104,7 @@ function isAuthenticated(req, res, next) {
 
 app.get('/session-check', (req, res) => {
     if (req.session && req.session.user) {
-        res.json({ loggedIn: true });
+        res.json({ loggedIn: true, username: req.session.user.username });
     } else {
         res.json({ loggedIn: false });
     }
@@ -131,6 +131,10 @@ app.get('/', (req, res) => {
 
 app.get('/dashboard', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+app.get('/productlisting', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'productlisting.html'));
 });
 
 // Start server

@@ -32,6 +32,19 @@ body {
   --bs-btn-active-border-color: #0c4e82;
 }
 
+.btn-darkblue2 {
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: #114067;
+  --bs-btn-border-color: #114067;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #11527e;
+  --bs-btn-hover-border-color: #11527e;
+  --bs-btn-focus-shadow-rgb: 17, 64, 103;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #15659c;
+  --bs-btn-active-border-color: #15659c;
+}
+
 /* Cards */
 
 .gradient-card {
@@ -46,11 +59,16 @@ body {
 }
 
 .profileButton ul {
-  background-color: #d5ebff;
+  background-color: #f8f9fa;
+}
+
+.profileButton ul li a {
+  background-color: #f8f9fa !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .profileButton ul li a:hover {
-  background-color: #c0e0ff !important;
+  background-color: #d8ecff !important;
 }
 
 .profileButton ul li a.dropdown-item-signout:hover {
