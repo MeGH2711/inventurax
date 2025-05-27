@@ -4,17 +4,23 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const app = express();
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 const PORT = 3000;
 
 app.use(express.static(path.join(__dirname), {
-    index: false // don't serve index.html automatically
+    index: false
 }));
 
 app.use(session({
     secret: '8a20bbb812f34b47a54ddc535d3a927b229991a061e1b1911e42b876c40eef57',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: 'mongodb://localhost:27017/inventura',
+        collectionName: 'sessions',
+        ttl: 24 * 60 * 60 // session TTL in seconds
+    }),
     cookie: {
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
