@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventura | Dashboard</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/lightTheme.css">
+    <link rel="stylesheet" href="css/material-font-icons.css">
+</head>
+
+<body>
+
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="shadow-sm" id="sidebar-wrapper">
+            <div class="sidebar-heading p-3 d-flex justify-content-between align-items-center">
+                <img id="sidebarLogoFull" src="images/inventuraxLogoWhite.png" alt="Full Logo" class="img-fluid">
+                <img id="sidebarLogoIcon" src="images/inventuraxIconWhite.png" alt="Icon Logo" class="img-fluid d-none">
+            </div>
+            <div class="list-group list-group-flush flex-grow-1">
+                <a class="list-group-item list-group-item-sidebar active" title="Dashboard">
+                    <i class="gsymbols-round gicon-home fs-5"></i><span class="link-text">Dashboard</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-sidebar" title="Product Listing">
+                    <i class="gsymbols-round gicon-inventory fs-5"></i><span class="link-text">Product Listing</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-sidebar" title="Billing">
+                    <i class="gsymbols-round gicon-receipt_long fs-5"></i><span class="link-text">Billing</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-sidebar" title="Analytics">
+                    <i class="gsymbols-round gicon-insights fs-5"></i><span class="link-text">Analytics</span>
+                </a>
+            </div>
+
+            <!-- Bottom Toggle Button -->
+            <div class="text-center p-3 sidebar-toggle-wrapper">
+                <button class="btn btn-outline-light w-100" id="toggleSidebar">
+                    <i class="gsymbols-round gicon-chevron_left" id="toggleIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Page content -->
+        <div id="mainPageContent" class="p-4 flex-grow-1">
+
+            <!-- Header Section -->
+            <div class="container-fluid d-flex justify-content-end">
+                <div class="dropdown profileButton">
+                    <button class="btn btn-sm btn-darkblue dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Username
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/logout">Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container my-4">
+                <div class="row g-4 d-flex justify-content-center">
+
+                    <div class="col-md-4">
+                        <div class="card text-white gradient-card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Sales</h5>
+                                <p class="card-text display-6">$25,300</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-white gradient-card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">New Customers</h5>
+                                <p class="card-text display-6">350</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-white gradient-card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">Pending Orders</h5>
+                                <p class="card-text display-6">45</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Listing Card -->
+                    <div class="col-md-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card text-white gradient-card shadow text-center p-3 h-100">
+                                <i class="gsymbols-round gicon-inventory fs-1 mb-2"></i>
+                                <h5 class="card-title">Product Listing</h5>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Billing Card -->
+                    <div class="col-md-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card text-white gradient-card shadow text-center p-3 h-100">
+                                <i class="gsymbols-round gicon-receipt_long fs-1 mb-2"></i>
+                                <h5 class="card-title">Billing</h5>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Analytics Card -->
+                    <div class="col-md-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card text-white gradient-card shadow text-center p-3 h-100">
+                                <i class="gsymbols-round gicon-insights fs-1 mb-2"></i>
+                                <h5 class="card-title">Analytics</h5>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Section -->
+            <footer class="mt-auto pt-3 border-top text-center small text-muted">
+                <div class="container">
+                    &copy; 2025 Inventurax. All rights reserved. | Version 1.0.0
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script>
+        fetch('/session-check')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.loggedIn) {
+                    window.location.href = '/';
+                }
+            })
+            .catch(() => {
+                window.location.href = '/';
+            });
+    </script>
+</body>
+
+</html>

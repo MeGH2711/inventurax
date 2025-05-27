@@ -1,0 +1,83 @@
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-Regular.ttf') format('ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+#togglePassword {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+#sidebar-wrapper {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+}
+
+#sidebar-wrapper .list-group-item-sidebar {
+  text-align: start;
+  border: none;
+  margin: 3px 10px;
+  border-radius: 5px;
+  text-wrap: nowrap;
+}
+
+#sidebar-wrapper .list-group-item-sidebar i {
+  margin-right: 1rem;
+}
+
+#sidebar-wrapper.collapsed {
+  width: 80px;
+}
+
+#sidebar-wrapper.collapsed .list-group-item-sidebar i {
+  margin-right: 0;
+}
+
+#sidebar-wrapper.collapsed .link-text {
+  display: none;
+}
+
+#sidebar-wrapper.collapsed .list-group-item-sidebar {
+  text-align: center;
+}
+
+#mainPageContent {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#sidebar-wrapper.collapsed~#mainPageContent {
+  margin-left: 80px;
+}
+
+.profileButton ul {
+  padding: 1px 0 !important;
+}
+
+/* Cards */
+
+.gradient-card .card-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.gradient-card .card-text {
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+}

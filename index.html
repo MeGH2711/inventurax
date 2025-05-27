@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inventura | Login</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/lightTheme.css" />
+    <link rel="stylesheet" href="css/material-font-icons.css" />
+    <style>
+        html,
+        body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container {
+            flex: 1;
+        }
+
+        .login-box {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+
+        .login-title {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.75rem;
+            color: #343a40;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid login-container d-flex align-items-center justify-content-center">
+        <div class="login-box w-100">
+            <div class="text-center mb-4">
+                <img src="images/inventuraxLogo.png" alt="Inventura Logo" class="img-fluid w-50">
+            </div>
+            <form id="loginForm" action="/login" method="POST" novalidate>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username"
+                        placeholder="Enter your username" required />
+                    <div class="invalid-feedback">Please enter your username.</div>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control border-top border-bottom border-start border-0"
+                            id="password" name="password" placeholder="Your password" required minlength="6" />
+                        <button class="btn border-top border-bottom border-end border-0" type="button"
+                            id="togglePassword">
+                            <i class="gsymbols-round gicon-visibility" id="toggleIcon"></i>
+                        </button>
+                        <div class="invalid-feedback">Password must be at least 6 characters.</div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-darkblue w-100">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="text-center py-3 text-muted small">
+        &copy; 2025 Inventura. All rights reserved.
+    </footer>
+
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Invalid username or password.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        (() => {
+            'use strict';
+
+            const form = document.querySelector('#loginForm');
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    form.classList.add('was-validated');
+                }
+            });
+
+            // Toggle password visibility and icon
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('togglePassword');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            toggleBtn.addEventListener('click', () => {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+
+                toggleIcon.classList.toggle('gicon-visibility');
+                toggleIcon.classList.toggle('gicon-visibility_off');
+            });
+        })();
+
+        // Show toast if error parameter is present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === '1') {
+            const toastEl = document.getElementById('errorToast');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+    </script>
+
+</body>
+
+</html>

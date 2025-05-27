@@ -1,0 +1,62 @@
+body {
+  background-color: #f8f9fa;
+}
+
+#sidebar-wrapper {
+  background-color: #0A2F4F;
+  color: #ffffff;
+}
+
+.list-group-item-sidebar {
+  background-color: #0A2F4F;
+  color: #ffffff;
+  transition: all 0.1s ease-in-out;
+}
+
+.list-group-item-sidebar.active,
+.list-group-item-sidebar:hover {
+  background-color: #ffffff;
+  color: #0A2F4F;
+}
+
+.btn-darkblue {
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: #0A2F4F;
+  --bs-btn-border-color: #0A2F4F;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #09406b;
+  --bs-btn-hover-border-color: #09406b;
+  --bs-btn-focus-shadow-rgb: 10, 47, 79;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #0c4e82;
+  --bs-btn-active-border-color: #0c4e82;
+}
+
+/* Cards */
+
+.gradient-card {
+  background: linear-gradient(135deg, #0A2F4F, #13558D);
+  border: none;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+}
+
+.gradient-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profileButton ul {
+  background-color: #d5ebff;
+}
+
+.profileButton ul li a:hover {
+  background-color: #c0e0ff !important;
+}
+
+.profileButton ul li a.dropdown-item-signout:hover {
+  color: #ff0000 !important;
+}
+
+.dropdown-item-signout {
+  color: #ff0000;
+}
