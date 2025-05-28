@@ -159,6 +159,20 @@ app.get('/get-product-categories', async (req, res) => {
     }
 });
 
+app.delete('/delete-product-category/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deleted = await ProductCategory.findByIdAndDelete(id);
+        if (!deleted) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        res.json({ message: 'Category deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Routes
 app.get('/', (req, res) => {
     if (req.session && req.session.user) {

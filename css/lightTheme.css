@@ -82,3 +82,9 @@ body {
 .modal-content{
   background-color: #f8f9fa;
 }
+
+/* Table */
+table thead tr th,
+table tbody tr td{
+  background-color: transparent !important;
+}
