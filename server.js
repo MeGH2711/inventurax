@@ -73,6 +73,7 @@ app.get('/create-user', async (req, res) => {
 });
 
 const bodyParser = require('body-parser');
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/login', async (req, res) => {
@@ -119,6 +120,43 @@ app.get('/logout', (req, res) => {
         res.clearCookie('connect.sid'); // Optional: clear session cookie
         res.redirect('/');
     });
+});
+
+// Product Category
+
+const productCategorySchema = new mongoose.Schema({
+    name: { type: String, required: true, unique: true }
+});
+
+const ProductCategory = mongoose.model('ProductCategory', productCategorySchema);
+
+app.post('/add-product-category', async (req, res) => {
+    const { name } = req.body;
+
+    try {
+        const existing = await ProductCategory.findOne({ name });
+        if (existing) {
+            return res.status(400).json({ message: 'Category already exists' });
+        }
+
+        const newCategory = new ProductCategory({ name });
+        await newCategory.save();
+
+        res.status(200).json({ message: 'Category added successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/get-product-categories', async (req, res) => {
+    try {
+        const categories = await ProductCategory.find().sort({ name: 1 });
+        res.json(categories);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
 });
 
 // Routes

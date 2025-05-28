@@ -64,7 +64,7 @@ body {
 
 .profileButton ul li a {
   background-color: #f8f9fa !important;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 
 .profileButton ul li a:hover {
@@ -77,4 +77,8 @@ body {
 
 .dropdown-item-signout {
   color: #ff0000 !important;
+}
+
+.modal-content{
+  background-color: #f8f9fa;
 }
