@@ -77,13 +77,15 @@
 
 /* Cards */
 
-.gradient-card .card-title {
+.gradient-card .card-title,
+.product-card .card-title {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
   font-family: 'Montserrat', sans-serif;
 }
 
-.gradient-card .card-text {
+.gradient-card .card-text,
+.product-card .card-text {
   font-weight: bold;
   font-family: 'Montserrat', sans-serif;
 }

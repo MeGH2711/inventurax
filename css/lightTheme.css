@@ -19,6 +19,12 @@ body {
   color: #0A2F4F;
 }
 
+/* Bootstrap Classes */
+
+.bg-darkblue {
+  background-color: #0A2F4F;
+}
+
 .btn-darkblue {
   --bs-btn-color: #ffffff;
   --bs-btn-bg: #0A2F4F;
@@ -58,6 +64,18 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+.product-card {
+  background: linear-gradient(135deg, #B3D4FC, #6FA8DC);
+  color: #0A2F4F;
+  border: none;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
 .profileButton ul {
   background-color: #f8f9fa;
 }
@@ -79,12 +97,23 @@ body {
   color: #ff0000 !important;
 }
 
-.modal-content{
+.modal-content {
   background-color: #f8f9fa;
 }
 
 /* Table */
 table thead tr th,
-table tbody tr td{
+table tbody tr td {
   background-color: transparent !important;
+}
+
+/* Form Control & Form Select */
+.form-control:focus,
+.form-select:focus {
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border: none;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(10, 47, 79, 0.35);
+  transition: all 0.2s ease-in-out;
 }

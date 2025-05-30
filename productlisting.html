@@ -72,9 +72,15 @@
                 <div class="d-flex justify-content-end gap-2 w-50">
                     <input type="text" class="form-control form-control-sm bg-transparent w-40"
                         placeholder="Search Item">
-                    <select class="form-select form-select-sm bg-transparent w-25">
+                    <select class="form-select form-select-sm bg-transparent w-25" id="searchByCategory">
                         <option>1</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="container-fluid mt-4">
+                <div class="row" id="productCardContainer">
+                    <!-- Product cards will be inserted here -->
                 </div>
             </div>
 
@@ -109,8 +115,12 @@
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label for="productWeight" class="form-label">Net Weight</label>
-                                <input type="text" class="form-control bg-transparent" placeholder="Add Net Weight"
-                                    id="productWeight">
+                                <div class="input-group mb-3">
+                                    <input type="text" inputmode="decimal" pattern="^\d*\.?\d*$"
+                                        class="form-control bg-transparent" placeholder="Add Net Weight"
+                                        id="productWeight">
+                                    <span class="input-group-text" id="basic-addon1">gms</span>
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -123,15 +133,18 @@
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label for="productPrice" class="form-label">Price</label>
-                                <input type="text" class="form-control bg-transparent" placeholder="Add Price"
-                                    id="productPrice">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">₹</span>
+                                    <input type="text" inputmode="decimal" pattern="^\d*\.?\d*$"
+                                        class="form-control bg-transparent" placeholder="Add Price" id="productPrice">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-darkblue2" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-darkblue">Save Product</button>
+                    <button type="button" class="btn btn-darkblue" id="saveProductBtn">Save Product</button>
                 </div>
             </div>
         </div>
@@ -147,12 +160,15 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="mb-3">
-                                <label for="productCategoryName" class="form-label">Product Category</label>
-                                <input type="text" class="form-control bg-transparent"
-                                    placeholder="Add Product Category" id="productCategoryName">
-                            </div>
+                        <div class="col-lg-9 mb-3">
+                            <label for="productCategoryName" class="form-label">Product Category</label>
+                            <input type="text" class="form-control bg-transparent" placeholder="Add Product Category"
+                                id="productCategoryName">
+                        </div>
+                        <div class="col-lg-3 d-flex align-items-end justify-content-center mb-3">
+                            <button type="button" class="btn btn-darkblue w-100" id="saveProductCategoryBtn">Save
+                                Product
+                                Category</button>
                         </div>
                         <hr>
                         <div class="col-lg-12">
@@ -173,11 +189,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-darkblue2" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-darkblue" id="saveProductCategoryBtn">Save Product
-                        Category</button>
-                </div>
             </div>
         </div>
     </div>
@@ -197,7 +208,8 @@
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/sidebar.js"></script>
     <script>
         // Session check
@@ -253,14 +265,17 @@
             fetch('/get-product-categories')
                 .then(res => res.json())
                 .then(data => {
-                    const select = document.getElementById('productCategory');
-                    select.innerHTML = '<option value="">Select Category</option>';
+                    const select1  = document.getElementById('productCategory');
+                    const select2  = document.getElementById('searchByCategory');
+                    select1.innerHTML = '<option value="">Select Category</option>';
+                    select2.innerHTML = '<option value="">Select Category</option>';
 
                     data.forEach(cat => {
                         const option = document.createElement('option');
-                        option.value = cat._id;
+                        option.value = cat.name;
                         option.textContent = cat.name;
-                        select.appendChild(option);
+                        select1.appendChild(option);
+                        select2.appendChild(option);
                     });
                 })
                 .catch(err => {
@@ -316,6 +331,96 @@
                 });
         }
 
+        document.getElementById('saveProductBtn').addEventListener('click', () => {
+            const name = document.getElementById('productName').value.trim();
+            const weight = document.getElementById('productWeight').value.trim();
+            const category = document.getElementById('productCategory').value;
+            const price = parseFloat(document.getElementById('productPrice').value.trim());
+
+            if (!name || !weight || !category || isNaN(price)) {
+                showToast('Please fill all fields correctly.', 'text-bg-danger');
+                return;
+            }
+
+            fetch('/add-product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, weight, category, price })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.message === 'Product added successfully') {
+                        showToast('Product added!', 'text-bg-success');
+                        document.getElementById('productName').value = '';
+                        document.getElementById('productWeight').value = '';
+                        document.getElementById('productCategory').value = '';
+                        document.getElementById('productPrice').value = '';
+
+                        const productModal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+                        productModal.hide();
+                    } else {
+                        showToast(data.message || 'Error occurred', 'text-bg-danger');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('Server error', 'text-bg-danger');
+                });
+        });
+
+        function loadProducts() {
+            fetch('/get-products')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('productCardContainer');
+                    container.innerHTML = '';
+
+                    if (data.length === 0) {
+                        container.innerHTML = '<p class="text-center text-muted">No products available.</p>';
+                        return;
+                    }
+
+                    data.forEach(product => {
+                        const card = document.createElement('div');
+                        card.className = 'col-md-3 mb-4';
+                        card.innerHTML = `
+                            <div class="card product-card shadow-sm border-0 h-100 position-relative overflow-visible">
+                                <span class="badge bg-darkblue position-absolute top-0 end-0 translate-middle-y">
+                                    ${product.category}
+                                </span>
+                            
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <div>
+                                        <h5 class="card-title fs-4">${product.name}</h5>
+                                        <p class="card-text mb-1">Weight: ${product.weight}</p>
+                                        <p class="card-text">Price: ₹${product.price.toFixed(2)}</p>
+                                    </div>
+                                
+                                    <div class="mt-auto d-flex justify-content-between pt-3 gap-2">
+                                        <button class="btn btn-darkblue2 w-100 d-flex align-items-center justify-content-center">
+                                            <i class="gsymbols-round gicon-edit me-2"></i>
+                                            <span>Edit</span>
+                                        </button>
+                                        <button class="btn btn-darkblue w-100 d-flex align-items-center justify-content-center">
+                                            <i class="gsymbols-round gicon-delete me-2"></i>Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error fetching products:', err);
+                });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProductCategories();
+            loadProducts();
+        });
+
         // Reusable Toast Function
         function showToast(message, bgColorClass = 'text-bg-primary') {
             const toastEl = document.getElementById('mainToast');
@@ -327,6 +432,21 @@
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
         }
+
+        $(document).ready(function () {
+            function allowOnlyFloat(selector) {
+                $(selector).on('input', function () {
+                    this.value = this.value.replace(/[^0-9.]/g, ''); // Allow digits and decimal
+                    // Prevent more than one decimal point
+                    if ((this.value.match(/\./g) || []).length > 1) {
+                        this.value = this.value.slice(0, -1);
+                    }
+                });
+            }
+
+            allowOnlyFloat('#productWeight');
+            allowOnlyFloat('#productPrice');
+        });
 
         window.addEventListener('DOMContentLoaded', () => {
             loadProductCategories();

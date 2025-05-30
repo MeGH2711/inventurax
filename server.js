@@ -173,6 +173,46 @@ app.delete('/delete-product-category/:id', async (req, res) => {
     }
 });
 
+// Product
+
+const productSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    weight: { type: String, required: true },
+    category: { type: String, required: true },
+    price: { type: Number, required: true }
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+app.post('/add-product', async (req, res) => {
+    const { name, weight, category, price } = req.body;
+
+    try {
+        const newProduct = new Product({
+            name,
+            weight,
+            category,
+            price
+        });
+
+        await newProduct.save();
+        res.status(200).json({ message: 'Product added successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/get-products', async (req, res) => {
+    try {
+        const products = await Product.find().populate('category', 'name');
+        res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Routes
 app.get('/', (req, res) => {
     if (req.session && req.session.user) {
