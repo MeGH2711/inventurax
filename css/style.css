@@ -89,3 +89,8 @@
   font-weight: bold;
   font-family: 'Montserrat', sans-serif;
 }
+
+.modal-faded {
+  opacity: 0.5 !important;
+  pointer-events: none;
+}

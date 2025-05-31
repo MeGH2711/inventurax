@@ -76,6 +76,8 @@ const bodyParser = require('body-parser');
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Login Check
+
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -86,7 +88,6 @@ app.post('/login', async (req, res) => {
             return res.redirect('/?error=1');
         }
 
-        // Set session
         req.session.user = { id: user._id, username: user.username };
         res.redirect('/dashboard');
     } catch (err) {
@@ -94,6 +95,8 @@ app.post('/login', async (req, res) => {
         res.redirect('/?error=1');
     }
 });
+
+// Authentication Check
 
 function isAuthenticated(req, res, next) {
     if (req.session && req.session.user) {
@@ -103,6 +106,8 @@ function isAuthenticated(req, res, next) {
     }
 }
 
+// Session Check
+
 app.get('/session-check', (req, res) => {
     if (req.session && req.session.user) {
         res.json({ loggedIn: true, username: req.session.user.username });
@@ -110,6 +115,8 @@ app.get('/session-check', (req, res) => {
         res.json({ loggedIn: false });
     }
 });
+
+// Logout
 
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -130,6 +137,8 @@ const productCategorySchema = new mongoose.Schema({
 
 const ProductCategory = mongoose.model('ProductCategory', productCategorySchema);
 
+// Create Product Category
+
 app.post('/add-product-category', async (req, res) => {
     const { name } = req.body;
 
@@ -149,6 +158,8 @@ app.post('/add-product-category', async (req, res) => {
     }
 });
 
+// Fetch Product Category
+
 app.get('/get-product-categories', async (req, res) => {
     try {
         const categories = await ProductCategory.find().sort({ name: 1 });
@@ -158,6 +169,8 @@ app.get('/get-product-categories', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
+// Delete Product Category
 
 app.delete('/delete-product-category/:id', async (req, res) => {
     const { id } = req.params;
@@ -184,29 +197,44 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model('Product', productSchema);
 
+// Create Product
+
 app.post('/add-product', async (req, res) => {
     const { name, weight, category, price } = req.body;
 
     try {
-        const newProduct = new Product({
-            name,
-            weight,
-            category,
-            price
-        });
-
+        const newProduct = new Product({ name, weight, category, price });
         await newProduct.save();
-        res.status(200).json({ message: 'Product added successfully' });
+        res.status(200).json({ message: 'Product added successfully', product: newProduct });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
+// Fetch Products
+
 app.get('/get-products', async (req, res) => {
     try {
         const products = await Product.find().populate('category', 'name');
         res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Delete Product
+
+app.delete('/delete-product/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deleted = await Product.findByIdAndDelete(id);
+        if (!deleted) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.json({ message: 'Product deleted successfully' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
