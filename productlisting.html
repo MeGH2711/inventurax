@@ -70,7 +70,7 @@
                         Add Product Category</button>
                 </div>
                 <div class="d-flex justify-content-end gap-2 w-50">
-                    <input type="text" class="form-control form-control-sm bg-transparent w-40"
+                    <input id="searchByName" type="text" class="form-control form-control-sm bg-transparent w-40"
                         placeholder="Search by Product Name">
                     <select class="form-select form-select-sm bg-transparent w-25" id="searchByCategory"></select>
                 </div>
@@ -563,20 +563,30 @@
         });
 
         function loadProducts() {
+            const nameFilter = document.getElementById('searchByName').value.toLowerCase();
+            const categoryFilter = document.getElementById('searchByCategory').value;
+
             fetch('/get-products')
                 .then(res => res.json())
                 .then(data => {
                     const container = document.getElementById('productCardContainer');
                     container.innerHTML = '';
 
-                    if (data.length === 0) {
-                        container.innerHTML = '<p class="text-center text-muted">No products available.</p>';
+                    // Apply filters
+                    const filteredProducts = data.filter(product => {
+                        const matchesName = product.name.toLowerCase().includes(nameFilter);
+                        const matchesCategory = categoryFilter === '' || product.category === categoryFilter;
+                        return matchesName && matchesCategory;
+                    });
+
+                    if (filteredProducts.length === 0) {
+                        container.innerHTML = '<p class="text-center text-muted">No products match the search criteria.</p>';
                         return;
                     }
 
-                    data.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+                    filteredProducts.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 
-                    data.forEach(product => {
+                    filteredProducts.forEach(product => {
                         const card = document.createElement('div');
                         card.className = 'col-md-3 mb-4';
                         card.innerHTML = `
@@ -646,6 +656,8 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadProductCategories();
             loadProducts();
+            document.getElementById('searchByName').addEventListener('input', loadProducts);
+            document.getElementById('searchByCategory').addEventListener('change', loadProducts);
         });
 
         // Reusable Toast Function
