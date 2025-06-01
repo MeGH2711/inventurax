@@ -1,51 +1,64 @@
-body {
-  background-color: #f8f9fa;
+:root {
+  --main-page-bg: #f8f9fa;
+  --main-bg: #0A2F4F;
+  --white: #ffffff;
+  --danger-color: #ff0000;
 }
 
+body {
+  background-color: var(--main-page-bg);
+}
+
+/* Sidebar */
+
 #sidebar-wrapper {
-  background-color: #0A2F4F;
-  color: #ffffff;
+  background-color: var(--main-bg);
+  color: var(--white);
 }
 
 .list-group-item-sidebar {
-  background-color: #0A2F4F;
-  color: #ffffff;
+  background-color: var(--main-bg);
+  color: var(--white);
 }
 
 .list-group-item-sidebar.active,
 .list-group-item-sidebar:hover {
-  background-color: #ffffff;
-  color: #0A2F4F;
+  background-color: var(--white);
+  color: var(--main-bg);
 }
 
 /* Bootstrap Classes */
 
+/* Background */
+
 .bg-darkblue {
-  background-color: #0A2F4F;
+  background-color: var(--main-bg);
 }
 
+/* Buttons */
+
 .btn-darkblue {
-  --bs-btn-color: #ffffff;
-  --bs-btn-bg: #0A2F4F;
-  --bs-btn-border-color: #0A2F4F;
-  --bs-btn-hover-color: #ffffff;
+  --bs-btn-color: var(--white);
+  --bs-btn-bg: var(--main-bg);
+  --bs-btn-border-color: var(--main-bg);
+  --bs-btn-hover-color: var(--white);
   --bs-btn-hover-bg: #09406b;
   --bs-btn-hover-border-color: #09406b;
   --bs-btn-focus-shadow-rgb: 10, 47, 79;
-  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-color: var(--white);
   --bs-btn-active-bg: #0c4e82;
   --bs-btn-active-border-color: #0c4e82;
 }
 
 .btn-darkblue2 {
-  --bs-btn-color: #ffffff;
+  --bs-btn-color: var(--white);
   --bs-btn-bg: #114067;
   --bs-btn-border-color: #114067;
-  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-color: var(--white);
   --bs-btn-hover-bg: #11527e;
   --bs-btn-hover-border-color: #11527e;
   --bs-btn-focus-shadow-rgb: 17, 64, 103;
-  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-color: var(--white);
   --bs-btn-active-bg: #15659c;
   --bs-btn-active-border-color: #15659c;
 }
@@ -53,7 +66,7 @@ body {
 /* Cards */
 
 .gradient-card {
-  background: linear-gradient(135deg, #0A2F4F, #13558D);
+  background: linear-gradient(135deg, var(--main-bg), #13558D);
 }
 
 .gradient-card:hover {
@@ -62,19 +75,21 @@ body {
 
 .product-card {
   background: linear-gradient(135deg, #B3D4FC, #6FA8DC);
-  color: #0A2F4F;
+  color: var(--main-bg);
 }
 
 .product-card:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Profile Button */
+
 .profileButton ul {
-  background-color: #f8f9fa;
+  background-color: var(--main-page-bg);
 }
 
 .profileButton ul li a {
-  background-color: #f8f9fa !important;
+  background-color: var(--main-page-bg) !important;
 }
 
 .profileButton ul li a:hover {
@@ -82,24 +97,28 @@ body {
 }
 
 .profileButton ul li a.dropdown-item-signout:hover {
-  color: #ff0000 !important;
+  color: var(--danger-color) !important;
 }
 
 .dropdown-item-signout {
-  color: #ff0000 !important;
+  color: var(--danger-color) !important;
 }
 
+/* Modal */
+
 .modal-content {
-  background-color: #f8f9fa;
+  background-color: var(--main-page-bg);
 }
 
 /* Table */
+
 table thead tr th,
 table tbody tr td {
   background-color: transparent !important;
 }
 
 /* Form Control & Form Select */
+
 .form-control:focus,
 .form-select:focus {
   background-color: var(--bs-body-bg);
@@ -107,7 +126,9 @@ table tbody tr td {
   box-shadow: 0 0 0 0.2rem rgba(10, 47, 79, 0.35);
 }
 
+/* Highlighted Text */
+
 .highlightedText {
   background-color: #005791;
-  color: #ffffff;
+  color: var(--white);
 }
