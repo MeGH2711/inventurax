@@ -10,7 +10,6 @@ body {
 .list-group-item-sidebar {
   background-color: #0A2F4F;
   color: #ffffff;
-  transition: all 0.1s ease-in-out;
 }
 
 .list-group-item-sidebar.active,
@@ -55,24 +54,18 @@ body {
 
 .gradient-card {
   background: linear-gradient(135deg, #0A2F4F, #13558D);
-  border: none;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
 }
 
 .gradient-card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .product-card {
   background: linear-gradient(135deg, #B3D4FC, #6FA8DC);
   color: #0A2F4F;
-  border: none;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
 }
 
 .product-card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -82,7 +75,6 @@ body {
 
 .profileButton ul li a {
   background-color: #f8f9fa !important;
-  transition: all 0.1s ease-in-out;
 }
 
 .profileButton ul li a:hover {
@@ -110,10 +102,12 @@ table tbody tr td {
 /* Form Control & Form Select */
 .form-control:focus,
 .form-select:focus {
-  color: var(--bs-body-color);
   background-color: var(--bs-body-bg);
-  border: none;
-  outline: none;
+  color: var(--bs-body-color);
   box-shadow: 0 0 0 0.2rem rgba(10, 47, 79, 0.35);
-  transition: all 0.2s ease-in-out;
+}
+
+.highlightedText {
+  background-color: #005791;
+  color: #ffffff;
 }
