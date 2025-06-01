@@ -90,7 +90,11 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+.product-card-body-content p {
+  font-weight: 600 !important;
+}
+
 .modal-faded {
-  opacity: 0.5 !important;
+  filter: brightness(40%);
   pointer-events: none;
 }

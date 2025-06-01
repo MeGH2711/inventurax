@@ -71,10 +71,8 @@
                 </div>
                 <div class="d-flex justify-content-end gap-2 w-50">
                     <input type="text" class="form-control form-control-sm bg-transparent w-40"
-                        placeholder="Search Item">
-                    <select class="form-select form-select-sm bg-transparent w-25" id="searchByCategory">
-                        <option>1</option>
-                    </select>
+                        placeholder="Search by Product Name">
+                    <select class="form-select form-select-sm bg-transparent w-25" id="searchByCategory"></select>
                 </div>
             </div>
 
@@ -152,6 +150,81 @@
         </div>
     </div>
 
+    <!-- Edit Product Modal -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-1">
+                <div class="modal-header">
+                    <h1 class="modal-title fw-bold fs-5" id="editProductModalLabel">Edit Product</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editProductId">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="editProductName" class="form-label">Product Name</label>
+                                <input type="text" class="form-control bg-transparent" id="editProductName"
+                                    placeholder="Edit Product Name">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="editProductWeight" class="form-label">Net Weight</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control bg-transparent" id="editProductWeight"
+                                        inputmode="decimal" placeholder="Edit Net Weight">
+                                    <span class="input-group-text">gms</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="editProductCategory" class="form-label">Product Category</label>
+                                <select class="form-select bg-transparent" id="editProductCategory"></select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="editProductPrice" class="form-label">Price</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="text" class="form-control bg-transparent" id="editProductPrice"
+                                        inputmode="decimal" placeholder="Edit Price">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-darkblue2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-darkblue" id="updateProductBtn">Update Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Product Confirmation Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-1">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="confirmDeleteLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteConfirmationMessage" class="mb-0"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Product Category Modal -->
     <div class="modal fade" id="addProductCategoryModal" tabindex="-1" aria-labelledby="addProductCategoryModalLabel"
         aria-hidden="true">
@@ -191,26 +264,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Product Confirmation Modal -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-1">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="confirmDeleteLabel">Confirm Deletion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="deleteConfirmationMessage" class="mb-0"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
                 </div>
             </div>
         </div>
@@ -442,6 +495,39 @@
                 });
         });
 
+        document.getElementById('updateProductBtn').addEventListener('click', () => {
+            const id = document.getElementById('editProductId').value;
+            const name = document.getElementById('editProductName').value.trim();
+            const weight = document.getElementById('editProductWeight').value.trim();
+            const category = document.getElementById('editProductCategory').value;
+            const price = parseFloat(document.getElementById('editProductPrice').value.trim());
+
+            if (!name || !weight || !category || isNaN(price)) {
+                showToast('Please fill all fields correctly.', 'text-bg-danger');
+                return;
+            }
+
+            fetch(`/update-product/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, weight, category, price })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.message === 'Product updated successfully') {
+                        showToast('Product updated!', 'text-bg-success');
+                        bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+                        loadProducts();
+                    } else {
+                        showToast(data.message || 'Error occurred', 'text-bg-danger');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('Server error', 'text-bg-danger');
+                });
+        });
+
         let productToDeleteId = null;
 
         function confirmDeleteProduct(productId, productName) {
@@ -488,6 +574,8 @@
                         return;
                     }
 
+                    data.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+
                     data.forEach(product => {
                         const card = document.createElement('div');
                         card.className = 'col-md-3 mb-4';
@@ -497,13 +585,14 @@
                                     ${product.category}
                                 </span>
                                 <div class="card-body d-flex flex-column justify-content-between h-100">
-                                    <div>
-                                        <h5 class="card-title fs-4">${product.name}</h5>
-                                        <p class="card-text mb-1">Weight: ${product.weight}</p>
+                                    <div class="product-card-body-content">
+                                        <h5 class="card-title fs-4 fw-bold">${product.name}</h5>
+                                        <p class="card-text mb-1">Weight: ${product.weight}gm</p>
                                         <p class="card-text">Price: ₹${product.price.toFixed(2)}</p>
                                     </div>
                                     <div class="mt-auto d-flex justify-content-between pt-3 gap-2">
-                                        <button class="btn btn-darkblue2 w-100 d-flex align-items-center justify-content-center">
+                                        <button class="btn btn-darkblue2 w-100 d-flex align-items-center justify-content-center"
+                                            onclick="openEditProductModal('${product._id}', '${product.name}', '${product.weight}', '${product.category}', ${product.price})">
                                             <i class="gsymbols-round gicon-edit me-2"></i>
                                             <span>Edit</span>
                                         </button>
@@ -511,7 +600,6 @@
                                             onclick="confirmDeleteProduct('${product._id}', '${product.name.replace(/'/g, "\\'")}')">
                                             <i class="gsymbols-round gicon-delete me-2"></i>Delete
                                         </button>
-                                    
                                     </div>
                                 </div>
                             </div>
@@ -521,6 +609,37 @@
                 })
                 .catch(err => {
                     console.error('Error fetching products:', err);
+                });
+        }
+
+        function openEditProductModal(id, name, weight, category, price) {
+            document.getElementById('editProductId').value = id;
+            document.getElementById('editProductName').value = name;
+            document.getElementById('editProductWeight').value = weight;
+            document.getElementById('editProductPrice').value = price;
+
+            // Populate category dropdown, then set selected value
+            loadProductCategoriesToSelect('editProductCategory', category);
+
+            const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+            modal.show();
+        }
+
+        function loadProductCategoriesToSelect(selectId, selectedValue = '') {
+            fetch('/get-product-categories')
+                .then(res => res.json())
+                .then(data => {
+                    const select = document.getElementById(selectId);
+                    select.innerHTML = '<option value="">Select Category</option>';
+                    data.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.name;
+                        option.textContent = cat.name;
+                        if (cat.name === selectedValue) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
                 });
         }
 
@@ -554,10 +673,9 @@
 
             allowOnlyFloat('#productWeight');
             allowOnlyFloat('#productPrice');
-        });
+            allowOnlyFloat('#editProductWeight');
+            allowOnlyFloat('#editProductPrice');
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadProductCategories();
         });
 
         document.getElementById('addProductCategoryModal').addEventListener('shown.bs.modal', () => {

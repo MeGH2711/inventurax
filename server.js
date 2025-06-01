@@ -224,6 +224,24 @@ app.get('/get-products', async (req, res) => {
     }
 });
 
+// Update Product
+
+app.put('/update-product/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, weight, category, price } = req.body;
+
+    try {
+        const updated = await Product.findByIdAndUpdate(id, { name, weight, category, price }, { new: true });
+        if (!updated) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.json({ message: 'Product updated successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Delete Product
 
 app.delete('/delete-product/:id', async (req, res) => {
