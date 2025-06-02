@@ -275,6 +275,10 @@ app.get('/productlisting', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'productlisting.html'));
 });
 
+app.get('/billing', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'billing.html'));
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

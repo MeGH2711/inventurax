@@ -28,7 +28,7 @@
                 <a class="list-group-item list-group-item-sidebar active" title="Product Listing">
                     <i class="gsymbols-round gicon-inventory fs-5"></i><span class="link-text">Product Listing</span>
                 </a>
-                <a href="#" class="list-group-item list-group-item-sidebar" title="Billing">
+                <a  href="/billing" class="list-group-item list-group-item-sidebar" title="Billing">
                     <i class="gsymbols-round gicon-receipt_long fs-5"></i><span class="link-text">Billing</span>
                 </a>
                 <a href="#" class="list-group-item list-group-item-sidebar" title="Analytics">
@@ -73,12 +73,42 @@
                     <input id="searchByName" type="text" class="form-control form-control-sm bg-transparent w-40"
                         placeholder="Search by Product Name">
                     <select class="form-select form-select-sm bg-transparent w-25" id="searchByCategory"></select>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="View Toggle">
+                        <button type="button" class="btn btn-outline-darkblue active" id="cardViewBtn">
+                            <i class="gsymbols-round gicon-view_carousel"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-darkblue" id="tableViewBtn">
+                            <i class="gsymbols-round gicon-table"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="container-fluid mt-4">
                 <div class="row" id="productCardContainer">
                     <!-- Product cards will be inserted here -->
+                </div>
+                <div class="row" id="productTableContainer" style="display: none;">
+                    <div class="col-12">
+                        <div class="card border-1">
+                            <div class="table-responsive">
+                                <table class="table table-darkblue table-striped table-bordered mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="ps-2">Name</th>
+                                            <th class="ps-2">Weight</th>
+                                            <th class="ps-2">Category</th>
+                                            <th class="ps-2">Price</th>
+                                            <th colspan="2" class="ps-2">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productTableBody">
+                                        <!-- Products will be inserted here in table format -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -586,7 +616,7 @@
                     filteredProducts.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 
                     filteredProducts.forEach(product => {
-                        
+
                         const highlightMatch = (text, searchTerm) => {
                             if (!searchTerm) return text;
                             const regex = new RegExp(`(${searchTerm})`, 'gi');
@@ -621,6 +651,39 @@
                             </div>
                         `;
                         container.appendChild(card);
+                    });
+
+                    const tableBody = document.getElementById('productTableBody');
+                    tableBody.innerHTML = '';
+
+                    filteredProducts.forEach(product => {
+
+                        const highlightMatch = (text, searchTerm) => {
+                            if (!searchTerm) return text;
+                            const regex = new RegExp(`(${searchTerm})`, 'gi');
+                            return text.replace(regex, '<span class="highlightedText">$1</span>');
+                        };
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="ps-2">${highlightMatch(product.name, nameFilter)}</td>
+                            <td class="ps-2">${product.weight}gm</td>
+                            <td class="ps-2">${product.category}</td>
+                            <td class="ps-2">₹${product.price.toFixed(2)}</td>
+                            <td class="ps-2">
+                                <button class="btn btn-sm btn-darkblue2 w-100"
+                                    onclick="openEditProductModal('${product._id}', '${product.name}', '${product.weight}', '${product.category}', ${product.price})">
+                                    Edit
+                                </button>
+                            </td>
+                            <td class="ps-2">
+                                <button class="btn btn-sm btn-danger w-100"
+                                    onclick="confirmDeleteProduct('${product._id}', '${product.name.replace(/'/g, "\\'")}')">
+                                    Delete
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
                     });
                 })
                 .catch(err => {
@@ -664,7 +727,53 @@
             loadProducts();
             document.getElementById('searchByName').addEventListener('input', loadProducts);
             document.getElementById('searchByCategory').addEventListener('change', loadProducts);
+
+            const savedView = localStorage.getItem('productView') || 'card';
+            setProductView(savedView);
         });
+
+        document.getElementById('cardViewBtn').addEventListener('click', () => {
+            document.getElementById('productCardContainer').style.display = 'flex';
+            document.getElementById('productTableContainer').style.display = 'none';
+            document.getElementById('cardViewBtn').classList.add('active');
+            document.getElementById('tableViewBtn').classList.remove('active');
+        });
+
+        document.getElementById('tableViewBtn').addEventListener('click', () => {
+            document.getElementById('productCardContainer').style.display = 'none';
+            document.getElementById('productTableContainer').style.display = 'block';
+            document.getElementById('cardViewBtn').classList.remove('active');
+            document.getElementById('tableViewBtn').classList.add('active');
+        });
+
+        document.getElementById('cardViewBtn').addEventListener('click', () => {
+            localStorage.setItem('productView', 'card');
+            setProductView('card');
+        });
+
+        document.getElementById('tableViewBtn').addEventListener('click', () => {
+            localStorage.setItem('productView', 'table');
+            setProductView('table');
+        });
+
+        function setProductView(viewType) {
+            const cardContainer = document.getElementById('productCardContainer');
+            const tableContainer = document.getElementById('productTableContainer');
+            const cardBtn = document.getElementById('cardViewBtn');
+            const tableBtn = document.getElementById('tableViewBtn');
+
+            if (viewType === 'card') {
+                cardContainer.style.display = 'flex';
+                tableContainer.style.display = 'none';
+                cardBtn.classList.add('active');
+                tableBtn.classList.remove('active');
+            } else {
+                cardContainer.style.display = 'none';
+                tableContainer.style.display = 'block';
+                cardBtn.classList.remove('active');
+                tableBtn.classList.add('active');
+            }
+        }
 
         // Reusable Toast Function
         function showToast(message, bgColorClass = 'text-bg-primary') {

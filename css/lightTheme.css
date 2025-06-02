@@ -50,6 +50,21 @@ body {
   --bs-btn-active-border-color: #0c4e82;
 }
 
+.btn-outline-darkblue {
+  --bs-btn-color: var(--main-bg);
+  --bs-btn-border-color: var(--main-bg);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #09406b;
+  --bs-btn-hover-border-color: #09406b;
+  --bs-btn-focus-shadow-rgb: 10, 47, 79;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #0c4e82;
+  --bs-btn-active-border-color: #0c4e82;
+  background-color: transparent;
+  color: var(--main-bg);
+  border: 1px solid var(--main-bg);
+}
+
 .btn-darkblue2 {
   --bs-btn-color: var(--white);
   --bs-btn-bg: #114067;
@@ -61,6 +76,19 @@ body {
   --bs-btn-active-color: var(--white);
   --bs-btn-active-bg: #15659c;
   --bs-btn-active-border-color: #15659c;
+}
+
+.btn-whatsapp {
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: #088F8F;
+  --bs-btn-border-color: #088F8F;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #066b6b;
+  --bs-btn-hover-border-color: #066b6b;
+  --bs-btn-focus-shadow-rgb: 8, 143, 143;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #055858;
+  --bs-btn-active-border-color: #055858;
 }
 
 /* Cards */

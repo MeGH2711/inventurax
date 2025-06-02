@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventura | Product Listing</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/lightTheme.css">
+    <link rel="stylesheet" href="css/material-font-icons.css">
+</head>
+
+<body>
+
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="shadow-sm" id="sidebar-wrapper">
+            <div class="sidebar-heading p-3 d-flex justify-content-between align-items-center">
+                <img id="sidebarLogoFull" src="images/inventuraxLogoWhite.png" alt="Full Logo" class="img-fluid">
+                <img id="sidebarLogoIcon" src="images/inventuraxIconWhite.png" alt="Icon Logo" class="img-fluid d-none">
+            </div>
+            <div class="list-group list-group-flush flex-grow-1">
+                <a href="/dashboard" class="list-group-item list-group-item-sidebar" title="Dashboard">
+                    <i class="gsymbols-round gicon-home fs-5"></i><span class="link-text">Dashboard</span>
+                </a>
+                <a href="/productlisting" class="list-group-item list-group-item-sidebar" title="Product Listing">
+                    <i class="gsymbols-round gicon-inventory fs-5"></i><span class="link-text">Product Listing</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-sidebar active" title="Billing">
+                    <i class="gsymbols-round gicon-receipt_long fs-5"></i><span class="link-text">Billing</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-sidebar" title="Analytics">
+                    <i class="gsymbols-round gicon-insights fs-5"></i><span class="link-text">Analytics</span>
+                </a>
+            </div>
+
+            <!-- Bottom Toggle Button -->
+            <div class="text-center p-3 sidebar-toggle-wrapper">
+                <button class="btn btn-outline-light w-100" id="toggleSidebar">
+                    <i class="gsymbols-round gicon-chevron_left" id="toggleIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Page content -->
+        <div id="mainPageContent" class="p-4 flex-grow-1">
+
+            <!-- Header Section -->
+            <div class="container-fluid d-flex justify-content-between">
+                <div class="gap-2">
+                    <button type="button" class="btn btn-darkblue btn-sm">Save Bill</button>
+                    <button type="button" class="btn btn-darkblue2 btn-sm">Generate Bill</button>
+                    <button type="button" class="btn btn-whatsapp btn-sm">Open WhatsApp</button>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <div class="input-group input-group-sm w-50">
+                        <span class="input-group-text bg-darkblue text-light" id="inputGroup-sizing-sm">Bill No.</span>
+                        <input type="text" class="form-control text-center" value="1" disabled>
+                    </div>
+                    <div class="dropdown profileButton">
+                        <button class="btn btn-sm btn-darkblue dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Username
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item dropdown-item-signout" href="/logout">Sign Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-fluid my-3">
+                <div class="row">
+                    <div class="col-lg-2 mb-3">
+                        <label for="customerName" class="form-label small">Customer Name</label>
+                        <input class="form-control form-control-sm bg-transparent" type="text" id="customerName">
+                    </div>
+                    <div class="col-lg-2 mb-3">
+                        <label for="customerNumber" class="form-label small">Contact Number</label>
+                        <input class="form-control form-control-sm bg-transparent" type="text" id="customerNumber">
+                    </div>
+                    <div class="col-lg-2 mb-3">
+                        <label for="billingDate" class="form-label small">Billing Date</label>
+                        <input class="form-control form-control-sm bg-transparent" type="date" id="billingDate">
+                    </div>
+                    <div class="col-lg-2 mb-3">
+                        <label for="billingTime" class="form-label small">Billing Time</label>
+                        <input class="form-control form-control-sm bg-transparent" type="time" id="billingTime">
+                    </div>
+                    <div class="col-lg-2 mb-3">
+                        <label for="modeOfDelivery" class="form-label small">Mode of Delivery</label>
+                        <select class="form-select form-select-sm bg-transparent" id="modeOfDelivery">
+                            <option selected>In-house</option>
+                            <option value="1">Home Delivery</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 mb-3">
+                        <label for="modeOfPayment" class="form-label small">Mode of Payment</label>
+                        <select class="form-select form-select-sm bg-transparent" id="modeOfPayment">
+                            <option selected>Cash</option>
+                            <option value="1">Online</option>
+                            <option value="2">Cheque</option>
+                            <option value="3">Debit</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-12 mb-3" id="addressContainer">
+                        <label for="customerAddress" class="form-label small">Address</label>
+                        <input class="form-control form-control-sm bg-transparent" type="text" id="customerAddress">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-5">
+                        <label for="productName" class="form-label small">Product Name</label>
+                        <input class="form-control form-control-sm bg-transparent" type="text" id="productName">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="productQuantity" class="form-label small">Quantity</label>
+                        <input class="form-control form-control-sm bg-transparent" type="text" id="productQuantity">
+                    </div>
+                    <div class="col-lg-3 d-flex align-items-center">
+                        <button class="btn btn-darkblue w-100 h-100">Add Product</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Section -->
+            <footer class="mt-auto pt-3 border-top text-center small text-muted">
+                <div class="container">
+                    &copy; 2025 Inventurax. All rights reserved. | Version 1.0.0
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Toast -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div id="mainToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
+            aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="mainToastBody">
+                    <!-- Message goes here -->
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script>
+        // Session check
+        fetch('/session-check')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.loggedIn) {
+                    window.location.href = '/';
+                } else {
+                    document.querySelector('.profileButton .dropdown-toggle').textContent = data.username;
+                }
+            })
+            .catch(() => {
+                window.location.href = '/';
+            });
+
+        $(document).ready(function () {
+            // Address Field Toggle based on Mode of Delivery
+            function toggleAddressField() {
+                const deliveryMode = $('#modeOfDelivery').val();
+                if (deliveryMode === '1') { // '1' = Home Delivery
+                    $('#addressContainer').show();
+                } else {
+                    $('#addressContainer').hide();
+                }
+            }
+
+            $('#modeOfDelivery').on('change', toggleAddressField);
+            toggleAddressField();
+
+            // Prefill Date and Time
+
+            const now = new Date();
+
+            const dateStr = now.toISOString().split('T')[0];
+            $('#billingDate').val(dateStr);
+
+            const timeStr = now.toTimeString().slice(0, 5);
+            $('#billingTime').val(timeStr);
+        });
+
+        // Reusable Toast Function
+        function showToast(message, bgColorClass = 'text-bg-primary') {
+            const toastEl = document.getElementById('mainToast');
+            const toastBody = document.getElementById('mainToastBody');
+
+            toastEl.className = `toast align-items-center ${bgColorClass} border-0`;
+            toastBody.textContent = message;
+
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+    </script>
+</body>
+
+</html>
