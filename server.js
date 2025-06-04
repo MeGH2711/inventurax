@@ -224,6 +224,18 @@ app.get('/get-products', async (req, res) => {
     }
 });
 
+// Search Products by Name
+app.get('/search-products', async (req, res) => {
+    const query = req.query.q;
+    try {
+        const products = await Product.find({ name: { $regex: query, $options: 'i' } }).limit(10);
+        res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Update Product
 
 app.put('/update-product/:id', async (req, res) => {

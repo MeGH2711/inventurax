@@ -7,6 +7,10 @@
 
 /* Widths */
 
+.w-10 {
+  width: 10%;
+}
+
 .w-40 {
   width: 40%;
 }
@@ -149,4 +153,9 @@
 .highlightedText {
   padding: 0 1px;
   border-radius: 2px;
+}
+
+#productNameDropdown {
+    position: absolute;
+    z-index: 1050;
 }
