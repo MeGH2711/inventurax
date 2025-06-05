@@ -271,6 +271,43 @@ app.delete('/delete-product/:id', async (req, res) => {
     }
 });
 
+// Bill
+
+const billSchema = new mongoose.Schema({
+    customerName: String,
+    customerNumber: String,
+    billingDate: String,
+    billingTime: String,
+    modeOfDelivery: String,
+    modeOfPayment: String,
+    customerAddress: String,
+    products: [{
+        name: String,
+        quantity: Number,
+        unitPrice: Number,
+        originalTotal: Number,
+        discount: Number,
+        discountedTotal: Number
+    }],
+    overallTotal: Number,
+    overallDiscount: Number,
+    finalTotal: Number,
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Bill = mongoose.model('Bill', billSchema);
+
+app.post('/save-bill', async (req, res) => {
+    try {
+        const newBill = new Bill(req.body);
+        await newBill.save();
+        res.status(200).json({ message: 'Bill saved successfully', billId: newBill._id });
+    } catch (err) {
+        console.error('Error saving bill:', err);
+        res.status(500).json({ message: 'Error saving bill' });
+    }
+});
+
 // Routes
 app.get('/', (req, res) => {
     if (req.session && req.session.user) {
