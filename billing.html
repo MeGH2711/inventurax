@@ -691,9 +691,54 @@
             toast.show();
         }
 
-        document.getElementById('generateBillBtn').addEventListener('click', function () {
+        document.getElementById('generateBillBtn').addEventListener('click', async function () {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+
+            const logo = await fetch('images/billLogo.png')
+                .then(res => res.blob())
+                .then(blob => new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                }));
+
+            doc.addImage(logo, 'PNG', 15, 10, 50, 50);
+
+            doc.setFontSize(25);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(40, 7, 0);
+            doc.text("Vekaria Foods", 195, 20, { align: 'right' });
+            doc.setFontSize(15);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(107, 68, 0);
+            doc.text("De Baker's & More", 195, 27, { align: 'right' });
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.text('GF-30, Shaligram Square,', 195, 37, { align: 'right' });
+            doc.text('Nr. Satyamev Vista,', 195, 43, { align: 'right' });
+            doc.text('Gota, Ahmedabad - 382481', 195, 49, { align: 'right' });
+            const rightX = 195;
+
+            doc.setFont(undefined, 'bold');
+            const boldWidth = doc.getTextWidth('Phone: ');
+
+            doc.setFont(undefined, 'normal');
+            const number = '+91 9876543210';
+            const numberWidth = doc.getTextWidth(number);
+
+            const totalWidth = boldWidth + numberWidth;
+
+            const startX = rightX - totalWidth;
+
+            doc.setFont(undefined, 'bold');
+            doc.text('Phone: ', startX, 56);
+
+            doc.setFont(undefined, 'normal');
+            doc.text(number, startX + boldWidth, 56);
+
+            let y = 70;
 
             const billNumber = document.getElementById('billNumber').value;
             const customerName = document.getElementById('customerName').value;
@@ -707,7 +752,6 @@
             const overallDiscount = document.getElementById('overallDiscountInput').value;
             const finalTotal = document.getElementById('finalTotalInput').value;
 
-            let y = 10;
             doc.setFontSize(14);
             doc.text(`Bill No: ${billNumber}`, 10, y); y += 7;
             doc.text(`Customer Name: ${customerName}`, 10, y); y += 7;
