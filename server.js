@@ -274,6 +274,7 @@ app.delete('/delete-product/:id', async (req, res) => {
 // Bill
 
 const billSchema = new mongoose.Schema({
+    billNumber: { type: Number, required: true, unique: true },
     customerName: String,
     customerNumber: String,
     billingDate: String,
@@ -299,12 +300,30 @@ const Bill = mongoose.model('Bill', billSchema);
 
 app.post('/save-bill', async (req, res) => {
     try {
-        const newBill = new Bill(req.body);
+        const latestBill = await Bill.findOne().sort({ billNumber: -1 });
+        const nextBillNumber = latestBill ? latestBill.billNumber + 1 : 1;
+
+        const newBill = new Bill({
+            ...req.body,
+            billNumber: nextBillNumber
+        });
+
         await newBill.save();
-        res.status(200).json({ message: 'Bill saved successfully', billId: newBill._id });
+        res.status(200).json({ message: 'Bill saved successfully', billNumber: nextBillNumber });
     } catch (err) {
         console.error('Error saving bill:', err);
         res.status(500).json({ message: 'Error saving bill' });
+    }
+});
+
+app.get('/next-bill-number', async (req, res) => {
+    try {
+        const latestBill = await Bill.findOne().sort({ billNumber: -1 });
+        const nextBillNumber = latestBill ? latestBill.billNumber + 1 : 1;
+        res.json({ nextBillNumber });
+    } catch (err) {
+        console.error('Error fetching bill number:', err);
+        res.status(500).json({ message: 'Error fetching bill number' });
     }
 });
 

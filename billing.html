@@ -50,14 +50,14 @@
             <!-- Header Section -->
             <div class="container-fluid d-flex justify-content-between">
                 <div class="gap-2">
-                    <button type="button" class="btn btn-darkblue btn-sm">Save Bill</button>
-                    <button type="button" class="btn btn-darkblue2 btn-sm">Generate Bill</button>
-                    <button type="button" class="btn btn-whatsapp btn-sm">Open WhatsApp</button>
+                    <button type="button" class="btn btn-darkblue btn-sm" id="saveBillBtn">Save Bill</button>
+                    <button type="button" class="btn btn-darkblue2 btn-sm" id="generateBillBtn">Generate Bill</button>
+                    <button type="button" class="btn btn-whatsapp btn-sm" id="whatsappBtn">Open WhatsApp</button>
                 </div>
                 <div class="d-flex justify-content-end gap-2">
                     <div class="input-group input-group-sm w-50">
                         <span class="input-group-text bg-darkblue text-light" id="inputGroup-sizing-sm">Bill No.</span>
-                        <input type="text" class="form-control text-center" value="1" disabled>
+                        <input type="text" class="form-control text-center" id="billNumber" disabled>
                     </div>
                     <div class="dropdown profileButton">
                         <button class="btn btn-sm btn-darkblue dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -92,8 +92,8 @@
                     <div class="col-lg-2 mb-3">
                         <label for="modeOfDelivery" class="form-label small">Mode of Delivery</label>
                         <select class="form-select form-select-sm bg-transparent" id="modeOfDelivery">
-                            <option selected>In-house</option>
-                            <option value="1">Home Delivery</option>
+                            <option value="In-house" selected>In-house</option>
+                            <option value="Home Delivery">Home Delivery</option>
                         </select>
                     </div>
                     <div class="col-lg-2 mb-3">
@@ -122,7 +122,7 @@
                             id="productQuantity">
                     </div>
                     <div class="col-lg-3 d-flex align-items-center">
-                        <button class="btn btn-darkblue w-100 h-100">Add Product</button>
+                        <button class="btn btn-darkblue w-100 h-100" id="addProductBtn">Add Product</button>
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -245,6 +245,7 @@
 
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
     <script src="js/sidebar.js"></script>
     <script>
         // Session check
@@ -262,10 +263,37 @@
             });
 
         $(document).ready(function () {
+
+            fetch('/next-bill-number')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.nextBillNumber) {
+                        $('#billNumber').val(data.nextBillNumber);
+                    }
+                })
+                .catch(() => {
+                    showToast('Failed to fetch bill number', 'text-bg-danger');
+                });
+
+            $('.btn-whatsapp').on('click', function () {
+                const number = $('#customerNumber').val().trim();
+
+                // Validate number: only 10 digits
+                if (!/^\d{10}$/.test(number)) {
+                    showToast('Please enter a valid 10-digit Contact Number', 'text-bg-danger');
+                    return;
+                }
+
+                const fullNumber = '91' + number; // Assuming Indian country code
+                const whatsappURL = `https://wa.me/${fullNumber}`;
+
+                window.open(whatsappURL, '_blank');
+            });
+
             // Address Field Toggle based on Mode of Delivery
             function toggleAddressField() {
                 const deliveryMode = $('#modeOfDelivery').val();
-                if (deliveryMode === '1') { // '1' = Home Delivery
+                if (deliveryMode === 'Home Delivery') {
                     $('#addressContainer').show();
                 } else {
                     $('#addressContainer').hide();
@@ -339,7 +367,7 @@
 
             let pendingProduct = null;
 
-            $('.btn:contains("Add Product")').on('click', function () {
+            $('#addProductBtn').on('click', function () {
                 const productName = $('#productName').val().trim();
                 const quantity = parseFloat($('#productQuantity').val().trim());
 
@@ -533,12 +561,29 @@
                 updateGrandTotal();
             });
 
-            $('.btn:contains("Save Bill")').on('click', function () {
+            $('#saveBillBtn').on('click', function () {
                 const hasProducts = $('#productTable tbody tr').not('#noProductRow').length > 0;
 
                 if (!hasProducts) {
                     showToast('Please enter items into cart', 'text-bg-danger');
                     return;
+                }
+
+                const modeOfDelivery = $('#modeOfDelivery').val();
+                const customerName = $('#customerName').val().trim();
+                const customerNumber = $('#customerNumber').val().trim();
+                const customerAddress = $('#customerAddress').val().trim();
+
+                if (modeOfDelivery === 'Home Delivery') {
+                    if (!customerName || !customerNumber || !customerAddress) {
+                        showToast('Please fill Customer Name, Contact Number, and Address for Home Delivery', 'text-bg-danger');
+                        return;
+                    }
+
+                    if (!/^\d{10}$/.test(customerNumber)) {
+                        showToast('Contact Number must be exactly 10 digits', 'text-bg-danger');
+                        return;
+                    }
                 }
 
                 new bootstrap.Modal(document.getElementById('saveConfirmModal')).show();
@@ -561,14 +606,27 @@
                     }
                 });
 
+                const modeOfDelivery = $('#modeOfDelivery').val();
+                const customerName = $('#customerName').val().trim();
+                const customerNumber = $('#customerNumber').val().trim();
+                const customerAddress = $('#customerAddress').val().trim();
+
+                if (modeOfDelivery === 'Home Delivery') {
+                    if (!customerName || !customerNumber || !customerAddress) {
+                        showToast('Please fill Customer Name, Contact Number, and Address for Home Delivery', 'text-bg-danger');
+                        return;
+                    }
+                }
+
                 const billData = {
+                    billNumber: parseInt($('#billNumber').val()),
                     customerName: $('#customerName').val().trim() || "Unknown",
                     customerNumber: $('#customerNumber').val().trim() || "0000000000",
                     billingDate: $('#billingDate').val(),
                     billingTime: $('#billingTime').val(),
                     modeOfDelivery: $('#modeOfDelivery').val(),
                     modeOfPayment: $('#modeOfPayment').val(),
-                    customerAddress: $('#customerAddress').val().trim(),
+                    customerAddress: $('#customerAddress').val().trim() || "Unknown",
                     products: products,
                     overallTotal: parseFloat($('#grandTotalCell').text()),
                     overallDiscount: parseFloat($('#overallDiscountInput').val()) || 0,
@@ -596,11 +654,27 @@
 
                         $('#productName').val('');
                         $('#productQuantity').val(1);
+
+                        if (response.billNumber) {
+                            $('#billNumber').val(response.billNumber + 1);
+                        } else {
+                            fetch('/next-bill-number')
+                                .then(res => res.json())
+                                .then(data => $('#billNumber').val(data.nextBillNumber));
+                        }
                     },
                     error: function () {
                         showToast('Failed to save bill', 'text-bg-danger');
                     }
                 });
+            });
+
+            $('#customerNumber').on('input', function () {
+                this.value = this.value.replace(/\D/g, ''); // Remove non-digits
+
+                if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10); // Limit to 10 digits
+                }
             });
 
         });
@@ -616,6 +690,62 @@
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
         }
+
+        document.getElementById('generateBillBtn').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const billNumber = document.getElementById('billNumber').value;
+            const customerName = document.getElementById('customerName').value;
+            const customerNumber = document.getElementById('customerNumber').value;
+            const billingDate = document.getElementById('billingDate').value;
+            const billingTime = document.getElementById('billingTime').value;
+            const modeOfDelivery = document.getElementById('modeOfDelivery').value;
+            const modeOfPayment = document.getElementById('modeOfPayment').value;
+            const customerAddress = document.getElementById('customerAddress').value;
+            const overallTotal = document.getElementById('grandTotalCell').textContent;
+            const overallDiscount = document.getElementById('overallDiscountInput').value;
+            const finalTotal = document.getElementById('finalTotalInput').value;
+
+            let y = 10;
+            doc.setFontSize(14);
+            doc.text(`Bill No: ${billNumber}`, 10, y); y += 7;
+            doc.text(`Customer Name: ${customerName}`, 10, y); y += 7;
+            doc.text(`Contact Number: ${customerNumber}`, 10, y); y += 7;
+            doc.text(`Address: ${customerAddress}`, 10, y); y += 7;
+            doc.text(`Billing Date: ${billingDate} ${billingTime}`, 10, y); y += 7;
+            doc.text(`Mode of Delivery: ${modeOfDelivery}`, 10, y); y += 7;
+            doc.text(`Mode of Payment: ${modeOfPayment}`, 10, y); y += 10;
+
+            doc.setFontSize(12);
+            doc.text("Products:", 10, y); y += 6;
+            doc.setFontSize(10);
+            doc.text("Name         Qty   Price   Disc%   Total", 10, y); y += 5;
+
+            const rows = document.querySelectorAll("#productTable tbody tr:not(#noProductRow)");
+            rows.forEach(row => {
+                const name = row.children[0].textContent.trim();
+                const qty = row.querySelector('.quantity-input').value;
+                const price = row.querySelector('.unit-price').textContent.trim();
+                const disc = row.querySelector('.discount-input').value;
+                const total = row.querySelector('.discounted-total-input').value;
+
+                const rowText = `${name.padEnd(12)} ${qty.padStart(3)}  ${price.padStart(6)}  ${disc.padStart(5)}%  ${total.padStart(6)}`;
+                doc.text(rowText, 10, y); y += 5;
+            });
+
+            y += 5;
+            doc.setFontSize(12);
+            doc.text(`Overall Total: ₹${overallTotal}`, 10, y); y += 6;
+            doc.text(`Overall Discount: ${overallDiscount}%`, 10, y); y += 6;
+            doc.text(`Final Total: ₹${finalTotal}`, 10, y); y += 10;
+
+            // doc.save(`Bill_${billNumber}.pdf`); // This downloads the PDF
+
+            doc.output('bloburl'); // This opens a blob URL in new tab
+            window.open(doc.output('bloburl'), '_blank');
+
+        });
 
     </script>
 </body>
