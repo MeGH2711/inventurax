@@ -242,7 +242,7 @@
             </div>
         </div>
     </div>
-
+    <iframe id="pdfFrame" style="width:100%; height:600px; border:1px solid #ccc;"></iframe>
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/jspdf.umd.min.js"></script>
@@ -380,7 +380,7 @@
                 $.get(`/search-products?q=${encodeURIComponent(productName)}`, function (products) {
                     const product = products.find(p => p.name.toLowerCase() === productName.toLowerCase());
                     if (!product) {
-                        showToast('Product not found', 'text-bg-warning');
+                        showToast('Product not found', 'text-bg-danger');
                         return;
                     }
 
@@ -695,6 +695,50 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
+            const iconSize = 6;
+            const iconY = 5;
+            const textYOffset = 4;
+            const spacing = 4;
+            const columnGap = 50;
+
+            // Fetch YouTube icon
+            const youtubeIcon = await fetch('images/youtubeLogo.png')
+                .then(res => res.blob())
+                .then(blob => new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                }));
+
+            // Fetch Instagram Icon
+            const instaIcon = await fetch('images/instaLogo.png')
+                .then(res => res.blob())
+                .then(blob => new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                }));
+
+            // YouTube Block
+            const ytX = 45;
+            doc.addImage(youtubeIcon, 'PNG', ytX, iconY, iconSize, iconSize);
+            doc.link(ytX, iconY, iconSize, iconSize, { url: 'https://www.youtube.com/@VimalDeBakers/' });
+
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.textWithLink('youtube.com/@VimalDeBakers', ytX + iconSize + spacing, iconY + textYOffset, {
+                url: 'https://www.youtube.com/@VimalDeBakers/'
+            });
+
+            // Instagram Block
+            const igX = ytX + iconSize + spacing + doc.getTextWidth('YouTube') + columnGap;
+            doc.addImage(instaIcon, 'PNG', igX, iconY, iconSize, iconSize);
+            doc.link(igX, iconY, iconSize, iconSize, { url: 'https://www.instagram.com/de.bakers.and.more/' });
+
+            doc.textWithLink('@de.bakers.and.more', igX + iconSize + spacing, iconY + textYOffset, {
+                url: 'https://www.instagram.com/de.bakers.and.more/'
+            });
+
             const logo = await fetch('images/billLogo.png')
                 .then(res => res.blob())
                 .then(blob => new Promise(resolve => {
@@ -703,22 +747,22 @@
                     reader.readAsDataURL(blob);
                 }));
 
-            doc.addImage(logo, 'PNG', 15, 10, 50, 50);
+            doc.addImage(logo, 'PNG', 15, 15, 50, 50);
 
             doc.setFontSize(25);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(40, 7, 0);
-            doc.text("Vekaria Foods", 195, 20, { align: 'right' });
+            doc.text("Vekaria Foods", 195, 25, { align: 'right' });
             doc.setFontSize(15);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(107, 68, 0);
-            doc.text("De Baker's & More", 195, 27, { align: 'right' });
+            doc.text("De Baker's & More", 195, 32, { align: 'right' });
             doc.setFontSize(12);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(0, 0, 0);
-            doc.text('GF-30, Shaligram Square,', 195, 37, { align: 'right' });
-            doc.text('Nr. Satyamev Vista,', 195, 43, { align: 'right' });
-            doc.text('Gota, Ahmedabad - 382481', 195, 49, { align: 'right' });
+            doc.text('GF-30, Shaligram Square,', 195, 42, { align: 'right' });
+            doc.text('Nr. Satyamev Vista,', 195, 48, { align: 'right' });
+            doc.text('Gota, Ahmedabad - 382481', 195, 54, { align: 'right' });
             const rightX = 195;
 
             doc.setFont(undefined, 'bold');
@@ -733,18 +777,28 @@
             const startX = rightX - totalWidth;
 
             doc.setFont(undefined, 'bold');
-            doc.text('Phone: ', startX, 56);
+            doc.text('Phone: ', startX, 61);
 
             doc.setFont(undefined, 'normal');
-            doc.text(number, startX + boldWidth, 56);
+            doc.text(number, startX + boldWidth, 61);
 
-            let y = 70;
+            let y = 75;
 
             const billNumber = document.getElementById('billNumber').value;
             const customerName = document.getElementById('customerName').value;
             const customerNumber = document.getElementById('customerNumber').value;
-            const billingDate = document.getElementById('billingDate').value;
-            const billingTime = document.getElementById('billingTime').value;
+            const billingDateRaw = document.getElementById('billingDate').value;
+            const billingDate = new Date(billingDateRaw).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }).replace(/ /g, '/');
+            const billingTimeRaw = document.getElementById('billingTime').value;
+            const [hourStr, minute] = billingTimeRaw.split(':');
+            const hour = parseInt(hourStr, 10);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12;
+            const billingTime = `${hour12}:${minute} ${period}`;
             const modeOfDelivery = document.getElementById('modeOfDelivery').value;
             const modeOfPayment = document.getElementById('modeOfPayment').value;
             const customerAddress = document.getElementById('customerAddress').value;
@@ -752,14 +806,70 @@
             const overallDiscount = document.getElementById('overallDiscountInput').value;
             const finalTotal = document.getElementById('finalTotalInput').value;
 
-            doc.setFontSize(14);
-            doc.text(`Bill No: ${billNumber}`, 10, y); y += 7;
-            doc.text(`Customer Name: ${customerName}`, 10, y); y += 7;
-            doc.text(`Contact Number: ${customerNumber}`, 10, y); y += 7;
-            doc.text(`Address: ${customerAddress}`, 10, y); y += 7;
-            doc.text(`Billing Date: ${billingDate} ${billingTime}`, 10, y); y += 7;
-            doc.text(`Mode of Delivery: ${modeOfDelivery}`, 10, y); y += 7;
-            doc.text(`Mode of Payment: ${modeOfPayment}`, 10, y); y += 10;
+            doc.setFontSize(11);
+
+            const boxX = 10;
+            const boxWidth = 190;
+            const contentStartY = y;
+
+            y += 4;
+
+            doc.setFont(undefined, 'bold');
+            doc.text('Customer Name:', boxX + 4, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(customerName || 'N/A', boxX + 37, y);
+
+            doc.setFont(undefined, 'bold');
+            doc.text('Contact Number:', 110, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(customerNumber || 'N/A', 143, y);
+
+            y += 9;
+
+            doc.setFont(undefined, 'bold');
+            doc.text(`Address:`, boxX + 4, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(customerAddress || 'N/A', boxX + 23, y);
+
+            y += 9;
+
+            doc.setFont(undefined, 'bold');
+            doc.text(`Bill No:`, boxX + 4, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(billNumber || 'N/A', boxX + 20, y);
+
+            doc.setFont(undefined, 'bold');
+            doc.text('Payment Mode:', 110, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(modeOfPayment || 'N/A', 140, y);
+
+            y += 9;
+
+            doc.setFont(undefined, 'bold');
+            doc.text('Delivery Mode:', boxX + 4, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(modeOfDelivery || 'N/A', boxX + 34, y);
+
+            doc.setFont(undefined, 'bold');
+            doc.text('Billing Date:', 110, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(billingDate || 'N/A', 135, y);
+
+            y += 9;
+
+            doc.setFont(undefined, 'bold');
+            doc.text('Billing Date:', boxX + 4, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(billingTime || 'N/A', boxX + 28, y);
+
+            y += 9;
+
+            const boxHeight = y - contentStartY;
+
+            doc.setDrawColor(0);
+            doc.rect(boxX, contentStartY - 6, boxWidth, boxHeight + 4);
+
+            y += 9;
 
             doc.setFontSize(12);
             doc.text("Products:", 10, y); y += 6;
@@ -786,8 +896,8 @@
 
             // doc.save(`Bill_${billNumber}.pdf`); // This downloads the PDF
 
-            doc.output('bloburl'); // This opens a blob URL in new tab
-            window.open(doc.output('bloburl'), '_blank');
+            const pdfBlobUrl = doc.output('bloburl');
+            document.getElementById('pdfFrame').src = pdfBlobUrl;
 
         });
 
