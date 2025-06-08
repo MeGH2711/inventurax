@@ -147,6 +147,7 @@
   border-top: 0;
 }
 
+#productTable tbody tr:last-child,
 #productTable tfoot tr:last-child {
   border-bottom: 0;
 }
