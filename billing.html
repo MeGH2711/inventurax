@@ -720,7 +720,7 @@
             const iconY = 5;
             const textYOffset = 4;
             const spacing = 4;
-            const columnGap = 50;
+            const columnGap = 113;
 
             // Fetch YouTube icon
             const youtubeIcon = await fetch('images/youtubeLogo.png')
@@ -741,13 +741,13 @@
                 }));
 
             // YouTube Block
-            const ytX = 45;
+            const ytX = 14;
             doc.addImage(youtubeIcon, 'PNG', ytX, iconY, iconSize, iconSize);
             doc.link(ytX, iconY, iconSize, iconSize, { url: 'https://www.youtube.com/@VimalDeBakers/' });
 
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
-            doc.textWithLink('youtube.com/@VimalDeBakers', ytX + iconSize + spacing, iconY + textYOffset, {
+            doc.textWithLink('@VimalDeBakers', ytX + iconSize + spacing, iconY + textYOffset, {
                 url: 'https://www.youtube.com/@VimalDeBakers/'
             });
 
@@ -833,7 +833,7 @@
             const boxWidth = 190;
             const contentStartY = y;
 
-            y += 4;
+            y += 2;
 
             doc.setFont(undefined, 'bold');
             doc.text('Customer Name:', boxX + 4, y);
@@ -883,7 +883,7 @@
             doc.setFont(undefined, 'normal');
             doc.text(billingTime || 'N/A', boxX + 28, y);
 
-            y += 9;
+            y += 7;
 
             const boxHeight = y - contentStartY;
 
@@ -896,13 +896,14 @@
             const productRows = [];
 
             document.querySelectorAll("#productTable tbody tr:not(#noProductRow)").forEach(row => {
-                const name = row.querySelector('.product-name').textContent.trim();
-                const qty = row.querySelector('.quantity-input').value;
-                const price = row.querySelector('.unit-price').textContent.trim();
-                const disc = row.querySelector('.discount-input').value;
-                const total = row.querySelector('.discounted-total-input').value;
+                const productName = row.querySelector('.product-name').textContent.trim();
+                const productQuantity = row.querySelector('.quantity-input').value;
+                const productPrice = row.querySelector('.unit-price').textContent.trim();
+                const originalTotal = row.querySelector('.original-total').textContent.trim();
+                const productDiscount = row.querySelector('.discount-input').value;
+                const productTotal = row.querySelector('.discounted-total-input').value;
 
-                productRows.push([name, price, qty, disc + '%', total]);
+                productRows.push([productName, productQuantity, productPrice, originalTotal, productDiscount + '%', productTotal]);
             });
 
             // Draw the table
@@ -910,25 +911,26 @@
                 startY: y,
                 head: [
                     [
-                        'Product',
-                        'Price (Rs.)',
+                        'Product Name',
                         'Quantity',
+                        'Price (per unit)',
+                        'Total',
                         'Discount (%)',
-                        'Total (Rs.)'
+                        'Discounted Total',
                     ]
                 ],
                 body: productRows,
                 foot: [
                     [
-                        { content: 'Overall Total:', colSpan: 4 },
+                        { content: 'Overall Total:', colSpan: 5 },
                         { content: "Rs. " + overallTotal }
                     ],
                     [
-                        { content: 'Overall Discount:', colSpan: 4 },
+                        { content: 'Overall Discount:', colSpan: 5 },
                         { content: overallDiscount + "%" }
                     ],
                     [
-                        { content: 'Final Total:', colSpan: 4 },
+                        { content: 'Final Total:', colSpan: 5 },
                         { content: "Rs. " + finalTotal }
                     ]
                 ],
