@@ -132,6 +132,39 @@
   font-weight: 600 !important;
 }
 
+/* Rounded Table Corner */
+
+#productTableCard {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#productTable {
+  margin-bottom: 0 !important;
+}
+
+#productTable thead tr:first-child {
+  border-top: 0;
+}
+
+#productTable tfoot tr:last-child {
+  border-bottom: 0;
+}
+
+#productTable thead tr:first-child th:first-child,
+#productTable tbody tr td:first-child,
+#productTable tfoot tr td:first-child,
+#productTable tfoot tr:last-child td:first-child {
+  border-left: 0;
+}
+
+#productTable thead tr:first-child th:last-child,
+#productTable tbody tr td:last-child,
+#productTable tfoot tr td:last-child,
+#productTable tfoot tr:last-child td:last-child {
+  border-right: 0;
+}
+
 /* Modal */
 
 .modal-faded {
@@ -156,6 +189,6 @@
 }
 
 #productNameDropdown {
-    position: absolute;
-    z-index: 1050;
+  position: absolute;
+  z-index: 1050;
 }
