@@ -645,10 +645,22 @@
 
                         showToast('Bill saved successfully!', 'text-bg-success');
 
+                        // Remove Existing Items from Cart
                         $('#productTable tbody tr').not('#noProductRow').remove();
 
+                        // Show no Product Row
                         $('#noProductRow').show();
 
+                        // Reset Values
+                        $('#customerName').val('');
+                        $('#customerNumber').val('');
+                        const now = new Date();
+                        const dateStr = now.toISOString().split('T')[0];
+                        $('#billingDate').val(dateStr);
+                        const timeStr = now.toTimeString().slice(0, 5);
+                        $('#billingTime').val(timeStr);
+                        $('#modeOfDelivery').val("In-house");
+                        $('#modeOfPayment').val("Cash");
                         $('#grandTotalCell').text('0.00');
                         $('#overallDiscountInput').val(0);
                         $('#finalTotalInput').val('0.00');
