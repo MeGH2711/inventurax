@@ -111,21 +111,21 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-5 position-relative">
+                    <div class="col-lg-5 mb-3 position-relative">
                         <label for="productName" class="form-label small">Product Name</label>
                         <input class="form-control form-control-sm bg-transparent" type="text" id="productName"
                             autocomplete="off">
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 mb-3">
                         <label for="productQuantity" class="form-label small">Quantity</label>
                         <input class="form-control form-control-sm bg-transparent" type="number" min="1" value="1"
                             id="productQuantity">
                     </div>
-                    <div class="col-lg-3 d-flex align-items-center">
+                    <div class="col-lg-3 mb-3 d-flex align-items-center">
                         <button class="btn btn-darkblue w-100 h-100" id="addProductBtn">Add Product</button>
                     </div>
                 </div>
-                <div class="row mt-4">
+                <div class="row mt-3">
                     <div class="col-12">
                         <div class="card border-1">
                             <table class="table table-sm table-bordered align-middle text-center" id="productTable">
@@ -242,10 +242,11 @@
             </div>
         </div>
     </div>
-    <iframe id="pdfFrame" style="width:100%; height:600px; border:1px solid #ccc;"></iframe>
+
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf.plugin.autotable.min.js"></script>
     <script src="js/sidebar.js"></script>
     <script>
         // Session check
@@ -426,7 +427,7 @@
 
                 const row = `
                     <tr>
-                        <td>${name}</td>
+                        <td class="product-name">${name}</td>
                         <td>
                             <input type="number" class="form-control form-control-sm quantity-input text-center" min="1" value="${quantity}">
                         </td>
@@ -692,6 +693,14 @@
         }
 
         document.getElementById('generateBillBtn').addEventListener('click', async function () {
+
+            const hasProducts = $('#productTable tbody tr').not('#noProductRow').length > 0;
+
+            if (!hasProducts) {
+                showToast('Please enter items into cart', 'text-bg-danger');
+                return;
+            }
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
@@ -869,35 +878,94 @@
             doc.setDrawColor(0);
             doc.rect(boxX, contentStartY - 6, boxWidth, boxHeight + 4);
 
-            y += 9;
+            y += 3;
 
-            doc.setFontSize(12);
-            doc.text("Products:", 10, y); y += 6;
-            doc.setFontSize(10);
-            doc.text("Name         Qty   Price   Disc%   Total", 10, y); y += 5;
+            // Collect product data
+            const productRows = [];
 
-            const rows = document.querySelectorAll("#productTable tbody tr:not(#noProductRow)");
-            rows.forEach(row => {
-                const name = row.children[0].textContent.trim();
+            document.querySelectorAll("#productTable tbody tr:not(#noProductRow)").forEach(row => {
+                const name = row.querySelector('.product-name').textContent.trim();
                 const qty = row.querySelector('.quantity-input').value;
                 const price = row.querySelector('.unit-price').textContent.trim();
                 const disc = row.querySelector('.discount-input').value;
                 const total = row.querySelector('.discounted-total-input').value;
 
-                const rowText = `${name.padEnd(12)} ${qty.padStart(3)}  ${price.padStart(6)}  ${disc.padStart(5)}%  ${total.padStart(6)}`;
-                doc.text(rowText, 10, y); y += 5;
+                productRows.push([name, price, qty, disc + '%', total]);
             });
 
-            y += 5;
-            doc.setFontSize(12);
-            doc.text(`Overall Total: ₹${overallTotal}`, 10, y); y += 6;
-            doc.text(`Overall Discount: ${overallDiscount}%`, 10, y); y += 6;
-            doc.text(`Final Total: ₹${finalTotal}`, 10, y); y += 10;
+            // Draw the table
+            doc.autoTable({
+                startY: y,
+                head: [
+                    [
+                        'Product',
+                        'Price (Rs.)',
+                        'Quantity',
+                        'Discount (%)',
+                        'Total (Rs.)'
+                    ]
+                ],
+                body: productRows,
+                foot: [
+                    [
+                        { content: 'Overall Total:', colSpan: 4 },
+                        { content: "Rs. " + overallTotal }
+                    ],
+                    [
+                        { content: 'Overall Discount:', colSpan: 4 },
+                        { content: overallDiscount + "%" }
+                    ],
+                    [
+                        { content: 'Final Total:', colSpan: 4 },
+                        { content: "Rs. " + finalTotal }
+                    ]
+                ],
+                styles: {
+                    fontSize: 10,
+                    lineColor: [0, 0, 0],
+                    lineWidth: 0.1,
+                    textColor: "#000000",
+                },
+                headStyles: {
+                    fillColor: [240, 240, 240],
+                    textColor: "#412100",
+                },
+                footStyles: {
+                    fillColor: [240, 240, 240],
+                    textColor: "#412100",
+                },
+                theme: 'grid',
+                margin: { left: 10, right: 10 }
+            });
 
-            // doc.save(`Bill_${billNumber}.pdf`); // This downloads the PDF
+            const pad = n => n.toString().padStart(2, '0');
+            const billingDateObj = new Date(billingDateRaw);
+            const day = pad(billingDateObj.getDate());
+            const month = pad(billingDateObj.getMonth() + 1);
+            const year = billingDateObj.getFullYear();
 
-            const pdfBlobUrl = doc.output('bloburl');
-            document.getElementById('pdfFrame').src = pdfBlobUrl;
+            const hourPadded = pad(hour);
+            const minutePadded = pad(minute);
+
+            const formattedDateTime = `${day}${month}${year}${hourPadded}${minutePadded}`;
+
+            const filenameParts = [
+                billNumber || '00',
+                (customerName || 'Unknown').replace(/\s+/g, '_'),
+                formattedDateTime
+            ];
+            const suggestedName = filenameParts.join('_') + '.pdf';
+
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName,
+                types: [{
+                    description: 'PDF Files',
+                    accept: { 'application/pdf': ['.pdf'] },
+                }],
+            });
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(doc.output('blob'));
+            await writableStream.close();
 
         });
 
