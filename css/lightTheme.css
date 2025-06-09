@@ -3,6 +3,7 @@
   --main-bg: #0A2F4F;
   --white: #ffffff;
   --danger-color: #ff0000;
+  --table-alternate-row: #e5f2ff;
 }
 
 body {
@@ -143,6 +144,10 @@ body {
 table thead tr th,
 table tbody tr td {
   background-color: transparent !important;
+}
+
+.productListingTable tbody tr:nth-of-type(even) td {
+  background-color: var(--table-alternate-row) !important;
 }
 
 /* Form Control & Form Select */
