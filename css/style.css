@@ -189,6 +189,13 @@
   border-radius: 2px;
 }
 
+.highlightedTextDropdown {
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
+/* Autofill Dropdowns */
+
 #productNameDropdown {
   position: absolute;
   z-index: 1050;

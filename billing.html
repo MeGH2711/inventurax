@@ -75,7 +75,7 @@
                 <div class="row">
                     <div class="col-lg-2 mb-3">
                         <label for="customerName" class="form-label small">Customer Name</label>
-                        <input class="form-control form-control-sm bg-transparent" type="text" id="customerName">
+                        <input id="customerName" type="text" class="form-control form-control-sm bg-transparent">
                     </div>
                     <div class="col-lg-2 mb-3">
                         <label for="customerNumber" class="form-label small">Contact Number</label>
@@ -156,8 +156,8 @@
                                         </td>
                                         <td class="text-center bg-transparent">
                                             <input type="number" id="overallDiscountInput"
-                                                class="form-control form-control-sm text-center fw-bold bg-transparent" min="0"
-                                                max="100" value="0">
+                                                class="form-control form-control-sm text-center fw-bold bg-transparent"
+                                                min="0" max="100" value="0">
                                         </td>
                                         <td class="bg-transparent"></td>
                                     </tr>
@@ -166,8 +166,8 @@
                                             Discount)</td>
                                         <td class="text-center bg-transparent">
                                             <input type="number" id="finalTotalInput"
-                                                class="form-control form-control-sm text-center fw-bold bg-transparent" min="0"
-                                                step="0.01" value="0.00">
+                                                class="form-control form-control-sm text-center fw-bold bg-transparent"
+                                                min="0" step="0.01" value="0.00">
                                         </td>
                                         <td class="bg-transparent"></td>
                                     </tr>
@@ -338,7 +338,16 @@
                     }
 
                     data.forEach(product => {
-                        const item = $(`<button class="dropdown-item" type="button">${product.name}</button>`);
+
+                        nameFilter = document.getElementById("productName").value;
+
+                        const highlightMatch = (text, searchTerm) => {
+                            if (!searchTerm) return text;
+                            const regex = new RegExp(`(${searchTerm})`, 'gi');
+                            return text.replace(regex, '<span class="highlightedTextDropdown">$1</span>');
+                        };
+
+                        const item = $(`<button class="dropdown-item" type="button">${highlightMatch(product.name, nameFilter)}</button>`);
                         item.on('click', function () {
                             $('#productName').val(product.name);
                             dropdown.remove();
@@ -656,6 +665,7 @@
                         // Reset Values
                         $('#customerName').val('');
                         $('#customerNumber').val('');
+                        $('#customerAddress').val('');
                         const now = new Date();
                         const dateStr = now.toISOString().split('T')[0];
                         $('#billingDate').val(dateStr);
@@ -685,12 +695,80 @@
             });
 
             $('#customerNumber').on('input', function () {
-                this.value = this.value.replace(/\D/g, ''); // Remove non-digits
+                this.value = this.value.replace(/\D/g, '');
 
                 if (this.value.length > 10) {
-                    this.value = this.value.slice(0, 10); // Limit to 10 digits
+                    this.value = this.value.slice(0, 10);
                 }
             });
+
+            function setupCustomerAutocomplete(inputId, isNameInput) {
+                $(`#${inputId}`).on('input', function () {
+                    const query = $(this).val().trim();
+                    if (query.length < 1) {
+                        $(`#${inputId}Dropdown`).remove();
+                        return;
+                    }
+
+                    $.get(`/search-customers?q=${encodeURIComponent(query)}`, function (data) {
+                        let dropdown = $(`#${inputId}Dropdown`);
+                        if (dropdown.length === 0) {
+                            dropdown = $('<div>', {
+                                id: `${inputId}Dropdown`,
+                                class: 'dropdown-menu dropdown-menu-sm py-1 show',
+                                css: {
+                                    position: 'absolute',
+                                    top: $(`#${inputId}`).position().top + $(`#${inputId}`).outerHeight(),
+                                    left: $(`#${inputId}`).position().left,
+                                    width: $(`#${inputId}`).outerWidth(),
+                                    zIndex: 9999
+                                }
+                            });
+                            $(`#${inputId}`).after(dropdown);
+                        }
+
+                        dropdown.empty();
+
+                        if (data.length === 0) {
+                            dropdown.append('<span class="dropdown-item text-muted">No results</span>');
+                            return;
+                        }
+
+                        data.forEach(item => {
+
+                            const highlightMatch = (text, searchTerm) => {
+                                if (!searchTerm) return text;
+                                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                                return text.replace(regex, '<span class="highlightedTextDropdown">$1</span>');
+                            };
+
+                            const labelRaw = isNameInput ? item.name : item.number;
+                            const labelHighlighted = highlightMatch(labelRaw, query);
+                            const btn = $(`<button class="dropdown-item" type="button">${labelHighlighted}</button>`);
+
+                            btn.on('click', () => {
+                                $('#customerName').val(item.name);
+                                $('#customerNumber').val(item.number);
+                                $('#customerAddress').val(item.address || '');
+                                dropdown.remove();
+                            });
+                            dropdown.append(btn);
+                        });
+                    });
+                });
+
+                // Remove dropdown if clicked outside
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest(`#${inputId}`).length) {
+                        $(`#${inputId}Dropdown`).remove();
+                    }
+                });
+            }
+
+            // Call for both inputs
+            setupCustomerAutocomplete('customerName', true);  // name input
+            setupCustomerAutocomplete('customerNumber', false); // number input
+
 
         });
 

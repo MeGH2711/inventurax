@@ -2,6 +2,7 @@
   --main-page-bg: #f8f9fa;
   --main-bg: #0A2F4F;
   --white: #ffffff;
+  --black: #000000;
   --danger-color: #ff0000;
   --table-alternate-row: #e5f2ff;
 }
@@ -164,4 +165,9 @@ table tbody tr td {
 .highlightedText {
   background-color: #005791;
   color: var(--white);
+}
+
+.highlightedTextDropdown {
+  background-color: #b3c7ff;
+  color: var(--black);
 }

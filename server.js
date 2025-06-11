@@ -298,17 +298,38 @@ const billSchema = new mongoose.Schema({
 
 const Bill = mongoose.model('Bill', billSchema);
 
+// Customer Schema
+
+const customerSchema = new mongoose.Schema({
+    name: String,
+    number: String,
+    address: String
+}, { timestamps: true });
+
+const Customer = mongoose.model('Customer', customerSchema);
+
 app.post('/save-bill', async (req, res) => {
     try {
+        const { customerName, customerNumber, customerAddress } = req.body;
+
+        // Get next bill number
         const latestBill = await Bill.findOne().sort({ billNumber: -1 });
         const nextBillNumber = latestBill ? latestBill.billNumber + 1 : 1;
 
+        // Save bill
         const newBill = new Bill({
             ...req.body,
             billNumber: nextBillNumber
         });
-
         await newBill.save();
+
+        // Upsert customer (create if not exist, update if exists)
+        await Customer.findOneAndUpdate(
+            { name: customerName, number: customerNumber },
+            { $set: { address: customerAddress } },
+            { upsert: true, new: true }
+        );
+
         res.status(200).json({ message: 'Bill saved successfully', billNumber: nextBillNumber });
     } catch (err) {
         console.error('Error saving bill:', err);
@@ -324,6 +345,28 @@ app.get('/next-bill-number', async (req, res) => {
     } catch (err) {
         console.error('Error fetching bill number:', err);
         res.status(500).json({ message: 'Error fetching bill number' });
+    }
+});
+
+app.get('/search-customers', async (req, res) => {
+    const query = req.query.q?.toLowerCase() || "";
+
+    try {
+        const customers = await Customer.find({
+            $or: [
+                { name: new RegExp(query, 'i') },
+                { number: new RegExp(query) }
+            ]
+        }).limit(10);
+
+        res.json(customers.map(c => ({
+            name: c.name,
+            number: c.number,
+            address: c.address
+        })));
+    } catch (err) {
+        console.error('Error fetching customers:', err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
