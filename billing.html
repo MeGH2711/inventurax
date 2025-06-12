@@ -245,11 +245,14 @@
         </div>
     </div>
 
+    <iframe id="pdfIframe" style="width:100%; height:600px; border:1px solid #ccc;"></iframe>
+
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/jspdf.umd.min.js"></script>
     <script src="js/jspdf.plugin.autotable.min.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="js/qrcode.min.js"></script>
     <script>
         // Session check
         fetch('/session-check')
@@ -801,6 +804,7 @@
             const textYOffset = 4;
             const spacing = 4;
             const columnGap = 113;
+            const leftMargin = 10;
 
             // Fetch YouTube icon
             const youtubeIcon = await fetch('images/youtubeLogo.png')
@@ -987,7 +991,7 @@
             });
 
             // Draw the table
-            doc.autoTable({
+            const autoTableResult = doc.autoTable({
                 startY: y,
                 head: [
                     [
@@ -1007,7 +1011,7 @@
                     ],
                     [
                         { content: 'Overall Discount:', colSpan: 5 },
-                        { content: overallDiscount + "%" }
+                        { content: overallDiscount + " %" }
                     ],
                     [
                         { content: 'Final Total:', colSpan: 5 },
@@ -1032,34 +1036,123 @@
                 margin: { left: 10, right: 10 }
             });
 
-            const pad = n => n.toString().padStart(2, '0');
-            const billingDateObj = new Date(billingDateRaw);
-            const day = pad(billingDateObj.getDate());
-            const month = pad(billingDateObj.getMonth() + 1);
-            const year = billingDateObj.getFullYear();
+            // Generate and add UPI QR code
+            const upiId = "Q355693476@ybl";
+            const payeeName = "PhonePeMerchant";
+            const upiAmount = finalTotal;
 
-            const hourPadded = pad(hour);
-            const minutePadded = pad(minute);
+            const qrBase64 = await generateUpiQrBase64(upiId, payeeName, upiAmount);
 
-            const formattedDateTime = `${day}${month}${year}${hourPadded}${minutePadded}`;
+            const pageHeight = doc.internal.pageSize.getHeight();
+            let currentY = (autoTableResult?.finalY ?? 100) + 70;
 
-            const filenameParts = [
-                billNumber || '00',
-                (customerName || 'Unknown').replace(/\s+/g, '_'),
-                formattedDateTime
-            ];
-            const suggestedName = filenameParts.join('_') + '.pdf';
+            // Ensure space for QR code
+            if (currentY + 50 > pageHeight) {
+                doc.addPage();
+                currentY = 20;
+            }
 
-            const fileHandle = await window.showSaveFilePicker({
-                suggestedName,
-                types: [{
-                    description: 'PDF Files',
-                    accept: { 'application/pdf': ['.pdf'] },
-                }],
-            });
-            const writableStream = await fileHandle.createWritable();
-            await writableStream.write(doc.output('blob'));
-            await writableStream.close();
+            let qrTextBox = currentY + 6;
+
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(107, 68, 0);
+            doc.text("Scan & Pay", leftMargin, qrTextBox);
+
+            let x = leftMargin;
+            qrTextBox = qrTextBox + 8;
+
+            const part1 = "OR Pay Directly on ";
+            const phone = "+91 9879718228";
+            const part2 = " or on UPI ID : ";
+            const upi = "Q355693476@ybl";
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.text(part1, x, qrTextBox);
+
+            x += doc.getTextWidth(part1);
+
+            doc.setFont(undefined, 'bold');
+            doc.text(phone, x, qrTextBox);
+            x += doc.getTextWidth(phone);
+
+            doc.setFont(undefined, 'normal');
+            doc.text(part2, x, qrTextBox);
+            x += doc.getTextWidth(part2);
+
+            doc.setFont(undefined, 'bold');
+            doc.text(upi, x, qrTextBox);
+
+            qrTextBox = qrTextBox + 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text("Kindly share the payment confirmation screenshot once the payment is completed,", leftMargin, qrTextBox);
+            
+            qrTextBox = qrTextBox + 6;
+
+            doc.text("so we can proceed with processing your order.", leftMargin, qrTextBox);
+
+            doc.addImage(qrBase64, 'PNG', 160, currentY, 40, 40);
+
+            async function generateUpiQrBase64(upiId, payeeName, amount) {
+                const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR`;
+
+                return new Promise((resolve) => {
+                    const tempDiv = document.createElement("div");
+                    const qr = new QRCode(tempDiv, {
+                        text: upiUrl,
+                        width: 150,
+                        height: 150,
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    setTimeout(() => {
+                        const img = tempDiv.querySelector('img');
+                        resolve(img.src);
+                    }, 500);
+                });
+            }
+
+            // Development
+
+            // Convert PDF to Blob and display in iframe
+            const pdfBlob = doc.output('blob');
+            const blobUrl = URL.createObjectURL(pdfBlob);
+            document.getElementById('pdfIframe').src = blobUrl;
+
+            // Save PDF
+
+            // const pad = n => n.toString().padStart(2, '0');
+            // const billingDateObj = new Date(billingDateRaw);
+            // const day = pad(billingDateObj.getDate());
+            // const month = pad(billingDateObj.getMonth() + 1);
+            // const year = billingDateObj.getFullYear();
+
+            // const hourPadded = pad(hour);
+            // const minutePadded = pad(minute);
+
+            // const formattedDateTime = `${day}${month}${year}${hourPadded}${minutePadded}`;
+
+            // const filenameParts = [
+            //     billNumber || '00',
+            //     (customerName || 'Unknown').replace(/\s+/g, '_'),
+            //     formattedDateTime
+            // ];
+            // const suggestedName = filenameParts.join('_') + '.pdf';
+
+            // const fileHandle = await window.showSaveFilePicker({
+            //     suggestedName,
+            //     types: [{
+            //         description: 'PDF Files',
+            //         accept: { 'application/pdf': ['.pdf'] },
+            //     }],
+            // });
+            // const writableStream = await fileHandle.createWritable();
+            // await writableStream.write(doc.output('blob'));
+            // await writableStream.close();
 
         });
 
