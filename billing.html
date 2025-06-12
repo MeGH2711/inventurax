@@ -245,7 +245,7 @@
         </div>
     </div>
 
-    <iframe id="pdfIframe" style="width:100%; height:600px; border:1px solid #ccc;"></iframe>
+    <!-- <iframe id="pdfIframe" style="width:100%; height:600px; border:1px solid #ccc;"></iframe> -->
 
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
@@ -270,6 +270,8 @@
 
         $(document).ready(function () {
 
+            // Fetch Next Bill Number
+
             fetch('/next-bill-number')
                 .then(res => res.json())
                 .then(data => {
@@ -281,22 +283,24 @@
                     showToast('Failed to fetch bill number', 'text-bg-danger');
                 });
 
+            // Open WhatsApp Profile
+
             $('.btn-whatsapp').on('click', function () {
                 const number = $('#customerNumber').val().trim();
 
-                // Validate number: only 10 digits
                 if (!/^\d{10}$/.test(number)) {
                     showToast('Please enter a valid 10-digit Contact Number', 'text-bg-danger');
                     return;
                 }
 
-                const fullNumber = '91' + number; // Assuming Indian country code
+                const fullNumber = '91' + number;
                 const whatsappURL = `https://wa.me/${fullNumber}`;
 
                 window.open(whatsappURL, '_blank');
             });
 
             // Address Field Toggle based on Mode of Delivery
+
             function toggleAddressField() {
                 const deliveryMode = $('#modeOfDelivery').val();
                 if (deliveryMode === 'Home Delivery') {
@@ -320,6 +324,7 @@
             $('#billingTime').val(timeStr);
 
             // Autocomplete for Product Name
+
             $('#productName').on('input', function () {
                 const query = $(this).val();
                 if (query.length < 1) {
@@ -369,16 +374,9 @@
 
             $('#productTable tbody').on('click', '.delete-row', function () {
                 $(this).closest('tr').remove();
-                updateRowIndices();
                 toggleNoProductRow();
                 updateGrandTotal();
             });
-
-            function updateRowIndices() {
-                $('#productTable tbody tr').not('#noProductRow').each(function (index) {
-                    $(this).find('td:first').text(index + 1);
-                });
-            }
 
             let pendingProduct = null;
 
@@ -991,50 +989,84 @@
             });
 
             // Draw the table
-            const autoTableResult = doc.autoTable({
-                startY: y,
-                head: [
-                    [
+            let currentY = y;
+            const firstPageRows = 15;
+            const nextPageRows = 25;
+
+            const totalRows = productRows.length;
+
+            // Split productRows into paginated chunks
+            const paginatedRows = [];
+
+            if (totalRows <= firstPageRows) {
+                paginatedRows.push(productRows);
+            } else {
+                paginatedRows.push(productRows.slice(0, firstPageRows));
+                for (let i = firstPageRows; i < totalRows; i += nextPageRows) {
+                    paginatedRows.push(productRows.slice(i, i + nextPageRows));
+                }
+            }
+
+            paginatedRows.forEach((rowsChunk, index) => {
+                const isFirstPage = index === 0;
+                const isLastPage = index === paginatedRows.length - 1;
+
+                doc.autoTable({
+                    startY: currentY,
+                    head: [[
                         'Product Name',
                         'Quantity',
                         'Price (per unit)',
                         'Total',
                         'Discount (%)',
                         'Discounted Total',
-                    ]
-                ],
-                body: productRows,
-                foot: [
-                    [
-                        { content: 'Overall Total:', colSpan: 5 },
-                        { content: "Rs. " + overallTotal }
-                    ],
-                    [
-                        { content: 'Overall Discount:', colSpan: 5 },
-                        { content: overallDiscount + " %" }
-                    ],
-                    [
-                        { content: 'Final Total:', colSpan: 5 },
-                        { content: "Rs. " + finalTotal }
-                    ]
-                ],
-                styles: {
-                    fontSize: 10,
-                    lineColor: [0, 0, 0],
-                    lineWidth: 0.1,
-                    textColor: "#000000",
-                },
-                headStyles: {
-                    fillColor: [240, 240, 240],
-                    textColor: "#412100",
-                },
-                footStyles: {
-                    fillColor: [240, 240, 240],
-                    textColor: "#412100",
-                },
-                theme: 'grid',
-                margin: { left: 10, right: 10 }
+                    ]],
+                    body: rowsChunk,
+                    foot: isLastPage ? [
+                        [
+                            { content: 'Overall Total:', colSpan: 5 },
+                            { content: "Rs. " + overallTotal }
+                        ],
+                        [
+                            { content: 'Overall Discount:', colSpan: 5 },
+                            { content: overallDiscount + " %" }
+                        ],
+                        [
+                            { content: 'Final Total:', colSpan: 5 },
+                            { content: "Rs. " + finalTotal }
+                        ]
+                    ] : undefined,
+                    styles: {
+                        fontSize: 10,
+                        lineColor: [0, 0, 0],
+                        lineWidth: 0.1,
+                        textColor: "#000000",
+                    },
+                    headStyles: {
+                        fillColor: [240, 240, 240],
+                        textColor: "#412100",
+                    },
+                    footStyles: {
+                        fillColor: [240, 240, 240],
+                        textColor: "#412100",
+                    },
+                    margin: {
+                        left: 10,
+                        right: 10,
+                    },
+                    theme: 'grid',
+                });
+
+                // If not the last page, add a new one and reset Y
+                if (!isLastPage) {
+                    doc.addPage();
+                    currentY = 20;
+                } else {
+                    currentY = doc.lastAutoTable.finalY + 8;
+                }
             });
+
+            currentY = doc.lastAutoTable.finalY + 8;
 
             // Generate and add UPI QR code
             const upiId = "Q355693476@ybl";
@@ -1044,10 +1076,9 @@
             const qrBase64 = await generateUpiQrBase64(upiId, payeeName, upiAmount);
 
             const pageHeight = doc.internal.pageSize.getHeight();
-            let currentY = (autoTableResult?.finalY ?? 100) + 70;
 
             // Ensure space for QR code
-            if (currentY + 50 > pageHeight) {
+            if (currentY + 60 > pageHeight) {
                 doc.addPage();
                 currentY = 20;
             }
@@ -1090,7 +1121,7 @@
             doc.setFontSize(10);
             doc.setFont(undefined, 'bold');
             doc.text("Kindly share the payment confirmation screenshot once the payment is completed,", leftMargin, qrTextBox);
-            
+
             qrTextBox = qrTextBox + 6;
 
             doc.text("so we can proceed with processing your order.", leftMargin, qrTextBox);
@@ -1116,43 +1147,53 @@
                 });
             }
 
+            const pageCount = doc.getNumberOfPages();
+
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(9);
+                doc.setTextColor(100);
+                doc.setFont(undefined, 'bold');
+                doc.text("This is a computer-generated bill and does not require any signature or stamp.", 105, 283, { align: 'center' });
+                doc.text("In case of any query, contact +91 9879718228", 105, 290, { align: 'center' });
+            }
+
             // Development
 
-            // Convert PDF to Blob and display in iframe
-            const pdfBlob = doc.output('blob');
-            const blobUrl = URL.createObjectURL(pdfBlob);
-            document.getElementById('pdfIframe').src = blobUrl;
+            // const pdfBlob = doc.output('blob');
+            // const blobUrl = URL.createObjectURL(pdfBlob);
+            // document.getElementById('pdfIframe').src = blobUrl;
 
             // Save PDF
 
-            // const pad = n => n.toString().padStart(2, '0');
-            // const billingDateObj = new Date(billingDateRaw);
-            // const day = pad(billingDateObj.getDate());
-            // const month = pad(billingDateObj.getMonth() + 1);
-            // const year = billingDateObj.getFullYear();
+            const pad = n => n.toString().padStart(2, '0');
+            const billingDateObj = new Date(billingDateRaw);
+            const day = pad(billingDateObj.getDate());
+            const month = pad(billingDateObj.getMonth() + 1);
+            const year = billingDateObj.getFullYear();
 
-            // const hourPadded = pad(hour);
-            // const minutePadded = pad(minute);
+            const hourPadded = pad(hour);
+            const minutePadded = pad(minute);
 
-            // const formattedDateTime = `${day}${month}${year}${hourPadded}${minutePadded}`;
+            const formattedDateTime = `${day}${month}${year}${hourPadded}${minutePadded}`;
 
-            // const filenameParts = [
-            //     billNumber || '00',
-            //     (customerName || 'Unknown').replace(/\s+/g, '_'),
-            //     formattedDateTime
-            // ];
-            // const suggestedName = filenameParts.join('_') + '.pdf';
+            const filenameParts = [
+                billNumber || '00',
+                (customerName || 'Unknown').replace(/\s+/g, '_'),
+                formattedDateTime
+            ];
+            const suggestedName = filenameParts.join('_') + '.pdf';
 
-            // const fileHandle = await window.showSaveFilePicker({
-            //     suggestedName,
-            //     types: [{
-            //         description: 'PDF Files',
-            //         accept: { 'application/pdf': ['.pdf'] },
-            //     }],
-            // });
-            // const writableStream = await fileHandle.createWritable();
-            // await writableStream.write(doc.output('blob'));
-            // await writableStream.close();
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName,
+                types: [{
+                    description: 'PDF Files',
+                    accept: { 'application/pdf': ['.pdf'] },
+                }],
+            });
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(doc.output('blob'));
+            await writableStream.close();
 
         });
 
