@@ -67,7 +67,7 @@
                         <div class="card text-white gradient-card shadow">
                             <div class="card-body">
                                 <h5 class="card-title">Total Sales</h5>
-                                <p class="card-text display-6">$25,300</p>
+                                <p id="totalSalesAmount" class="card-text display-6">₹ --</p>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                         <div class="card text-white gradient-card shadow">
                             <div class="card-body">
                                 <h5 class="card-title">New Customers</h5>
-                                <p class="card-text display-6">350</p>
+                                <p id="newCustomersCount" class="card-text display-6">--</p>
                             </div>
                         </div>
                     </div>
@@ -148,6 +148,28 @@
             .catch(() => {
                 window.location.href = '/';
             });
+
+        fetch('/total-sales-amount')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('totalSalesAmount').textContent = `₹ ${data.totalSales.toLocaleString()}`;
+            })
+            .catch(err => {
+                console.error('Error fetching total sales amount:', err);
+                document.getElementById('totalSalesAmount').textContent = '$N/A';
+            });
+
+        fetch('/unique-customers-count')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('newCustomersCount').textContent = data.count;
+            })
+            .catch(err => {
+                console.error('Error fetching unique customer count:', err);
+                document.getElementById('newCustomersCount').textContent = 'N/A';
+            });
+
+
     </script>
 </body>
 

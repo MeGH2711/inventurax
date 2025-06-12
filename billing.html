@@ -28,7 +28,7 @@
                 <a href="/productlisting" class="list-group-item list-group-item-sidebar" title="Product Listing">
                     <i class="gsymbols-round gicon-inventory fs-5"></i><span class="link-text">Product Listing</span>
                 </a>
-                <a href="#" class="list-group-item list-group-item-sidebar active" title="Billing">
+                <a class="list-group-item list-group-item-sidebar active" title="Billing">
                     <i class="gsymbols-round gicon-receipt_long fs-5"></i><span class="link-text">Billing</span>
                 </a>
                 <a href="#" class="list-group-item list-group-item-sidebar" title="Analytics">
@@ -131,45 +131,45 @@
                             <table class="table table-sm table-bordered align-middle text-center" id="productTable">
                                 <thead>
                                     <tr>
-                                        <th class="w-25">Product Name</th>
-                                        <th class="w-10">Quantity</th>
-                                        <th class="w-10">Price (per unit)</th>
-                                        <th class="w-10">Total</th>
-                                        <th class="w-10">Discount (%)</th>
-                                        <th class="w-25">Discounted Total</th>
-                                        <th class="w-10">Action</th>
+                                        <th class="w-25 align-middle">Product Name</th>
+                                        <th class="w-10 align-middle">Quantity</th>
+                                        <th class="w-10 align-middle">Price (per unit)</th>
+                                        <th class="w-10 align-middle">Total</th>
+                                        <th class="w-10 align-middle">Discount (%)</th>
+                                        <th class="w-25 align-middle">Discounted Total</th>
+                                        <th class="w-10 align-middle">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr id="noProductRow">
-                                        <td colspan="7" class="text-muted">No Product Selected</td>
+                                        <td colspan="7" class="text-muted align-middle">No Product Selected</td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="5" class="text-center fw-bold bg-transparent">Total</td>
-                                        <td class="text-center fw-bold bg-transparent" id="grandTotalCell">0.00</td>
-                                        <td class="bg-transparent"></td>
+                                        <td colspan="5" class="text-center fw-bold bg-transparent align-middle">Total</td>
+                                        <td class="text-center fw-bold bg-transparent" id="grandTotalCell align-middle">0.00</td>
+                                        <td class="bg-transparent align-middle"></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="5" class="text-center fw-bold bg-transparent">Overall Discount (%)
+                                        <td colspan="5" class="text-center fw-bold bg-transparent align-middle">Overall Discount (%)
                                         </td>
-                                        <td class="text-center bg-transparent">
+                                        <td class="text-center bg-transparent align-middle">
                                             <input type="number" id="overallDiscountInput"
                                                 class="form-control form-control-sm text-center fw-bold bg-transparent"
                                                 min="0" max="100" value="0">
                                         </td>
-                                        <td class="bg-transparent"></td>
+                                        <td class="bg-transparent align-middle"></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="5" class="text-center fw-bold bg-transparent">Final Total (After
+                                        <td colspan="5" class="text-center fw-bold bg-transparent align-middle">Final Total (After
                                             Discount)</td>
-                                        <td class="text-center bg-transparent">
+                                        <td class="text-center bg-transparent align-middle">
                                             <input type="number" id="finalTotalInput"
                                                 class="form-control form-control-sm text-center fw-bold bg-transparent"
                                                 min="0" step="0.01" value="0.00">
                                         </td>
-                                        <td class="bg-transparent"></td>
+                                        <td class="bg-transparent align-middle"></td>
                                     </tr>
                                 </tfoot>
                             </table>

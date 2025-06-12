@@ -370,6 +370,38 @@ app.get('/search-customers', async (req, res) => {
     }
 });
 
+// Fetch Total Sales Amount
+
+app.get('/total-sales-amount', async (req, res) => {
+    try {
+        const result = await Bill.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalSales: { $sum: "$finalTotal" }
+                }
+            }
+        ]);
+        const total = result[0]?.totalSales || 0;
+        res.json({ totalSales: total });
+    } catch (err) {
+        console.error('Error calculating total sales:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Fetch Unique Customer Count
+
+app.get('/unique-customers-count', async (req, res) => {
+    try {
+        const uniqueCount = await Customer.countDocuments();
+        res.json({ count: uniqueCount });
+    } catch (err) {
+        console.error('Error fetching unique customers count:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Routes
 app.get('/', (req, res) => {
     if (req.session && req.session.user) {
