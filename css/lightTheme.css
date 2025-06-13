@@ -93,6 +93,12 @@ body {
   --bs-btn-active-border-color: #055858;
 }
 
+/* Borders */
+
+.border-lightgreen {
+  border-color: rgb(0, 180, 39) !important;
+}
+
 /* Cards */
 
 .gradient-card {
