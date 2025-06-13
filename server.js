@@ -334,6 +334,19 @@ app.get('/get-bills', isAuthenticated, async (req, res) => {
     }
 });
 
+app.get('/get-bill/:id', isAuthenticated, async (req, res) => {
+    try {
+        const bill = await Bill.findById(req.params.id);
+        if (!bill) {
+            return res.status(404).json({ message: 'Bill not found' });
+        }
+        res.json(bill);
+    } catch (err) {
+        console.error('Error fetching bill:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 app.get('/next-bill-number', async (req, res) => {
     try {
         const latestBill = await Bill.findOne().sort({ billNumber: -1 });

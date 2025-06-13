@@ -134,35 +134,42 @@
 
 /* Rounded Table Corner */
 
-#productTableCard {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-#productTable {
+#productTable,
+#billlogsTable {
   margin-bottom: 0 !important;
 }
 
-#productTable thead tr:first-child {
+#productTable thead tr:first-child,
+#billlogsTable thead tr:first-child {
   border-top: 0;
 }
 
 #productTable tbody tr:last-child,
-#productTable tfoot tr:last-child {
+#productTable tfoot tr:last-child,
+#billlogsTable tbody tr:last-child,
+#billlogsTable tfoot tr:last-child {
   border-bottom: 0;
 }
 
 #productTable thead tr:first-child th:first-child,
 #productTable tbody tr td:first-child,
 #productTable tfoot tr td:first-child,
-#productTable tfoot tr:last-child td:first-child {
+#productTable tfoot tr:last-child td:first-child,
+#billlogsTable thead tr:first-child th:first-child,
+#billlogsTable tbody tr td:first-child,
+#billlogsTable tfoot tr td:first-child,
+#billlogsTable tfoot tr:last-child td:first-child {
   border-left: 0;
 }
 
 #productTable thead tr:first-child th:last-child,
 #productTable tbody tr td:last-child,
 #productTable tfoot tr td:last-child,
-#productTable tfoot tr:last-child td:last-child {
+#productTable tfoot tr:last-child td:last-child,
+#billlogsTable thead tr:first-child th:last-child,
+#billlogsTable tbody tr td:last-child,
+#billlogsTable tfoot tr td:last-child,
+#billlogsTable tfoot tr:last-child td:last-child {
   border-right: 0;
 }
 
