@@ -600,6 +600,9 @@
                     const container = document.getElementById('productCardContainer');
                     container.innerHTML = '';
 
+                    const tableBody = document.getElementById('productTableBody');
+                    tableBody.innerHTML = '';
+
                     const filteredProducts = data.filter(product => {
                         const matchesName = product.name.toLowerCase().includes(nameFilter);
                         const matchesCategory = categoryFilter === '' || product.category === categoryFilter;
@@ -608,6 +611,11 @@
 
                     if (filteredProducts.length === 0) {
                         container.innerHTML = '<p class="text-center text-muted">No products match the search criteria.</p>';
+                        const noProductsRow = document.createElement('tr');
+                        noProductsRow.innerHTML = `
+                            <td colspan="6" class="text-center text-muted">No products match the search criteria.</td>
+                        `;
+                        tableBody.appendChild(noProductsRow);
                         return;
                     }
 
@@ -650,9 +658,6 @@
                         `;
                         container.appendChild(card);
                     });
-
-                    const tableBody = document.getElementById('productTableBody');
-                    tableBody.innerHTML = '';
 
                     filteredProducts.forEach(product => {
 
