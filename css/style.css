@@ -200,3 +200,11 @@
   position: absolute;
   z-index: 1050;
 }
+
+/* Page Headers */
+
+.pageHeader {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+}

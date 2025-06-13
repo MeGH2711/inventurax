@@ -99,9 +99,11 @@ app.post('/login', async (req, res) => {
 // Authentication Check
 
 function isAuthenticated(req, res, next) {
+    console.log('Session user:', req.session.user); // DEBUG LINE
     if (req.session && req.session.user) {
         return next();
     } else {
+        console.log('User not authenticated, redirecting to /');
         return res.redirect('/');
     }
 }
@@ -403,6 +405,7 @@ app.get('/unique-customers-count', async (req, res) => {
 });
 
 // Routes
+
 app.get('/', (req, res) => {
     if (req.session && req.session.user) {
         return res.redirect('/dashboard');
@@ -420,6 +423,10 @@ app.get('/productlisting', isAuthenticated, (req, res) => {
 
 app.get('/billing', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'billing.html'));
+});
+
+app.get('/billlogs', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'billlogs.html'));
 });
 
 // Start server

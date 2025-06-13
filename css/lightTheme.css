@@ -97,6 +97,7 @@ body {
 
 .gradient-card {
   background: linear-gradient(135deg, var(--main-bg), #13558D);
+  color: var(--white);
 }
 
 .gradient-card:hover {

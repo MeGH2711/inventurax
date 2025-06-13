@@ -23,7 +23,7 @@
                 <img id="sidebarLogoIcon" src="images/inventuraxIconWhite.png" alt="Icon Logo" class="img-fluid d-none">
             </div>
             <div class="list-group list-group-flush flex-grow-1">
-                <a class="list-group-item list-group-item-sidebar active" title="Dashboard">
+                <a href="/dashboard" class="list-group-item list-group-item-sidebar" title="Dashboard">
                     <i class="gsymbols-round gicon-home fs-5"></i><span class="link-text">Dashboard</span>
                 </a>
                 <a href="/productlisting" class="list-group-item list-group-item-sidebar" title="Product Listing">
@@ -32,7 +32,7 @@
                 <a href="/billing" class="list-group-item list-group-item-sidebar" title="Billing">
                     <i class="gsymbols-round gicon-receipt_long fs-5"></i><span class="link-text">Billing</span>
                 </a>
-                <a href="/billlogs" class="list-group-item list-group-item-sidebar" title="Bill Logs">
+                <a class="list-group-item list-group-item-sidebar active" title="Bill Logs">
                     <i class="gsymbols-round gicon-auto_stories fs-5"></i><span class="link-text">Bill Logs</span>
                 </a>
                 <a href="#" class="list-group-item list-group-item-sidebar" title="Analytics">
@@ -51,7 +51,7 @@
         <!-- Main Page content -->
         <div id="mainPageContent" class="p-4 flex-grow-1">
 
-            <!-- Header Section -->
+            <!-- Profile Header -->
             <div class="container-fluid d-flex justify-content-end">
                 <div class="dropdown profileButton">
                     <button class="btn btn-sm btn-darkblue dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -64,66 +64,13 @@
                 </div>
             </div>
 
-            <div class="container my-4">
-                <div class="row g-4 d-flex justify-content-center">
-
-                    <div class="col-md-4">
-                        <div class="card gradient-card shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Sales</h5>
-                                <p id="totalSalesAmount" class="card-text display-6">₹ --</p>
-                            </div>
-                        </div>
+            <!-- Main Content -->
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="pageHeader mb-4">Bill Logs</h1>
                     </div>
-
-                    <div class="col-md-4">
-                        <div class="card gradient-card shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">New Customers</h5>
-                                <p id="newCustomersCount" class="card-text display-6">--</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card gradient-card shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">Pending Orders</h5>
-                                <p class="card-text display-6">45</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Product Listing Card -->
-                    <div class="col-md-3">
-                        <a href="/productlisting" class="text-decoration-none">
-                            <div class="card gradient-card shadow text-center p-3 h-100">
-                                <i class="gsymbols-round gicon-inventory fs-1 mb-2"></i>
-                                <h5 class="card-title">Product Listing</h5>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Billing Card -->
-                    <div class="col-md-3">
-                        <a href="/billing" class="text-decoration-none">
-                            <div class="card gradient-card shadow text-center p-3 h-100">
-                                <i class="gsymbols-round gicon-receipt_long fs-1 mb-2"></i>
-                                <h5 class="card-title">Billing</h5>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Analytics Card -->
-                    <div class="col-md-3">
-                        <a href="#" class="text-decoration-none">
-                            <div class="card gradient-card shadow text-center p-3 h-100">
-                                <i class="gsymbols-round gicon-insights fs-1 mb-2"></i>
-                                <h5 class="card-title">Analytics</h5>
-                            </div>
-                        </a>
-                    </div>
-
+                    <div class="col-12" id="billLogsContainer"></div>
                 </div>
             </div>
 
@@ -153,26 +100,18 @@
                 window.location.href = '/';
             });
 
-        fetch('/total-sales-amount')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('totalSalesAmount').textContent = `₹ ${data.totalSales.toLocaleString()}`;
-            })
-            .catch(err => {
-                console.error('Error fetching total sales amount:', err);
-                document.getElementById('totalSalesAmount').textContent = '$N/A';
-            });
+        // Reusable Toast Function
 
-        fetch('/unique-customers-count')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('newCustomersCount').textContent = data.count;
-            })
-            .catch(err => {
-                console.error('Error fetching unique customer count:', err);
-                document.getElementById('newCustomersCount').textContent = 'N/A';
-            });
+        function showToast(message, bgColorClass = 'text-bg-primary') {
+            const toastEl = document.getElementById('mainToast');
+            const toastBody = document.getElementById('mainToastBody');
 
+            toastEl.className = `toast align-items-center ${bgColorClass} border-0`;
+            toastBody.textContent = message;
+
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
 
     </script>
 </body>
