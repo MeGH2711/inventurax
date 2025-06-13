@@ -152,7 +152,7 @@
                                     <tr>
                                         <td colspan="5" class="text-center fw-bold bg-transparent align-middle">Total
                                         </td>
-                                        <td class="text-center fw-bold bg-transparent" id="grandTotalCell align-middle">
+                                        <td class="text-center fw-bold bg-transparent align-middle" id="grandTotalCell">
                                             0.00</td>
                                         <td class="bg-transparent align-middle"></td>
                                     </tr>
@@ -934,12 +934,15 @@
             doc.setFont(undefined, 'normal');
             doc.text(customerNumber || 'N/A', 143, y);
 
-            y += 9;
+            if (modeOfDelivery === 'Home Delivery') {
+                
+                y += 9;
 
-            doc.setFont(undefined, 'bold');
-            doc.text(`Address:`, boxX + 4, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(customerAddress || 'N/A', boxX + 23, y);
+                doc.setFont(undefined, 'bold');
+                doc.text(`Address:`, boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(customerAddress || 'N/A', boxX + 23, y);
+            }
 
             y += 9;
 
@@ -1094,7 +1097,7 @@
 
             doc.setFontSize(20);
             doc.setFont(undefined, 'bold');
-            doc.setTextColor(107, 68, 0);
+            doc.setTextColor(40, 7, 0);
             doc.text("Scan & Pay", leftMargin, qrTextBox);
 
             let x = leftMargin;

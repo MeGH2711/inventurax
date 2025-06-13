@@ -300,16 +300,6 @@ const billSchema = new mongoose.Schema({
 
 const Bill = mongoose.model('Bill', billSchema);
 
-// Customer Schema
-
-const customerSchema = new mongoose.Schema({
-    name: String,
-    number: String,
-    address: String
-}, { timestamps: true });
-
-const Customer = mongoose.model('Customer', customerSchema);
-
 app.post('/save-bill', async (req, res) => {
     try {
         const { customerName, customerNumber, customerAddress } = req.body;
@@ -325,17 +315,22 @@ app.post('/save-bill', async (req, res) => {
         });
         await newBill.save();
 
-        // Upsert customer (create if not exist, update if exists)
-        await Customer.findOneAndUpdate(
-            { name: customerName, number: customerNumber },
-            { $set: { address: customerAddress } },
-            { upsert: true, new: true }
-        );
-
         res.status(200).json({ message: 'Bill saved successfully', billNumber: nextBillNumber });
     } catch (err) {
         console.error('Error saving bill:', err);
         res.status(500).json({ message: 'Error saving bill' });
+    }
+});
+
+// Fetch All Bills
+
+app.get('/get-bills', isAuthenticated, async (req, res) => {
+    try {
+        const bills = await Bill.find().sort({ createdAt: -1 });
+        res.json(bills);
+    } catch (err) {
+        console.error('Error fetching bills:', err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
@@ -354,20 +349,35 @@ app.get('/search-customers', async (req, res) => {
     const query = req.query.q?.toLowerCase() || "";
 
     try {
-        const customers = await Customer.find({
-            $or: [
-                { name: new RegExp(query, 'i') },
-                { number: new RegExp(query) }
-            ]
-        }).limit(10);
+        const bills = await Bill.aggregate([
+            {
+                $match: {
+                    $or: [
+                        { customerName: { $regex: query, $options: 'i' } },
+                        { customerNumber: { $regex: query } }
+                    ]
+                }
+            },
+            {
+                $group: {
+                    _id: { name: "$customerName", number: "$customerNumber" },
+                    address: { $last: "$customerAddress" }
+                }
+            },
+            {
+                $limit: 10
+            }
+        ]);
 
-        res.json(customers.map(c => ({
-            name: c.name,
-            number: c.number,
-            address: c.address
-        })));
+        const suggestions = bills.map(b => ({
+            name: b._id.name,
+            number: b._id.number,
+            address: b.address
+        }));
+
+        res.json(suggestions);
     } catch (err) {
-        console.error('Error fetching customers:', err);
+        console.error('Error fetching customer data from bills:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -393,13 +403,26 @@ app.get('/total-sales-amount', async (req, res) => {
 });
 
 // Fetch Unique Customer Count
-
 app.get('/unique-customers-count', async (req, res) => {
     try {
-        const uniqueCount = await Customer.countDocuments();
-        res.json({ count: uniqueCount });
+        const result = await Bill.aggregate([
+            {
+                $group: {
+                    _id: {
+                        name: "$customerName",
+                        number: "$customerNumber"
+                    }
+                }
+            },
+            {
+                $count: "uniqueCount"
+            }
+        ]);
+
+        const count = result[0]?.uniqueCount || 0;
+        res.json({ count });
     } catch (err) {
-        console.error('Error fetching unique customers count:', err);
+        console.error('Error fetching unique customers count from bills:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
