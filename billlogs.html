@@ -214,6 +214,20 @@
                 const res = await fetch(`/get-bill/${billId}`);
                 const bill = await res.json();
 
+                const billingDateRaw = bill.billingDate;
+                const billingDate = new Date(billingDateRaw).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                }).replace(/ /g, '/');
+
+                const billingTimeRaw = bill.billingTime;
+                const [hourStr, minute] = billingTimeRaw.split(':');
+                const hour = parseInt(hourStr, 10);
+                const period = hour >= 12 ? 'PM' : 'AM';
+                const hour12 = hour % 12 || 12;
+                const billingTime = `${hour12}:${minute} ${period}`;
+
                 let itemsHTML = `
                     <div class="row">
                         <div class="col-lg-6 mb-3">
@@ -232,11 +246,11 @@
                         <div class="col-lg-6 mb-3">
                             <div class="card gradient-card h-100">
                               <div class="card-body">
-                                <h5 class="card-title fw-bold"><i class="gsymbols-round gicon-receipt_long me-1"></i> Bill Information</h5>
+                                <h5 class="card-title fw-bold"><i class="gsymbols-round gicon-description me-1"></i> Bill Information</h5>
                                 <div class="row">
                                   <div class="col-12 mb-2"><strong>Bill No.:</strong> ${bill.billNumber}</div>
-                                  <div class="col-md-6 mb-2"><strong>Date:</strong> ${bill.billingDate}</div>
-                                  <div class="col-md-6 mb-2"><strong>Time:</strong> ${bill.billingTime}</div>
+                                  <div class="col-md-6 mb-2"><strong>Date:</strong> ${billingDate}</div>
+                                  <div class="col-md-6 mb-2"><strong>Time:</strong> ${billingTime}</div>
                                   <div class="col-md-6 mb-2"><strong>Payment Mode:</strong> ${bill.modeOfPayment}</div>
                                   <div class="col-md-6 mb-2"><strong>Delivery Mode:</strong> ${bill.modeOfDelivery}</div>
                                 </div>
@@ -294,14 +308,23 @@
 
                 itemsHTML += `
                     <div class="d-flex justify-content-end gap-2 mt-3">
-                      <a href="https://wa.me/91${bill.customerNumber}?text=${encodeURIComponent(`Dear Customer,\n\nYour order has been successfully delivered to the address provided.\n\nThank you for choosing De Baker's & More. We look forward to serving you again soon!\n\nBest regards,\nDe Baker's & More\n9879718228`)}" 
-                         target="_blank" class="btn btn-whatsapp">
-                        <i class="bi bi-whatsapp me-1"></i> WhatsApp Confirmation
-                      </a>
-                      <button class="btn btn-darkblue" onclick="downloadBill('${bill._id}')">
-                        <i class="gsymbols-round gicon-download fs-4"></i> Download Bill
-                      </button>
-                    </div>`;
+                `;
+
+                if (bill.modeOfDelivery === 'Home Delivery') {
+                    itemsHTML += `
+                          <a href="https://wa.me/91${bill.customerNumber}?text=${encodeURIComponent(`Dear Customer,\n\nYour order has been successfully delivered to the address provided.\n\nThank you for choosing De Baker's & More. We look forward to serving you again soon!\n\nBest regards,\nDe Baker's & More\n9879718228`)}" 
+                             target="_blank" class="btn btn-whatsapp">
+                            <i class="bi bi-whatsapp me-1"></i> WhatsApp Confirmation
+                          </a>                          
+                    `;
+                }
+
+                itemsHTML += `
+                        <button class="btn btn-darkblue" onclick="downloadBill('${bill._id}')">
+                            <i class="gsymbols-round gicon-download fs-4"></i> Download Bill
+                        </button>
+                    </div>
+                `;
 
                 document.getElementById('billDetailsBody').innerHTML = itemsHTML;
                 const modal = new bootstrap.Modal(document.getElementById('billDetailsModal'));
@@ -713,7 +736,7 @@
                 const writableStream = await fileHandle.createWritable();
                 await writableStream.write(doc.output('blob'));
                 await writableStream.close();
-                
+
             } catch (err) {
                 console.error("Error generating bill PDF:", err);
                 showToast('Failed to generate bill PDF.', 'text-bg-danger');
