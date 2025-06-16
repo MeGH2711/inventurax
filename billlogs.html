@@ -104,8 +104,13 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf.plugin.autotable.min.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="js/qrcode.min.js"></script>
+
     <script>
         fetch('/session-check')
             .then(res => res.json())
@@ -307,8 +312,412 @@
             }
         }
 
-        function downloadBill(billId) {
-            alert(`Download functionality for Bill ID ${billId} is coming soon!`);
+        async function downloadBill(billId) {
+            try {
+                const res = await fetch(`/get-bill/${billId}`);
+                const bill = await res.json();
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                const iconSize = 6;
+                const iconY = 5;
+                const textYOffset = 4;
+                const spacing = 4;
+                const columnGap = 113;
+                const leftMargin = 10;
+
+                // Fetch YouTube icon
+                const youtubeIcon = await fetch('images/youtubeLogo.png')
+                    .then(res => res.blob())
+                    .then(blob => new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }));
+
+                // Fetch Instagram Icon
+                const instaIcon = await fetch('images/instaLogo.png')
+                    .then(res => res.blob())
+                    .then(blob => new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }));
+
+                // YouTube Block
+                const ytX = 14;
+                doc.addImage(youtubeIcon, 'PNG', ytX, iconY, iconSize, iconSize);
+                doc.link(ytX, iconY, iconSize, iconSize, { url: 'https://www.youtube.com/@VimalDeBakers/' });
+
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.textWithLink('@VimalDeBakers', ytX + iconSize + spacing, iconY + textYOffset, {
+                    url: 'https://www.youtube.com/@VimalDeBakers/'
+                });
+
+                // Instagram Block
+                const igX = ytX + iconSize + spacing + doc.getTextWidth('YouTube') + columnGap;
+                doc.addImage(instaIcon, 'PNG', igX, iconY, iconSize, iconSize);
+                doc.link(igX, iconY, iconSize, iconSize, { url: 'https://www.instagram.com/de.bakers.and.more/' });
+
+                doc.textWithLink('@de.bakers.and.more', igX + iconSize + spacing, iconY + textYOffset, {
+                    url: 'https://www.instagram.com/de.bakers.and.more/'
+                });
+
+                const logo = await fetch('images/billLogo.png')
+                    .then(res => res.blob())
+                    .then(blob => new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }));
+
+                doc.addImage(logo, 'PNG', 15, 15, 50, 50);
+
+                doc.setFontSize(25);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(40, 7, 0);
+                doc.text("Vekaria Foods", 195, 25, { align: 'right' });
+                doc.setFontSize(15);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(107, 68, 0);
+                doc.text("De Baker's & More", 195, 32, { align: 'right' });
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text('GF-30, Shaligram Square,', 195, 42, { align: 'right' });
+                doc.text('Nr. Satyamev Vista,', 195, 48, { align: 'right' });
+                doc.text('Gota, Ahmedabad - 382481', 195, 54, { align: 'right' });
+                const rightX = 195;
+
+                doc.setFont(undefined, 'bold');
+                const boldWidth = doc.getTextWidth('Phone: ');
+
+                doc.setFont(undefined, 'normal');
+                const number = '+91 9879718228';
+                const numberWidth = doc.getTextWidth(number);
+
+                const totalWidth = boldWidth + numberWidth;
+
+                const startX = rightX - totalWidth;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Phone: ', startX, 61);
+
+                doc.setFont(undefined, 'normal');
+                doc.text(number, startX + boldWidth, 61);
+
+                let y = 75;
+
+                const billNumber = bill.billNumber.toString();
+                const customerName = bill.customerName;
+                const customerNumber = bill.customerNumber;
+                const billingDateRaw = bill.billingDate;
+                const billingDate = new Date(billingDateRaw).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                }).replace(/ /g, '/');
+                const billingTimeRaw = bill.billingTime;
+                const [hourStr, minute] = billingTimeRaw.split(':');
+                const hour = parseInt(hourStr, 10);
+                const period = hour >= 12 ? 'PM' : 'AM';
+                const hour12 = hour % 12 || 12;
+                const billingTime = `${hour12}:${minute} ${period}`;
+                const modeOfDelivery = bill.modeOfDelivery;
+                const modeOfPayment = bill.modeOfPayment;
+                const customerAddress = bill.customerAddress;
+                const overallTotal = bill.overallTotal;
+                const overallDiscount = bill.overallDiscount;
+                const finalTotal = bill.finalTotal;
+
+                doc.setFontSize(11);
+
+                const boxX = 10;
+                const boxWidth = 190;
+                const contentStartY = y;
+
+                y += 2;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Customer Name:', boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(customerName || 'N/A', boxX + 37, y);
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Contact Number:', 110, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(customerNumber || 'N/A', 143, y);
+
+                if (modeOfDelivery === 'Home Delivery') {
+
+                    y += 9;
+
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Address:`, boxX + 4, y);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(customerAddress || 'N/A', boxX + 23, y);
+                }
+
+                y += 9;
+
+                doc.setFont(undefined, 'bold');
+                doc.text(`Bill No:`, boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(billNumber, boxX + 20, y);
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Payment Mode:', 110, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(modeOfPayment || 'N/A', 140, y);
+
+                y += 9;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Delivery Mode:', boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(modeOfDelivery || 'N/A', boxX + 34, y);
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Billing Date:', 110, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(billingDate || 'N/A', 135, y);
+
+                y += 9;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Billing Date:', boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(billingTime || 'N/A', boxX + 28, y);
+
+                y += 7;
+
+                const boxHeight = y - contentStartY;
+
+                doc.setDrawColor(0);
+                doc.rect(boxX, contentStartY - 6, boxWidth, boxHeight + 4);
+
+                y += 3;
+
+                // Collect product data
+                const productRows = [];
+
+                // Items table
+                const itemRows = bill.products.map((item, index) => [
+                    item.name,
+                    item.quantity,
+                    `${item.unitPrice.toFixed(2)}`,
+                    `${item.originalTotal.toFixed(2)}`,
+                    `${item.discount.toFixed(2)}`,
+                    `${item.discountedTotal.toFixed(2)}`
+                ]);
+
+                // Draw the table
+                let currentY = y;
+                const firstPageRows = 15;
+                const nextPageRows = 25;
+
+                const totalRows = productRows.length;
+
+                // Split itemRows into paginated chunks
+                const paginatedRows = [];
+
+                if (totalRows <= firstPageRows) {
+                    paginatedRows.push(itemRows);
+                } else {
+                    paginatedRows.push(itemRows.slice(0, firstPageRows));
+                    for (let i = firstPageRows; i < totalRows; i += nextPageRows) {
+                        paginatedRows.push(itemRows.slice(i, i + nextPageRows));
+                    }
+                }
+
+                paginatedRows.forEach((itemRows, index) => {
+                    const isFirstPage = index === 0;
+                    const isLastPage = index === paginatedRows.length - 1;
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [[
+                            'Product Name',
+                            'Quantity',
+                            'Price (per unit)',
+                            'Total',
+                            'Discount (%)',
+                            'Discounted Total',
+                        ]],
+                        body: itemRows,
+                        foot: isLastPage ? [
+                            [
+                                { content: 'Overall Total:', colSpan: 5 },
+                                { content: "Rs. " + overallTotal }
+                            ],
+                            [
+                                { content: 'Overall Discount:', colSpan: 5 },
+                                { content: overallDiscount + " %" }
+                            ],
+                            [
+                                { content: 'Final Total:', colSpan: 5 },
+                                { content: "Rs. " + finalTotal }
+                            ]
+                        ] : undefined,
+                        styles: {
+                            fontSize: 10,
+                            lineColor: [0, 0, 0],
+                            lineWidth: 0.1,
+                            textColor: "#000000",
+                        },
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: "#000000",
+                        },
+                        footStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: "#000000",
+                        },
+                        margin: {
+                            left: 10,
+                            right: 10,
+                        },
+                        theme: 'grid',
+                    });
+
+                    // If not the last page, add a new one and reset Y
+                    if (!isLastPage) {
+                        doc.addPage();
+                        currentY = 20;
+                    } else {
+                        currentY = doc.lastAutoTable.finalY + 8;
+                    }
+                });
+
+                currentY = doc.lastAutoTable.finalY + 8;
+
+                // Generate and add UPI QR code
+                const upiId = "Q355693476@ybl";
+                const payeeName = "PhonePeMerchant";
+                const upiAmount = finalTotal;
+
+                const qrBase64 = await generateUpiQrBase64(upiId, payeeName, upiAmount);
+
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                // Ensure space for QR code
+                if (currentY + 60 > pageHeight) {
+                    doc.addPage();
+                    currentY = 20;
+                }
+
+                let qrTextBox = currentY + 6;
+
+                doc.setFontSize(20);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(40, 7, 0);
+                doc.text("Scan & Pay", leftMargin, qrTextBox);
+
+                let x = leftMargin;
+                qrTextBox = qrTextBox + 8;
+
+                const part1 = "OR Pay Directly on ";
+                const phone = "+91 9879718228";
+                const part2 = " or on UPI ID : ";
+                const upi = "Q355693476@ybl";
+
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(part1, x, qrTextBox);
+
+                x += doc.getTextWidth(part1);
+
+                doc.setFont(undefined, 'bold');
+                doc.text(phone, x, qrTextBox);
+                x += doc.getTextWidth(phone);
+
+                doc.setFont(undefined, 'normal');
+                doc.text(part2, x, qrTextBox);
+                x += doc.getTextWidth(part2);
+
+                doc.setFont(undefined, 'bold');
+                doc.text(upi, x, qrTextBox);
+
+                qrTextBox = qrTextBox + 8;
+
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.text("Kindly share the payment confirmation screenshot once the payment is completed,", leftMargin, qrTextBox);
+
+                qrTextBox = qrTextBox + 6;
+
+                doc.text("so we can proceed with processing your order.", leftMargin, qrTextBox);
+
+                doc.addImage(qrBase64, 'PNG', 160, currentY, 40, 40);
+
+                async function generateUpiQrBase64(upiId, payeeName, amount) {
+                    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR`;
+
+                    return new Promise((resolve) => {
+                        const tempDiv = document.createElement("div");
+                        const qr = new QRCode(tempDiv, {
+                            text: upiUrl,
+                            width: 150,
+                            height: 150,
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+
+                        setTimeout(() => {
+                            const img = tempDiv.querySelector('img');
+                            resolve(img.src);
+                        }, 500);
+                    });
+                }
+
+                const pageCount = doc.getNumberOfPages();
+
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.setFont(undefined, 'bold');
+                    doc.text("This is a computer-generated bill and does not require any signature or stamp.", 105, 283, { align: 'center' });
+                    doc.text("In case of any query, contact +91 9879718228", 105, 290, { align: 'center' });
+                }
+
+                // Save PDF
+
+                const pad = n => n.toString().padStart(2, '0');
+                const billingDateObj = new Date(billingDateRaw);
+                const day = pad(billingDateObj.getDate());
+                const month = pad(billingDateObj.getMonth() + 1);
+                const year = billingDateObj.getFullYear();
+
+                const hourPadded = pad(hour);
+                const minutePadded = pad(minute);
+
+                const formattedDateTime = `${day}${month}${year}${hourPadded}${minutePadded}`;
+
+                const filenameParts = [
+                    billNumber || '00',
+                    (customerName || 'Unknown').replace(/\s+/g, '_'),
+                    formattedDateTime
+                ];
+                const suggestedName = filenameParts.join('_') + '.pdf';
+
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName,
+                    types: [{
+                        description: 'PDF Files',
+                        accept: { 'application/pdf': ['.pdf'] },
+                    }],
+                });
+                const writableStream = await fileHandle.createWritable();
+                await writableStream.write(doc.output('blob'));
+                await writableStream.close();
+                
+            } catch (err) {
+                console.error("Error generating bill PDF:", err);
+                showToast('Failed to generate bill PDF.', 'text-bg-danger');
+            }
         }
 
         // Reusable Toast Function
