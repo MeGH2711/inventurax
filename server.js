@@ -420,6 +420,11 @@ app.get('/unique-customers-count', async (req, res) => {
     try {
         const result = await Bill.aggregate([
             {
+                $match: {
+                    customerName: { $ne: "Unknown" }
+                }
+            },
+            {
                 $group: {
                     _id: {
                         name: "$customerName",
