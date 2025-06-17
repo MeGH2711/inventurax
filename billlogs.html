@@ -68,10 +68,71 @@
 
             <!-- Main Content -->
             <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <h1 class="pageHeader mb-4">Bill Logs</h1>
+                <div class="row mt-3">
+                    <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h1 class="pageHeader">Bill Logs</h1>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-darkblue" onclick="toggleFilterCard()">
+                                Filter <i class="gsymbols-round gicon-keyboard_arrow_down"></i>
+                            </button>
+                        </div>
                     </div>
+                    <div class="col-12 mb-4" id="filterCard" style="display: none;">
+                        <div class="card shadow-sm border-0 rounded-3">
+                            <div class="card-body">
+                                <div class="row g-2 align-items-end flex-wrap">
+                                    <div class="col-lg-1">
+                                        <label class="form-label">Bill Number</label>
+                                        <input type="text" class="form-control form-control-sm" id="filterBillNumber"
+                                            name="billNumber">
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label class="form-label">Customer Name</label>
+                                        <input type="text" class="form-control form-control-sm" name="customerName">
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label class="form-label">Customer Number</label>
+                                        <input type="text" class="form-control form-control-sm" id="filterCustomerNumber"
+                                            name="customerNumber" maxlength="10">
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label">Date Range</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="date" class="form-control" name="startDate">
+                                            <span class="input-group-text">to</span>
+                                            <input type="date" class="form-control" name="endDate">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <label class="form-label">Payment</label>
+                                        <select class="form-select form-select-sm" name="modeOfPayment">
+                                            <option value="">All</option>
+                                            <option>Cash</option>
+                                            <option>Card</option>
+                                            <option>Online</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <label class="form-label">Delivery</label>
+                                        <select class="form-select form-select-sm" name="modeOfDelivery">
+                                            <option value="">All</option>
+                                            <option>In-house</option>
+                                            <option>Home Delivery</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 d-flex gap-1">
+                                        <button class="btn btn-sm btn-darkblue w-100"
+                                            id="applyFilterBtn">Search</button>
+                                        <button class="btn btn-sm btn-outline-darkblue" id="clearFilter">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-12" id="billLogsContainer"></div>
                 </div>
             </div>
@@ -125,6 +186,8 @@
                 window.location.href = '/';
             });
 
+        // Display Bill Cards
+
         async function loadBills() {
             try {
                 const res = await fetch('/get-bills');
@@ -140,6 +203,14 @@
                         </div>`;
                     return;
                 }
+
+                const billingDates = bills.map(bill => new Date(`${bill.billingDate}T${bill.billingTime}`));
+                const minDate = new Date(Math.min(...billingDates));
+                const maxDate = new Date(Math.max(...billingDates));
+
+                const toDateInputFormat = date => date.toISOString().split('T')[0];
+                document.querySelector('[name="startDate"]').value = toDateInputFormat(minDate);
+                document.querySelector('[name="endDate"]').value = toDateInputFormat(maxDate);
 
                 bills.forEach(bill => {
                     const billingDateTime = new Date(`${bill.billingDate}T${bill.billingTime}`);
@@ -207,7 +278,120 @@
             }
         }
 
+        // Apply Filter
+
+        document.querySelector('#applyFilterBtn').addEventListener('click', async () => {
+            const billNumber = document.querySelector('[name="billNumber"]').value.trim();
+            const customerName = document.querySelector('[name="customerName"]').value.trim();
+            const customerNumber = document.querySelector('[name="customerNumber"]').value.trim();
+            const startDate = document.querySelector('[name="startDate"]').value;
+            const endDate = document.querySelector('[name="endDate"]').value;
+            const modeOfPayment = document.querySelector('[name="modeOfPayment"]').value;
+            const modeOfDelivery = document.querySelector('[name="modeOfDelivery"]').value;
+
+            const query = new URLSearchParams({
+                billNumber,
+                customerName,
+                customerNumber,
+                startDate,
+                endDate,
+                modeOfPayment,
+                modeOfDelivery
+            });
+
+            try {
+                const res = await fetch(`/get-bills?${query.toString()}`);
+                const bills = await res.json();
+                renderBills(bills);
+            } catch (err) {
+                console.error('Error applying filters:', err);
+            }
+        });
+
+        // Clear Filter
+
+        document.querySelector('#clearFilter').addEventListener('click', () => {
+            document.querySelectorAll('#filterCard input, #filterCard select').forEach(input => input.value = '');
+            loadBills();
+        });
+
+        // Render Bills as per the Filter
+
+        function renderBills(bills) {
+            const container = document.getElementById('billLogsContainer');
+            container.innerHTML = '';
+
+            if (!bills.length) {
+                container.innerHTML = `<div class="text-center">No bills match the filters.</div>`;
+                return;
+            }
+
+            bills.forEach(bill => {
+                const billingDateTime = new Date(`${bill.billingDate}T${bill.billingTime}`);
+
+                // Format date
+                const formattedDate = billingDateTime.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                }).replace(/ /g, '/');
+
+                // Format time
+                const formattedTime = billingDateTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                const cardHTML = `
+                        <div class="card gradient-card shadow-sm h-100 rounded-3 border-0 position-relative
+                            ${bill.modeOfDelivery === 'Home Delivery' ? 'border-start border-5 border-warning' :
+                        bill.modeOfDelivery === 'In-house' ? 'border-start border-5 border-lightgreen' : ''}">
+
+                            <div class="card-body p-3 d-flex">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title fw-semibold mb-1">
+                                                <i class="gsymbols-round gicon-account_circle me-1"></i>${bill.customerName}
+                                            </h5>
+                                            <p class="mb-2 small"><i class="gsymbols-round gicon-call me-1"></i>${bill.customerNumber}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-wrap small mt-2">
+                                        <div class="me-4 mb-1"><i class="gsymbols-round gicon-confirmation_number me-1"></i><strong>${bill.billNumber}</strong></div>
+                                        <div class="me-4 mb-1"><i class="gsymbols-round gicon-event me-1"></i><strong>${formattedDate}</strong></div>
+                                        <div class="me-4 mb-1"><i class="gsymbols-round gicon-schedule me-1"></i><strong>${formattedTime}</strong></div>
+                                        <div class="me-4 mb-1"><i class="gsymbols-round gicon-wallet me-1"></i>${bill.modeOfPayment}</div>
+                                        <div class="me-4 mb-1"><i class="gsymbols-round gicon-local_shipping me-1"></i>${bill.modeOfDelivery}</div>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="d-flex justify-content-between align-items-center small">
+                                        <span><strong>Total:</strong> ₹ ${bill.overallTotal}</span>
+                                        <span><strong>Discount:</strong> ${bill.overallDiscount} %</span>
+                                        <span><strong>Final:</strong> ₹ ${bill.finalTotal}</span>
+                                        <div>
+                                            <button class="btn btn-sm btn-darkblue" onclick="viewBill('${bill._id}')">
+                                                View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('col-12', 'mb-3');
+                wrapper.innerHTML = cardHTML;
+
+                container.appendChild(wrapper);
+            });
+        }
+
         window.onload = loadBills;
+
+        // View Bill Details in Modal
 
         async function viewBill(billId) {
             try {
@@ -334,6 +518,8 @@
                 showToast('Failed to load bill details.', 'text-bg-danger');
             }
         }
+
+        // Download Bill PDF
 
         async function downloadBill(billId) {
             try {
@@ -742,6 +928,19 @@
                 showToast('Failed to generate bill PDF.', 'text-bg-danger');
             }
         }
+
+        // Filter Card Toggle
+
+        function toggleFilterCard() {
+            const card = document.getElementById('filterCard');
+            card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        }
+
+        $(document).ready(function () {
+            $('#filterBillNumber, #filterCustomerNumber').on('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
 
         // Reusable Toast Function
 

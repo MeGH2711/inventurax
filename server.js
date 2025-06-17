@@ -326,7 +326,43 @@ app.post('/save-bill', async (req, res) => {
 
 app.get('/get-bills', isAuthenticated, async (req, res) => {
     try {
-        const bills = await Bill.find().sort({ createdAt: -1 });
+        const {
+            billNumber,
+            customerName,
+            customerNumber,
+            startDate,
+            endDate,
+            modeOfPayment,
+            modeOfDelivery
+        } = req.query;
+
+        const query = {};
+
+        if (billNumber) {
+            query.billNumber = billNumber;
+        }
+
+        if (customerName) {
+            query.customerName = { $regex: customerName, $options: 'i' }; // case-insensitive
+        }
+
+        if (customerNumber) {
+            query.customerNumber = { $regex: customerNumber, $options: 'i' };
+        }
+
+        if (startDate && endDate) {
+            query.billingDate = { $gte: startDate, $lte: endDate };
+        }
+
+        if (modeOfPayment) {
+            query.modeOfPayment = modeOfPayment;
+        }
+
+        if (modeOfDelivery) {
+            query.modeOfDelivery = modeOfDelivery;
+        }
+
+        const bills = await Bill.find(query).sort({ billingDate: -1, billingTime: -1 });
         res.json(bills);
     } catch (err) {
         console.error('Error fetching bills:', err);
@@ -347,7 +383,7 @@ app.get('/get-bill/:id', isAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/next-bill-number', async (req, res) => {
+app.get('/next-bill-number', isAuthenticated, async (req, res) => {
     try {
         const latestBill = await Bill.findOne().sort({ billNumber: -1 });
         const nextBillNumber = latestBill ? latestBill.billNumber + 1 : 1;
@@ -358,7 +394,7 @@ app.get('/next-bill-number', async (req, res) => {
     }
 });
 
-app.get('/search-customers', async (req, res) => {
+app.get('/search-customers', isAuthenticated, async (req, res) => {
     const query = req.query.q?.toLowerCase() || "";
 
     try {
