@@ -506,6 +506,10 @@ app.get('/billlogs', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'billlogs.html'));
 });
 
+app.get('/customers', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'customers.html'));
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
