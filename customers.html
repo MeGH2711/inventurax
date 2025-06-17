@@ -74,6 +74,48 @@
                 </div>
             </div>
 
+            <div class="container-fluid">
+                <div class="row mt-3">
+                    <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h1 class="pageHeader">Customers</h1>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-darkblue" onclick="toggleFilterCard()">
+                                Filter <i id="filterToggleIcon" class="gsymbols-round gicon-keyboard_arrow_down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3" id="filterCard" style="display: none;">
+                        <div class="card shadow-sm border-0 rounded-3">
+                            <div class="card-body">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-lg-5">
+                                        <label class="form-label">Customer Name</label>
+                                        <input type="text" class="form-control form-control-sm" name="customerName">
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <label class="form-label">Customer Number</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            id="filterCustomerNumber" name="customerNumber" maxlength="10">
+                                    </div>
+                                    <div class="col-lg-2 d-flex align-items-end gap-1">
+                                        <button class="btn btn-sm btn-darkblue w-100"
+                                            id="applyFilterBtn">Search</button>
+                                        <button class="btn btn-sm btn-darkblue2 w-100" id="clearFilter">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12" id="customerLogContainer">
+                        <div class="card" id="customerTableCard"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Footer Section -->
             <footer class="mt-auto pt-3 border-top text-center small text-muted">
                 <div class="container">
@@ -106,6 +148,92 @@
             .catch(() => {
                 window.location.href = '/';
             });
+
+        async function loadCustomers() {
+            try {
+                const res = await fetch('/get-unique-customers');
+                const customers = await res.json();
+
+                const container = document.getElementById('customerTableCard');
+                if (!customers.length) {
+                    container.innerHTML = '<div class="alert alert-info">No customer records found.</div>';
+                    return;
+                }
+
+                customers.sort((a, b) => a.name.localeCompare(b.name));
+
+                const table = document.createElement('table');
+                table.className = 'table table-bordered table-sm';
+                table.id = 'customerTable';
+
+                const thead = `
+                    <thead>
+                        <tr>
+                            <th class="text-center align-middle">Sr. No.</th>
+                            <th class="text-center align-middle">Name</th>
+                            <th class="text-center align-middle">Contact Number</th>
+                            <th class="text-center align-middle">Address</th>
+                            <th class="text-center align-middle">Total Shopping (₹)</th>
+                            <th class="text-center align-middle" colspan="2"></th>
+                        </tr>
+                    </thead>
+                `;
+
+                const rows = customers.map((c, i) => {
+                    const waLink = `https://wa.me/91${c.number}`;
+                    const shortAddress = c.address.length > 15 ? c.address.slice(0, 15) + '...' : c.address;
+                    const addressTitle = c.address.toLowerCase() !== "unknown" ? `title="${c.address}"  data-bs-placement="right" data-bs-toggle="tooltip"` : "";
+
+                    return `
+                        <tr>
+                            <td class="text-center align-middle">${i + 1}</td>
+                            <td class="text-center align-middle">${c.name}</td>
+                            <td class="text-center align-middle">${c.number}</td>
+                            <td class="text-center align-middle" ${addressTitle}>${shortAddress}</td>
+                            <td class="text-center align-middle">₹ ${c.totalSpent.toFixed(2)}</td>
+                            <td class="text-center align-middle">
+                                <button class="btn btn-darkblue btn-sm w-100">
+                                    View Details
+                                </button>
+                            </td>                            
+                            <td class="text-center align-middle">
+                                <a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm w-100">
+                                    WhatsApp
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+
+
+                table.innerHTML = thead + `<tbody>${rows}</tbody>`;
+                container.innerHTML = '';
+                container.appendChild(table);
+            } catch (err) {
+                console.error("Failed to load customers:", err);
+                document.getElementById('customerTableCard').innerHTML =
+                    '<div class="alert alert-danger">Error loading customer data.</div>';
+            }
+
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                new bootstrap.Tooltip(el);
+            });
+
+        }
+
+        window.addEventListener('DOMContentLoaded', loadCustomers);
+
+        function toggleFilterCard() {
+            const card = document.getElementById('filterCard');
+            const icon = document.getElementById('filterToggleIcon');
+
+            const isHidden = card.style.display === 'none';
+
+            card.style.display = isHidden ? 'block' : 'none';
+            icon.classList.toggle('gicon-keyboard_arrow_down', !isHidden);
+            icon.classList.toggle('gicon-keyboard_arrow_up', isHidden);
+        }
 
         // Reusable Toast Function
 

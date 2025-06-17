@@ -154,7 +154,8 @@ table tbody tr td {
   background-color: transparent !important;
 }
 
-.productListingTable tbody tr:nth-of-type(even) td {
+.productListingTable tbody tr:nth-of-type(even) td,
+#customerTable tbody tr:nth-of-type(even) td {
   background-color: var(--table-alternate-row) !important;
 }
 

@@ -481,6 +481,58 @@ app.get('/unique-customers-count', async (req, res) => {
     }
 });
 
+app.get('/get-unique-customers', isAuthenticated, async (req, res) => {
+    try {
+        const result = await Bill.aggregate([
+            {
+                $group: {
+                    _id: {
+                        name: "$customerName",
+                        number: "$customerNumber"
+                    },
+                    totalSpent: { $sum: "$finalTotal" },
+                    latestBillDate: { $max: "$createdAt" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "bills",
+                    let: { cname: "$_id.name", cnum: "$_id.number", latestDate: "$latestBillDate" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$customerName", "$$cname"] },
+                                        { $eq: ["$customerNumber", "$$cnum"] },
+                                        { $eq: ["$createdAt", "$$latestDate"] }
+                                    ]
+                                }
+                            }
+                        },
+                        { $project: { customerAddress: 1, _id: 0 } }
+                    ],
+                    as: "latestAddressData"
+                }
+            },
+            {
+                $project: {
+                    name: "$_id.name",
+                    number: "$_id.number",
+                    totalSpent: 1,
+                    address: { $arrayElemAt: ["$latestAddressData.customerAddress", 0] }
+                }
+            },
+            { $sort: { totalSpent: -1 } }
+        ]);
+
+        res.json(result);
+    } catch (err) {
+        console.error("Error fetching unique customers with totals:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
 // Routes
 
 app.get('/', (req, res) => {
