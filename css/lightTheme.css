@@ -178,3 +178,9 @@ table tbody tr td {
   background-color: #b3c7ff;
   color: var(--black);
 }
+
+/* Comming Soon */
+
+.coming-soon-text {
+  color: var(--main-bg);
+}

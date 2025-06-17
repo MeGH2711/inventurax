@@ -506,6 +506,10 @@ app.get('/billlogs', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'billlogs.html'));
 });
 
+app.get('/analytics', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'analytics.html'));
+});
+
 app.get('/customers', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'customers.html'));
 });
