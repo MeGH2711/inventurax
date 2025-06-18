@@ -90,19 +90,25 @@
                         <div class="card shadow-sm border-0 rounded-3">
                             <div class="card-body">
                                 <div class="row g-2 mb-2">
-                                    <div class="col-lg-5">
-                                        <label class="form-label">Customer Name</label>
-                                        <input type="text" class="form-control form-control-sm" name="customerName">
+                                    <div class="col-lg-4">
+                                        <label for="filterCustomerName" class="form-label">Customer Name</label>
+                                        <input type="text" id="filterCustomerName" class="form-control form-control-sm"
+                                            name="customerName">
                                     </div>
-                                    <div class="col-lg-5">
-                                        <label class="form-label">Customer Number</label>
+                                    <div class="col-lg-4">
+                                        <label for="filterCustomerNumber" class="form-label">Customer Number</label>
                                         <input type="text" class="form-control form-control-sm"
                                             id="filterCustomerNumber" name="customerNumber" maxlength="10">
                                     </div>
-                                    <div class="col-lg-2 d-flex align-items-end gap-1">
-                                        <button class="btn btn-sm btn-darkblue w-100"
-                                            id="applyFilterBtn">Search</button>
-                                        <button class="btn btn-sm btn-darkblue2 w-100" id="clearFilter">Clear</button>
+                                    <div class="col-lg-4">
+                                        <label for="filterSortSelection" class="form-label">Sort By</label>
+                                        <select id="filterSortSelection" class="form-select form-select-sm"
+                                            aria-label="Default select example">
+                                            <option selected value="name-asc">Name A → Z</option>
+                                            <option value="name-desc">Name Z → A</option>
+                                            <option value="shopping-asc">Total Shopping ₹ Low → High</option>
+                                            <option value="shopping-desc">Total Shopping ₹ High → Low</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -174,6 +180,8 @@
             try {
                 const res = await fetch('/get-unique-customers');
                 const customers = await res.json();
+                allCustomers = customers;
+                applyFiltersAndSorting();
 
                 const container = document.getElementById('customerTableCard');
                 if (!customers.length) {
@@ -226,7 +234,7 @@
                             </td>                            
                             <td class="text-center align-middle">
                                 <a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm w-100">
-                                    WhatsApp
+                                    <i class="bi bi-whatsapp me-2"></i>WhatsApp
                                 </a>
                             </td>
                         </tr>
@@ -259,6 +267,128 @@
                 });
             });
 
+        }
+
+        let allCustomers = [];
+
+        document.getElementById('filterCustomerName').addEventListener('input', applyFiltersAndSorting);
+        document.getElementById('filterCustomerNumber').addEventListener('input', applyFiltersAndSorting);
+        document.getElementById('filterSortSelection').addEventListener('change', applyFiltersAndSorting);
+
+        function applyFiltersAndSorting() {
+            const nameFilter = document.getElementById('filterCustomerName').value.toLowerCase();
+            const numberFilter = document.getElementById('filterCustomerNumber').value.toLowerCase();
+            const sortOption = document.getElementById('filterSortSelection').value;
+
+            let filtered = allCustomers.filter(c => {
+                const matchesName = c.name.toLowerCase().includes(nameFilter);
+                const matchesNumber = c.number.toLowerCase().includes(numberFilter);
+                return matchesName && matchesNumber;
+            });
+
+            switch (sortOption) {
+                case 'name-asc':
+                    filtered.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'name-desc':
+                    filtered.sort((a, b) => b.name.localeCompare(a.name));
+                    break;
+                case 'shopping-asc':
+                    filtered.sort((a, b) => a.totalSpent - b.totalSpent);
+                    break;
+                case 'shopping-desc':
+                    filtered.sort((a, b) => b.totalSpent - a.totalSpent);
+                    break;
+            }
+
+            renderCustomerTable(filtered);
+        }
+
+        function renderCustomerTable(customers) {
+
+            const nameFilter = document.getElementById('filterCustomerName').value.toLowerCase();
+            const numberFilter = document.getElementById('filterCustomerNumber').value.toLowerCase();
+
+            const container = document.getElementById('customerTableCard');
+
+            if (!customers.length) {
+                container.innerHTML = '<div class="alert alert-info text-center m-0 py-3">No matching customer records found.</div>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'table table-bordered table-sm';
+            table.id = 'customerTable';
+
+            const thead = `
+                <thead>
+                    <tr>
+                        <th class="text-center align-middle">Sr. No.</th>
+                        <th class="text-center align-middle">Name</th>
+                        <th class="text-center align-middle">Contact Number</th>
+                        <th class="text-center align-middle">Address</th>
+                        <th class="text-center align-middle">Total Shopping (₹)</th>
+                        <th class="text-center align-middle" colspan="2">Action</th>
+                    </tr>
+                </thead>
+            `;
+
+            const rows = customers.map((c, i) => {
+                const waLink = `https://wa.me/91${c.number}`;
+                const fullAddress = c.address;
+                const shortAddress = fullAddress.length > 15 ? fullAddress.slice(0, 15) + '...' : fullAddress;
+                const showTooltip = fullAddress.toLowerCase() !== "unknown";
+                const tooltipAttr = showTooltip ? `title="${fullAddress}" data-bs-toggle="tooltip" data-bs-placement="right"` : '';
+                const copyIcon = showTooltip ? `<i class="gsymbols-round gicon-content_paste ms-2 copy-icon" data-address="${fullAddress}" role="button" title="Copy to clipboard"></i>` : '';
+
+                const highlightMatch = (text, searchTerm) => {
+                    if (!searchTerm) return text;
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    return text.replace(regex, '<span class="highlightedText">$1</span>');
+                };
+
+                return `
+                    <tr>
+                        <td class="text-center align-middle">${i + 1}</td>
+                        <td class="text-center align-middle">${highlightMatch(c.name, nameFilter)}</td>
+                        <td class="text-center align-middle">${highlightMatch(c.number, numberFilter)}</td>
+                        <td class="text-center align-middle" ${tooltipAttr}>
+                            ${shortAddress}${copyIcon}
+                        </td>
+                        <td class="text-center align-middle">₹ ${c.totalSpent.toFixed(2)}</td>
+                        <td class="text-center align-middle">
+                            <button class="btn btn-darkblue btn-sm w-100 view-details-btn"
+                                data-name="${c.name}"
+                                data-number="${c.number}">
+                                View Details
+                            </button>
+                        </td>                            
+                        <td class="text-center align-middle">
+                            <a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm w-100">
+                                <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            table.innerHTML = thead + `<tbody>${rows}</tbody>`;
+            container.innerHTML = '';
+            container.appendChild(table);
+
+            // Initialize tooltip and clipboard
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+            document.querySelectorAll('.copy-icon').forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const address = icon.getAttribute('data-address');
+                    navigator.clipboard.writeText(address).then(() => {
+                        icon.classList.replace('gicon-content_paste', 'gicon-inventory');
+                        setTimeout(() => {
+                            icon.classList.replace('gicon-inventory', 'gicon-content_paste');
+                        }, 3000);
+                    });
+                });
+            });
         }
 
         window.addEventListener('DOMContentLoaded', loadCustomers);
@@ -321,8 +451,8 @@
                             <div class="card-body">
                                 <h5 class="card-title fw-bold"><i class="gsymbols-round gicon-description me-1"></i> Bill Information</h5>
                                 <div class="row">
-                                    <div class="col-md-6 mb-2"><strong>Number of Visits:</strong> ${purchases.length}</div>
-                                    <div class="col-md-6 mb-2"><strong>Last Visit:</strong> ${lastVisitDate}</div>
+                                    <div class="col-md-6 mb-2"><strong>Number of Orders:</strong> ${purchases.length}</div>
+                                    <div class="col-md-6 mb-2"><strong>Previous Order Date:</strong> ${lastVisitDate}</div>
                                     <div class="col-md-12 mb-2"><strong>Total Shopping (₹):</strong> ₹ ${totalSpent.toFixed(2)}</div>
                                     <div class="col-md-12 mb-2"><strong>Average Bill Value (₹):</strong> ₹ ${averageBill.toFixed(2)}</div>
                                 </div>
@@ -358,11 +488,11 @@
                                         <span class="badge d-flex align-items-center ${p.modeOfDelivery === 'Home Delivery' ? 'bg-warning text-dark' : 'bg-info text-dark'} mb-1">
                                             <i class="gsymbols-round gicon-local_shipping me-1"></i> ${p.modeOfDelivery}
                                         </span>
-                                        <span class="badge d-flex align-items-center ${p.modeOfPayment === 'Cash' ? 'bg-success' : p.modeOfPayment === 'Online' ? 'bg-primary' : p.modeOfPayment === 'Cheque' ? 'bg-info' : p.modeOfPayment === 'Debit' ? 'bg-danger' : 'bg-secondary'} text-light mb-1">
+                                        <span class="badge d-flex align-items-center ${p.modeOfPayment === 'Cash' ? 'bg-success' : p.modeOfPayment === 'Online' ? 'bg-primary' : p.modeOfPayment === 'Cheque' ? 'bg-info text-dark' : p.modeOfPayment === 'Debit' ? 'bg-danger' : 'bg-secondary'} text-light mb-1">
                                             <i class="gsymbols-round gicon-wallet me-1"></i> ${p.modeOfPayment}
                                         </span>
                                     </div>
-                                    <button class="btn btn-darkblue w-100 mt-2 generate-bill-btn" data-id="${p._id}">
+                                    <button class="btn btn-darkblue w-100 mt-2 generate-bill-btn" onclick="downloadBill('${p._id}')">
                                         <i class="gsymbols-round gicon-receipt_long me-1"></i> Generate Bill
                                     </button>
                                 </div>
@@ -378,6 +508,414 @@
                 modal.show();
             }
         });
+
+        async function downloadBill(billId) {
+            try {
+                const res = await fetch(`/get-bill/${billId}`);
+                const bill = await res.json();
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                const iconSize = 6;
+                const iconY = 5;
+                const textYOffset = 4;
+                const spacing = 4;
+                const columnGap = 113;
+                const leftMargin = 10;
+
+                // Fetch YouTube icon
+                const youtubeIcon = await fetch('images/youtubeLogo.png')
+                    .then(res => res.blob())
+                    .then(blob => new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }));
+
+                // Fetch Instagram Icon
+                const instaIcon = await fetch('images/instaLogo.png')
+                    .then(res => res.blob())
+                    .then(blob => new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }));
+
+                // YouTube Block
+                const ytX = 14;
+                doc.addImage(youtubeIcon, 'PNG', ytX, iconY, iconSize, iconSize);
+                doc.link(ytX, iconY, iconSize, iconSize, { url: 'https://www.youtube.com/@VimalDeBakers/' });
+
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.textWithLink('@VimalDeBakers', ytX + iconSize + spacing, iconY + textYOffset, {
+                    url: 'https://www.youtube.com/@VimalDeBakers/'
+                });
+
+                // Instagram Block
+                const igX = ytX + iconSize + spacing + doc.getTextWidth('YouTube') + columnGap;
+                doc.addImage(instaIcon, 'PNG', igX, iconY, iconSize, iconSize);
+                doc.link(igX, iconY, iconSize, iconSize, { url: 'https://www.instagram.com/de.bakers.and.more/' });
+
+                doc.textWithLink('@de.bakers.and.more', igX + iconSize + spacing, iconY + textYOffset, {
+                    url: 'https://www.instagram.com/de.bakers.and.more/'
+                });
+
+                const logo = await fetch('images/billLogo.png')
+                    .then(res => res.blob())
+                    .then(blob => new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }));
+
+                doc.addImage(logo, 'PNG', 15, 15, 50, 50);
+
+                doc.setFontSize(25);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(40, 7, 0);
+                doc.text("Vekaria Foods", 195, 25, { align: 'right' });
+                doc.setFontSize(15);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(107, 68, 0);
+                doc.text("De Baker's & More", 195, 32, { align: 'right' });
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text('GF-30, Shaligram Square,', 195, 42, { align: 'right' });
+                doc.text('Nr. Satyamev Vista,', 195, 48, { align: 'right' });
+                doc.text('Gota, Ahmedabad - 382481', 195, 54, { align: 'right' });
+                const rightX = 195;
+
+                doc.setFont(undefined, 'bold');
+                const boldWidth = doc.getTextWidth('Phone: ');
+
+                doc.setFont(undefined, 'normal');
+                const number = '+91 9879718228';
+                const numberWidth = doc.getTextWidth(number);
+
+                const totalWidth = boldWidth + numberWidth;
+
+                const startX = rightX - totalWidth;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Phone: ', startX, 61);
+
+                doc.setFont(undefined, 'normal');
+                doc.text(number, startX + boldWidth, 61);
+
+                let y = 75;
+
+                const billNumber = bill.billNumber.toString();
+                const customerName = bill.customerName;
+                const customerNumber = bill.customerNumber;
+                const billingDateRaw = bill.billingDate;
+                const billingDate = new Date(billingDateRaw).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                }).replace(/ /g, '/');
+                const billingTimeRaw = bill.billingTime;
+                const [hourStr, minute] = billingTimeRaw.split(':');
+                const hour = parseInt(hourStr, 10);
+                const period = hour >= 12 ? 'PM' : 'AM';
+                const hour12 = hour % 12 || 12;
+                const billingTime = `${hour12}:${minute} ${period}`;
+                const modeOfDelivery = bill.modeOfDelivery;
+                const modeOfPayment = bill.modeOfPayment;
+                const customerAddress = bill.customerAddress;
+                const overallTotal = bill.overallTotal;
+                const overallDiscount = bill.overallDiscount;
+                const finalTotal = bill.finalTotal;
+
+                doc.setFontSize(11);
+
+                const boxX = 10;
+                const boxWidth = 190;
+                const contentStartY = y;
+
+                y += 2;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Customer Name:', boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(customerName || 'N/A', boxX + 37, y);
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Contact Number:', 110, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(customerNumber || 'N/A', 143, y);
+
+                if (modeOfDelivery === 'Home Delivery') {
+
+                    y += 9;
+
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Address:`, boxX + 4, y);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(customerAddress || 'N/A', boxX + 23, y);
+                }
+
+                y += 9;
+
+                doc.setFont(undefined, 'bold');
+                doc.text(`Bill No:`, boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(billNumber, boxX + 20, y);
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Payment Mode:', 110, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(modeOfPayment || 'N/A', 140, y);
+
+                y += 9;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Delivery Mode:', boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(modeOfDelivery || 'N/A', boxX + 34, y);
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Billing Date:', 110, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(billingDate || 'N/A', 135, y);
+
+                y += 9;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('Billing Date:', boxX + 4, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(billingTime || 'N/A', boxX + 28, y);
+
+                y += 7;
+
+                const boxHeight = y - contentStartY;
+
+                doc.setDrawColor(0);
+                doc.rect(boxX, contentStartY - 6, boxWidth, boxHeight + 4);
+
+                y += 3;
+
+                // Collect product data
+                const productRows = [];
+
+                // Items table
+                const itemRows = bill.products.map((item, index) => [
+                    item.name,
+                    item.quantity,
+                    `${item.unitPrice.toFixed(2)}`,
+                    `${item.originalTotal.toFixed(2)}`,
+                    `${item.discount.toFixed(2)}`,
+                    `${item.discountedTotal.toFixed(2)}`
+                ]);
+
+                // Draw the table
+                let currentY = y;
+                const firstPageRows = 15;
+                const nextPageRows = 25;
+
+                const totalRows = productRows.length;
+
+                // Split itemRows into paginated chunks
+                const paginatedRows = [];
+
+                if (totalRows <= firstPageRows) {
+                    paginatedRows.push(itemRows);
+                } else {
+                    paginatedRows.push(itemRows.slice(0, firstPageRows));
+                    for (let i = firstPageRows; i < totalRows; i += nextPageRows) {
+                        paginatedRows.push(itemRows.slice(i, i + nextPageRows));
+                    }
+                }
+
+                paginatedRows.forEach((itemRows, index) => {
+                    const isFirstPage = index === 0;
+                    const isLastPage = index === paginatedRows.length - 1;
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [[
+                            'Product Name',
+                            'Quantity',
+                            'Price (per unit)',
+                            'Total',
+                            'Discount (%)',
+                            'Discounted Total',
+                        ]],
+                        body: itemRows,
+                        foot: isLastPage ? [
+                            [
+                                { content: 'Overall Total:', colSpan: 5 },
+                                { content: "Rs. " + overallTotal }
+                            ],
+                            [
+                                { content: 'Overall Discount:', colSpan: 5 },
+                                { content: overallDiscount + " %" }
+                            ],
+                            [
+                                { content: 'Final Total:', colSpan: 5 },
+                                { content: "Rs. " + finalTotal }
+                            ]
+                        ] : undefined,
+                        styles: {
+                            fontSize: 10,
+                            lineColor: [0, 0, 0],
+                            lineWidth: 0.1,
+                            textColor: "#000000",
+                        },
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: "#000000",
+                        },
+                        footStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: "#000000",
+                        },
+                        margin: {
+                            left: 10,
+                            right: 10,
+                        },
+                        theme: 'grid',
+                    });
+
+                    // If not the last page, add a new one and reset Y
+                    if (!isLastPage) {
+                        doc.addPage();
+                        currentY = 20;
+                    } else {
+                        currentY = doc.lastAutoTable.finalY + 8;
+                    }
+                });
+
+                currentY = doc.lastAutoTable.finalY + 8;
+
+                // Generate and add UPI QR code
+                const upiId = "Q355693476@ybl";
+                const payeeName = "PhonePeMerchant";
+                const upiAmount = finalTotal;
+
+                const qrBase64 = await generateUpiQrBase64(upiId, payeeName, upiAmount);
+
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                // Ensure space for QR code
+                if (currentY + 60 > pageHeight) {
+                    doc.addPage();
+                    currentY = 20;
+                }
+
+                let qrTextBox = currentY + 6;
+
+                doc.setFontSize(20);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(40, 7, 0);
+                doc.text("Scan & Pay", leftMargin, qrTextBox);
+
+                let x = leftMargin;
+                qrTextBox = qrTextBox + 8;
+
+                const part1 = "OR Pay Directly on ";
+                const phone = "+91 9879718228";
+                const part2 = " or on UPI ID : ";
+                const upi = "Q355693476@ybl";
+
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(part1, x, qrTextBox);
+
+                x += doc.getTextWidth(part1);
+
+                doc.setFont(undefined, 'bold');
+                doc.text(phone, x, qrTextBox);
+                x += doc.getTextWidth(phone);
+
+                doc.setFont(undefined, 'normal');
+                doc.text(part2, x, qrTextBox);
+                x += doc.getTextWidth(part2);
+
+                doc.setFont(undefined, 'bold');
+                doc.text(upi, x, qrTextBox);
+
+                qrTextBox = qrTextBox + 8;
+
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.text("Kindly share the payment confirmation screenshot once the payment is completed,", leftMargin, qrTextBox);
+
+                qrTextBox = qrTextBox + 6;
+
+                doc.text("so we can proceed with processing your order.", leftMargin, qrTextBox);
+
+                doc.addImage(qrBase64, 'PNG', 160, currentY, 40, 40);
+
+                async function generateUpiQrBase64(upiId, payeeName, amount) {
+                    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR`;
+
+                    return new Promise((resolve) => {
+                        const tempDiv = document.createElement("div");
+                        const qr = new QRCode(tempDiv, {
+                            text: upiUrl,
+                            width: 150,
+                            height: 150,
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+
+                        setTimeout(() => {
+                            const img = tempDiv.querySelector('img');
+                            resolve(img.src);
+                        }, 500);
+                    });
+                }
+
+                const pageCount = doc.getNumberOfPages();
+
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.setFont(undefined, 'bold');
+                    doc.text("This is a computer-generated bill and does not require any signature or stamp.", 105, 283, { align: 'center' });
+                    doc.text("In case of any query, contact +91 9879718228", 105, 290, { align: 'center' });
+                }
+
+                // Save PDF
+
+                const pad = n => n.toString().padStart(2, '0');
+                const billingDateObj = new Date(billingDateRaw);
+                const day = pad(billingDateObj.getDate());
+                const month = pad(billingDateObj.getMonth() + 1);
+                const year = billingDateObj.getFullYear();
+
+                const hourPadded = pad(hour);
+                const minutePadded = pad(minute);
+
+                const formattedDateTime = `${day}${month}${year}${hourPadded}${minutePadded}`;
+
+                const filenameParts = [
+                    billNumber || '00',
+                    (customerName || 'Unknown').replace(/\s+/g, '_'),
+                    formattedDateTime
+                ];
+                const suggestedName = filenameParts.join('_') + '.pdf';
+
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName,
+                    types: [{
+                        description: 'PDF Files',
+                        accept: { 'application/pdf': ['.pdf'] },
+                    }],
+                });
+                const writableStream = await fileHandle.createWritable();
+                await writableStream.write(doc.output('blob'));
+                await writableStream.close();
+
+            } catch (err) {
+                console.error("Error generating bill PDF:", err);
+                showToast('Failed to generate bill PDF.', 'text-bg-danger');
+            }
+        }
 
         function toggleFilterCard() {
             const card = document.getElementById('filterCard');
