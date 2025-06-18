@@ -221,6 +221,10 @@
   pointer-events: none;
 }
 
+.modal-xxl{
+  max-width: 95vw;
+}
+
 /* Form Control & Form Select */
 
 .form-control:focus,

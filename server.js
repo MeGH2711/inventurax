@@ -533,6 +533,22 @@ app.get('/get-unique-customers', isAuthenticated, async (req, res) => {
     }
 });
 
+app.get('/customer-purchases', isAuthenticated, async (req, res) => {
+    const { name, number } = req.query;
+
+    try {
+        const purchases = await Bill.find({
+            customerName: name,
+            customerNumber: number
+        }).sort({ createdAt: -1 });
+
+        res.json(purchases);
+    } catch (err) {
+        console.error('Error fetching customer purchases:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Routes
 
 app.get('/', (req, res) => {

@@ -37,6 +37,12 @@ body {
   background-color: var(--main-bg);
 }
 
+/* Texts */
+
+.text-warning{
+  color: #d7a100 !important;
+}
+
 /* Buttons */
 
 .btn-darkblue {
@@ -108,6 +114,11 @@ body {
 
 .gradient-card:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-card2 {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 1px solid #dee2e6;
 }
 
 .product-card {

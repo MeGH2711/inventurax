@@ -128,6 +128,27 @@
 
     <!-- Modals -->
 
+    <div class="modal fade" id="customerDetailsModal" tabindex="-1" aria-labelledby="customerDetailsLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xxl modal-dialog-scrollable">
+            <div class="modal-content border-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customerDetailsLabel">Customer Overview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Customer & Latest Bill Cards -->
+                    <div class="row" id="customerAndBillCards"></div>
+                    <hr>
+                    <!-- Purchases List -->
+                    <h5 class="mb-3 fw-bold"><i class="gsymbols-round gicon-shopping_cart me-1"></i> Purchase History
+                    </h5>
+                    <div id="purchaseCards" class="row g-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/jspdf.umd.min.js"></script>
@@ -174,25 +195,32 @@
                             <th class="text-center align-middle">Contact Number</th>
                             <th class="text-center align-middle">Address</th>
                             <th class="text-center align-middle">Total Shopping (₹)</th>
-                            <th class="text-center align-middle" colspan="2"></th>
+                            <th class="text-center align-middle" colspan="2">Action</th>
                         </tr>
                     </thead>
                 `;
 
                 const rows = customers.map((c, i) => {
                     const waLink = `https://wa.me/91${c.number}`;
-                    const shortAddress = c.address.length > 15 ? c.address.slice(0, 15) + '...' : c.address;
-                    const addressTitle = c.address.toLowerCase() !== "unknown" ? `title="${c.address}"  data-bs-placement="right" data-bs-toggle="tooltip"` : "";
+                    const fullAddress = c.address;
+                    const shortAddress = fullAddress.length > 15 ? fullAddress.slice(0, 15) + '...' : fullAddress;
+                    const showTooltip = fullAddress.toLowerCase() !== "unknown";
+                    const tooltipAttr = showTooltip ? `title="${fullAddress}" data-bs-toggle="tooltip" data-bs-placement="right"` : '';
+                    const copyIcon = showTooltip ? `<i class="gsymbols-round gicon-content_paste ms-2 copy-icon" data-address="${fullAddress}" role="button" title="Copy to clipboard"></i>` : '';
 
                     return `
                         <tr>
                             <td class="text-center align-middle">${i + 1}</td>
                             <td class="text-center align-middle">${c.name}</td>
                             <td class="text-center align-middle">${c.number}</td>
-                            <td class="text-center align-middle" ${addressTitle}>${shortAddress}</td>
+                            <td class="text-center align-middle" ${tooltipAttr}>
+                                ${shortAddress}${copyIcon}
+                            </td>
                             <td class="text-center align-middle">₹ ${c.totalSpent.toFixed(2)}</td>
                             <td class="text-center align-middle">
-                                <button class="btn btn-darkblue btn-sm w-100">
+                                <button class="btn btn-darkblue btn-sm w-100 view-details-btn"
+                                    data-name="${c.name}"
+                                    data-number="${c.number}">
                                     View Details
                                 </button>
                             </td>                            
@@ -204,8 +232,6 @@
                         </tr>
                     `;
                 }).join('');
-
-
 
                 table.innerHTML = thead + `<tbody>${rows}</tbody>`;
                 container.innerHTML = '';
@@ -220,9 +246,138 @@
                 new bootstrap.Tooltip(el);
             });
 
+            // Initialize clipboard copy functionality
+            document.querySelectorAll('.copy-icon').forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const address = icon.getAttribute('data-address');
+                    navigator.clipboard.writeText(address).then(() => {
+                        icon.classList.replace('gicon-content_paste', 'gicon-inventory');
+                        setTimeout(() => {
+                            icon.classList.replace('gicon-inventory', 'gicon-content_paste');
+                        }, 3000);
+                    });
+                });
+            });
+
         }
 
         window.addEventListener('DOMContentLoaded', loadCustomers);
+
+        document.addEventListener('click', async function (e) {
+            if (e.target.classList.contains('view-details-btn')) {
+                const name = e.target.getAttribute('data-name');
+                const number = e.target.getAttribute('data-number');
+
+                const res = await fetch(`/customer-purchases?name=${encodeURIComponent(name)}&number=${number}`);
+                const purchases = await res.json();
+
+                // Determine latest bill
+
+                const latestBill = purchases.length ? purchases[0] : null;
+
+                // Customer Cards
+
+                const customerCardHTML = `
+                    <div class="col-lg-6 mb-2">
+                        <div class="card gradient-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold"><i class="gsymbols-round gicon-account_circle me-1"></i> Customer Details</h5>
+                                <div class="row">
+                                    <div class="col-12 mb-2"><strong>Name:</strong> ${name}</div>
+                                    <div class="col-12 mb-2"><strong>Contact:</strong> ${number}</div>
+                                    <div class="col-12 mb-2"><strong>Address:</strong> ${latestBill?.customerAddress || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Bill Cards
+
+                const totalSpent = purchases.reduce((sum, p) => sum + (p.finalTotal || 0), 0);
+                const averageBill = totalSpent / purchases.length || 0;
+                const lastVisitDate = formatDate(latestBill?.billingDate);
+
+                function formatDate(dateStr) {
+                    const date = new Date(dateStr);
+                    const day = date.getDate();
+                    const month = date.toLocaleString('default', { month: 'long' });
+                    const year = date.getFullYear();
+                    return `${day}/${month}/${year}`;
+                }
+
+                function formatTime(timeStr) {
+                    const [hourStr, minuteStr] = timeStr.split(':');
+                    let hour = parseInt(hourStr, 10);
+                    const minute = parseInt(minuteStr, 10);
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    hour = hour % 12 || 12;
+                    return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+                }
+
+                const billCardHTML = latestBill ? `
+                    <div class="col-lg-6 mb-2">
+                        <div class="card gradient-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold"><i class="gsymbols-round gicon-description me-1"></i> Bill Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2"><strong>Number of Visits:</strong> ${purchases.length}</div>
+                                    <div class="col-md-6 mb-2"><strong>Last Visit:</strong> ${lastVisitDate}</div>
+                                    <div class="col-md-12 mb-2"><strong>Total Shopping (₹):</strong> ₹ ${totalSpent.toFixed(2)}</div>
+                                    <div class="col-md-12 mb-2"><strong>Average Bill Value (₹):</strong> ₹ ${averageBill.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ` : '';
+
+                document.getElementById('customerAndBillCards').innerHTML = customerCardHTML + billCardHTML;
+
+                // Purchases History Cards
+
+                const cards = purchases.map(p => {
+
+                    return `
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm rounded-3 gradient-card2 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="card-title mb-0">
+                                            <i class="gsymbols-round gicon-description me-1"></i>
+                                            <span class="fw-bold">Bill #${p.billNumber}</span>
+                                        </h6>
+                                        <small class="text-muted">${formatDate(p.billingDate)} ${formatTime(p.billingTime)}</small>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-2">
+                                        <p class="mb-1"><strong>Total Amount:</strong> <span class="float-end text-primary">₹ ${p.overallTotal.toFixed(2)}</span></p>
+                                        <p class="mb-1"><strong>Discount:</strong> <span class="float-end text-warning">${p.overallDiscount.toFixed(2)} %</span></p>
+                                        <p class="mb-2"><strong>Final Amount:</strong> <span class="float-end text-success fw-bold">₹ ${p.finalTotal.toFixed(2)}</span></p>
+                                    </div>
+                                    <div class="d-flex justify-content-between flex-wrap mb-2">
+                                        <span class="badge d-flex align-items-center ${p.modeOfDelivery === 'Home Delivery' ? 'bg-warning text-dark' : 'bg-info text-dark'} mb-1">
+                                            <i class="gsymbols-round gicon-local_shipping me-1"></i> ${p.modeOfDelivery}
+                                        </span>
+                                        <span class="badge d-flex align-items-center ${p.modeOfPayment === 'Cash' ? 'bg-success' : p.modeOfPayment === 'Online' ? 'bg-primary' : p.modeOfPayment === 'Cheque' ? 'bg-info' : p.modeOfPayment === 'Debit' ? 'bg-danger' : 'bg-secondary'} text-light mb-1">
+                                            <i class="gsymbols-round gicon-wallet me-1"></i> ${p.modeOfPayment}
+                                        </span>
+                                    </div>
+                                    <button class="btn btn-darkblue w-100 mt-2 generate-bill-btn" data-id="${p._id}">
+                                        <i class="gsymbols-round gicon-receipt_long me-1"></i> Generate Bill
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('purchaseCards').innerHTML = cards || "<p>No purchases found.</p>";
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('customerDetailsModal'));
+                modal.show();
+            }
+        });
 
         function toggleFilterCard() {
             const card = document.getElementById('filterCard');
