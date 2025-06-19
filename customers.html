@@ -64,9 +64,9 @@
             <!-- Profile Header -->
             <div class="container-fluid d-flex justify-content-between">
 
-                <button id="whatsappNotepadBtn" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                <button id="whatsappNotepadBtn" class="btn btn-sm btn-outline-darkblue" data-bs-toggle="modal"
                     data-bs-target="#whatsappNotepadModal">
-                    <i class="bi bi-pencil-square"></i> Notepad
+                    <i class="gsymbols-round gicon-edit_note"></i> WhatsApp Notepad
                 </button>
 
                 <div class="dropdown profileButton">
@@ -1041,6 +1041,7 @@
 
                 let tag = node.tagName?.toLowerCase();
                 let symbolStart = '', symbolEnd = '';
+                let postfix = '';
 
                 switch (tag) {
                     case 'b': case 'strong': symbolStart = symbolEnd = '*'; break;
@@ -1052,10 +1053,20 @@
                 }
 
                 const inner = Array.from(node.childNodes).map(walk).join('');
-                return symbolStart + inner + symbolEnd;
+                return symbolStart + inner + symbolEnd + postfix;
             }
 
-            return Array.from(tempDiv.childNodes).map(walk).join('');
+            let markdown = Array.from(tempDiv.childNodes).map(walk).join('');
+
+            markdown = markdown
+                .split('\n')
+                .map(line => line.trimEnd())
+                .filter((line, idx, arr) => {
+                    return !(line === '' && arr[idx - 1] === '');
+                })
+                .join('\n');
+
+            return markdown.trimEnd();
         }
 
         document.getElementById('whatsappNotepadModal').addEventListener('show.bs.modal', async () => {
@@ -1070,11 +1081,20 @@
         });
 
         function convertMarkdownToHTML(text) {
-            return text
+            // First convert special styles
+            let html = text
                 .replace(/```([\s\S]*?)```/g, (_, code) => `<code>${code}</code>`)
                 .replace(/\*([^\*]+)\*/g, '<b>$1</b>')
                 .replace(/_([^_]+)_/g, '<i>$1</i>')
                 .replace(/~([^~]+)~/g, '<s>$1</s>');
+
+            // Then convert \n to actual line breaks
+            html = html
+                .split('\n')
+                .map(line => `<div>${line || '<br>'}</div>`) // preserve empty lines
+                .join('');
+
+            return html;
         }
 
         async function saveWhatsAppMessage() {
@@ -1114,9 +1134,11 @@
                 if (!btn) return;
 
                 if (data.message?.trim()) {
+                    btn.classList.remove('btn-outline-darkblue');
                     btn.classList.remove('btn-outline-danger');
                     btn.classList.add('btn-outline-success');
                 } else {
+                    btn.classList.remove('btn-outline-darkblue');
                     btn.classList.remove('btn-outline-success');
                     btn.classList.add('btn-outline-danger');
                 }
