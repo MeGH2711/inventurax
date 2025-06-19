@@ -386,6 +386,49 @@ app.get('/get-bill/:id', isAuthenticated, async (req, res) => {
     }
 });
 
+// WhatsApp
+
+const whatsappMessageSchema = new mongoose.Schema({
+    message: { type: String, required: false },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const WhatsAppMessage = mongoose.model('WhatsAppMessage', whatsappMessageSchema);
+
+app.post('/save-whatsapp-message', async (req, res) => {
+    try {
+        const { message } = req.body;
+
+        // Check if a message already exists (assuming you want to keep just one)
+        const existing = await WhatsAppMessage.findOne().sort({ createdAt: -1 });
+
+        if (existing) {
+            existing.message = message;
+            existing.createdAt = new Date();
+            await existing.save();
+            return res.status(200).json({ message: 'Message updated successfully' });
+        }
+
+        // If no message exists, create one
+        const newMessage = new WhatsAppMessage({ message });
+        await newMessage.save();
+        res.status(200).json({ message: 'Message saved successfully' });
+    } catch (err) {
+        console.error('Failed to save/update message:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/get-whatsapp-message', async (req, res) => {
+    try {
+        const latest = await WhatsAppMessage.findOne().sort({ createdAt: -1 });
+        res.json({ message: latest?.message || '' });
+    } catch (err) {
+        console.error('Failed to fetch message:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Fetch Next Bill Number
 
 app.get('/next-bill-number', isAuthenticated, async (req, res) => {
@@ -457,6 +500,8 @@ app.get('/total-sales-amount', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+// Fetch Sales Date Range
 
 app.get('/sales-date-range', async (req, res) => {
     try {

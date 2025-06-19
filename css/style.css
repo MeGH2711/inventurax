@@ -262,6 +262,30 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+/* Notepad Editor */
+
+#editor b,
+#editor strong {
+  font-weight: bold;
+}
+
+#editor i,
+#editor em {
+  font-style: italic;
+}
+
+#editor s,
+#editor strike {
+  text-decoration: line-through;
+}
+
+#editor code {
+  background: #eee;
+  font-family: monospace;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
 /* Comming Soon */
 
 .coming-soon-text {

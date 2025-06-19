@@ -62,7 +62,13 @@
         <div id="mainPageContent" class="p-4 flex-grow-1">
 
             <!-- Profile Header -->
-            <div class="container-fluid d-flex justify-content-end">
+            <div class="container-fluid d-flex justify-content-between">
+
+                <button id="whatsappNotepadBtn" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                    data-bs-target="#whatsappNotepadModal">
+                    <i class="bi bi-pencil-square"></i> Notepad
+                </button>
+
                 <div class="dropdown profileButton">
                     <button class="btn btn-sm btn-darkblue dropdown-toggle" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
@@ -155,6 +161,50 @@
         </div>
     </div>
 
+    <!-- WhatsApp Notepad Modal -->
+    <div class="modal fade" id="whatsappNotepadModal" tabindex="-1" aria-labelledby="whatsappNotepadLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="whatsappNotepadLabel">WhatsApp Message Notepad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <button class="btn btn-sm btn-outline-dark me-1" onclick="execCommand('bold')"><b>B</b>
+                            (Ctrl+B)</button>
+                        <button class="btn btn-sm btn-outline-dark me-1" onclick="execCommand('italic')"><i>I</i>
+                            (Ctrl+I)</button>
+                        <button class="btn btn-sm btn-outline-dark me-1" onclick="execCommand('strikeThrough')"><s>S</s>
+                            (Ctrl+S)</button>
+                        <button class="btn btn-sm btn-outline-dark me-1" onclick="wrapMonospace()"><code>Mono</code>
+                            (Ctrl+M)</button>
+                    </div>
+                    <div id="editor" contenteditable="true" class="form-control" style="min-height: 200px;"></div>
+                    <input type="hidden" id="formattedOutput">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-darkblue" onclick="saveWhatsAppMessage()">Save Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div id="mainToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
+            aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="mainToastBody">
+                    <!-- Message goes here -->
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/jspdf.umd.min.js"></script>
@@ -233,9 +283,9 @@
                                 </button>
                             </td>                            
                             <td class="text-center align-middle">
-                                <a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm w-100">
+                                <button class="btn btn-whatsapp btn-sm w-100 send-whatsapp-btn" data-number="${c.number}">
                                     <i class="bi bi-whatsapp me-2"></i>WhatsApp
-                                </a>
+                                </button>
                             </td>
                         </tr>
                     `;
@@ -365,9 +415,9 @@
                             </button>
                         </td>                            
                         <td class="text-center align-middle">
-                            <a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm w-100">
+                            <button class="btn btn-whatsapp btn-sm w-100 send-whatsapp-btn" data-number="${c.number}">
                                 <i class="bi bi-whatsapp me-2"></i>WhatsApp
-                            </a>
+                            </button>
                         </td>
                     </tr>
                 `;
@@ -393,6 +443,30 @@
         }
 
         window.addEventListener('DOMContentLoaded', loadCustomers);
+
+        document.addEventListener('click', async (e) => {
+            if (e.target.closest('.send-whatsapp-btn')) {
+                const button = e.target.closest('.send-whatsapp-btn');
+                const number = button.getAttribute('data-number');
+
+                try {
+                    const res = await fetch('/get-whatsapp-message');
+                    const data = await res.json();
+
+                    if (!data.message) {
+                        return showToast("No message saved yet.", "text-bg-warning");
+                    }
+
+                    const encodedMessage = encodeURIComponent(data.message);
+                    const waUrl = `https://wa.me/91${number}?text=${encodedMessage}`;
+
+                    window.open(waUrl, '_blank');
+                } catch (err) {
+                    console.error("Error sending WhatsApp message:", err);
+                    showToast("Failed to fetch message.", "text-bg-danger");
+                }
+            }
+        });
 
         document.addEventListener('click', async function (e) {
             if (e.target.classList.contains('view-details-btn')) {
@@ -928,6 +1002,130 @@
             icon.classList.toggle('gicon-keyboard_arrow_down', !isHidden);
             icon.classList.toggle('gicon-keyboard_arrow_up', isHidden);
         }
+
+        function execCommand(cmd) {
+            document.execCommand(cmd, false, null);
+            editor.focus();
+        }
+
+        function wrapMonospace() {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+
+            const range = sel.getRangeAt(0);
+            const span = document.createElement("code");
+            span.textContent = range.toString();
+            range.deleteContents();
+            range.insertNode(span);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        document.getElementById('editor').addEventListener('keydown', function (e) {
+            if (e.ctrlKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'b': e.preventDefault(); execCommand('bold'); break;
+                    case 'i': e.preventDefault(); execCommand('italic'); break;
+                    case 's': e.preventDefault(); execCommand('strikeThrough'); break;
+                    case 'm': e.preventDefault(); wrapMonospace(); break;
+                }
+            }
+        });
+
+        function convertToWhatsAppMarkdown(html) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            function walk(node) {
+                if (node.nodeType === 3) return node.nodeValue;
+
+                let tag = node.tagName?.toLowerCase();
+                let symbolStart = '', symbolEnd = '';
+
+                switch (tag) {
+                    case 'b': case 'strong': symbolStart = symbolEnd = '*'; break;
+                    case 'i': case 'em': symbolStart = symbolEnd = '_'; break;
+                    case 's': case 'strike': symbolStart = symbolEnd = '~'; break;
+                    case 'code': symbolStart = symbolEnd = '```'; break;
+                    case 'br': return '\n';
+                    case 'div': case 'p': postfix = '\n'; break;
+                }
+
+                const inner = Array.from(node.childNodes).map(walk).join('');
+                return symbolStart + inner + symbolEnd;
+            }
+
+            return Array.from(tempDiv.childNodes).map(walk).join('');
+        }
+
+        document.getElementById('whatsappNotepadModal').addEventListener('show.bs.modal', async () => {
+            try {
+                const res = await fetch('/get-whatsapp-message');
+                const data = await res.json();
+                const raw = data.message || '';
+                document.getElementById('editor').innerHTML = convertMarkdownToHTML(raw);
+            } catch (err) {
+                console.error('Error loading existing message:', err);
+            }
+        });
+
+        function convertMarkdownToHTML(text) {
+            return text
+                .replace(/```([\s\S]*?)```/g, (_, code) => `<code>${code}</code>`)
+                .replace(/\*([^\*]+)\*/g, '<b>$1</b>')
+                .replace(/_([^_]+)_/g, '<i>$1</i>')
+                .replace(/~([^~]+)~/g, '<s>$1</s>');
+        }
+
+        async function saveWhatsAppMessage() {
+            const html = document.getElementById('editor').innerHTML.trim();
+            const plainMessage = convertToWhatsAppMarkdown(html);
+            document.getElementById('formattedOutput').value = plainMessage;
+
+            try {
+                const res = await fetch('/save-whatsapp-message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: plainMessage })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('Message saved!', 'text-bg-success');
+                    document.getElementById('editor').innerHTML = '';
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('whatsappNotepadModal'));
+                    modal.hide();
+                    updateNotepadButtonStyle();
+                } else {
+                    showToast(data.message || 'Failed to save message', 'text-bg-danger');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Server error', 'text-bg-danger');
+            }
+        }
+
+        async function updateNotepadButtonStyle() {
+            try {
+                const res = await fetch('/get-whatsapp-message');
+                const data = await res.json();
+                const btn = document.getElementById('whatsappNotepadBtn');
+
+                if (!btn) return;
+
+                if (data.message?.trim()) {
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-outline-success');
+                } else {
+                    btn.classList.remove('btn-outline-success');
+                    btn.classList.add('btn-outline-danger');
+                }
+            } catch (err) {
+                console.error('Error checking message status:', err);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', updateNotepadButtonStyle);
 
         // Reusable Toast Function
 
