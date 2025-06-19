@@ -227,6 +227,7 @@ app.get('/get-products', async (req, res) => {
 });
 
 // Search Products by Name
+
 app.get('/search-products', async (req, res) => {
     const query = req.query.q;
     try {
@@ -370,6 +371,8 @@ app.get('/get-bills', isAuthenticated, async (req, res) => {
     }
 });
 
+// Fetch Bill from ID
+
 app.get('/get-bill/:id', isAuthenticated, async (req, res) => {
     try {
         const bill = await Bill.findById(req.params.id);
@@ -383,6 +386,8 @@ app.get('/get-bill/:id', isAuthenticated, async (req, res) => {
     }
 });
 
+// Fetch Next Bill Number
+
 app.get('/next-bill-number', isAuthenticated, async (req, res) => {
     try {
         const latestBill = await Bill.findOne().sort({ billNumber: -1 });
@@ -393,6 +398,8 @@ app.get('/next-bill-number', isAuthenticated, async (req, res) => {
         res.status(500).json({ message: 'Error fetching bill number' });
     }
 });
+
+// Search Customers
 
 app.get('/search-customers', isAuthenticated, async (req, res) => {
     const query = req.query.q?.toLowerCase() || "";
@@ -451,7 +458,27 @@ app.get('/total-sales-amount', async (req, res) => {
     }
 });
 
+app.get('/sales-date-range', async (req, res) => {
+    try {
+        const earliest = await Bill.findOne().sort({ billingDate: 1 });
+        const latest = await Bill.findOne().sort({ billingDate: -1 });
+
+        if (!earliest || !latest) {
+            return res.json({ from: null, to: null });
+        }
+
+        res.json({
+            from: earliest.billingDate,
+            to: latest.billingDate
+        });
+    } catch (err) {
+        console.error('Error fetching sales date range:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Fetch Unique Customer Count
+
 app.get('/unique-customers-count', async (req, res) => {
     try {
         const result = await Bill.aggregate([
@@ -480,6 +507,20 @@ app.get('/unique-customers-count', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+// Fetch Total Products Count
+
+app.get('/total-products-count', async (req, res) => {
+    try {
+        const count = await Product.countDocuments();
+        res.json({ count });
+    } catch (err) {
+        console.error('Error fetching total products count:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Fetch Unique Customers
 
 app.get('/get-unique-customers', isAuthenticated, async (req, res) => {
     try {
@@ -532,6 +573,8 @@ app.get('/get-unique-customers', isAuthenticated, async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+// Fetch Customer Purchase Details
 
 app.get('/customer-purchases', isAuthenticated, async (req, res) => {
     const { name, number } = req.query;

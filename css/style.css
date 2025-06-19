@@ -127,21 +127,14 @@
 
 /* Cards */
 
-.gradient-card {
-  border: none;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
-}
-
+.gradient-card,
 .product-card {
   border: none;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s;
 }
 
+.gradient-card:hover,
 .product-card:hover {
-  transform: translateY(-2px);
-}
-
-.gradient-card:hover {
   transform: translateY(-2px);
 }
 
@@ -159,6 +152,14 @@
 
 .product-card-body-content p {
   font-weight: 600 !important;
+}
+
+.dashboardCardTitle {
+  font-weight: 700;
+}
+
+.dashboardCardText {
+  font-weight: 300;
 }
 
 /* Rounded Table Corner */
@@ -221,7 +222,7 @@
   pointer-events: none;
 }
 
-.modal-xxl{
+.modal-xxl {
   max-width: 95vw;
 }
 

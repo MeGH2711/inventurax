@@ -312,6 +312,7 @@
             const container = document.getElementById('customerTableCard');
 
             if (!customers.length) {
+                container.classList.add("border-0");
                 container.innerHTML = '<div class="alert alert-info text-center m-0 py-3">No matching customer records found.</div>';
                 return;
             }
@@ -493,7 +494,7 @@
                                         </span>
                                     </div>
                                     <button class="btn btn-darkblue w-100 mt-2 generate-bill-btn" onclick="downloadBill('${p._id}')">
-                                        <i class="gsymbols-round gicon-receipt_long me-1"></i> Generate Bill
+                                        <i class="gsymbols-round gicon-download fs-4 me-1"></i> Download Bill
                                     </button>
                                 </div>
                             </div>
