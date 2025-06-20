@@ -39,7 +39,7 @@ body {
 
 /* Texts */
 
-.text-warning{
+.text-warning {
   color: #d7a100 !important;
 }
 
@@ -119,6 +119,11 @@ body {
 .gradient-card2 {
   background: linear-gradient(145deg, #ffffff, #f0f0f0);
   border: 1px solid #dee2e6;
+}
+
+.gradient-card3 {
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  border-radius: 1rem;
 }
 
 .product-card {

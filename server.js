@@ -565,6 +565,46 @@ app.get('/total-products-count', async (req, res) => {
     }
 });
 
+// Fetch Daily Income
+app.get('/daily-income', async (req, res) => {
+    try {
+        const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+        const result = await Bill.aggregate([
+            { $match: { billingDate: today } },
+            { $group: { _id: null, total: { $sum: "$finalTotal" } } }
+        ]);
+        const total = result[0]?.total || 0;
+        res.json({ dailyIncome: total });
+    } catch (err) {
+        console.error('Error fetching daily income:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Fetch Daily Customer Count
+app.get('/daily-customer-count', async (req, res) => {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const result = await Bill.aggregate([
+            { $match: { billingDate: today } },
+            {
+                $group: {
+                    _id: {
+                        name: "$customerName",
+                        number: "$customerNumber"
+                    }
+                }
+            },
+            { $count: "count" }
+        ]);
+        const count = result[0]?.count || 0;
+        res.json({ dailyCustomerCount: count });
+    } catch (err) {
+        console.error('Error fetching daily customer count:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Fetch Unique Customers
 
 app.get('/get-unique-customers', isAuthenticated, async (req, res) => {

@@ -139,6 +139,8 @@
 }
 
 .gradient-card .card-title,
+.gradient-card3 .card-title,
+#dailyStatsHeading,
 .product-card .card-title {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
@@ -146,6 +148,7 @@
 }
 
 .gradient-card .card-text,
+.gradient-card3 .card-text,
 .product-card .card-text {
   font-family: 'Montserrat', sans-serif;
 }
@@ -284,6 +287,10 @@
   font-family: monospace;
   padding: 1px 4px;
   border-radius: 4px;
+}
+
+#dailyStatsDate {
+  font-size: 1rem;
 }
 
 /* Comming Soon */
