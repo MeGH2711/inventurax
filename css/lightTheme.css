@@ -126,6 +126,11 @@ body {
   border-radius: 1rem;
 }
 
+.dailyStatsHeader {
+  background: linear-gradient(135deg, var(--main-bg), #13558D);
+  color: var(--white);
+}
+
 .product-card {
   background: linear-gradient(135deg, #B3D4FC, #6FA8DC);
   color: var(--main-bg);

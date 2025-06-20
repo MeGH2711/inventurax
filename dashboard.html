@@ -110,8 +110,8 @@
 
                 <!-- Daily Stats Section -->
                 <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden">
-                    <div class="card-header bg-gradient bg-darkblue text-white py-3">
-                        <h5 class="mb-0 d-flex justify-content-between align-items-center" id="dailyStatsHeading">
+                    <div class="card-header dailyStatsHeader py-3">
+                        <h5 class="mb-0 d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
                                 <i class="gsymbols-round gicon-bar_chart fs-3 me-2"></i> Daily Stats
                             </div>
@@ -124,7 +124,7 @@
                         <div class="row g-4">
 
                             <!-- Daily Income Card -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="card h-100 border-0 gradient-card3 shadow-sm rounded-4">
                                     <div class="card-body d-flex flex-column justify-content-between p-4">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -136,7 +136,7 @@
                             </div>
 
                             <!-- Daily Customer Count Card -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="card h-100 border-0 gradient-card3 shadow-sm rounded-4">
                                     <div class="card-body d-flex flex-column justify-content-between p-4">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -144,6 +144,18 @@
                                         </div>
                                         <p id="dailyCustomerCount" class="card-text display-5 fw-bold text-dark mb-0">--
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Daily Bill Count Card -->
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 gradient-card3 shadow-sm rounded-4">
+                                    <div class="card-body d-flex flex-column justify-content-between p-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="card-title text-muted fw-semibold">Bills Generated Today</h6>
+                                        </div>
+                                        <p id="dailyBillCount" class="card-text display-5 fw-bold mb-0">--</p>
                                     </div>
                                 </div>
                             </div>
@@ -259,6 +271,17 @@
             .catch(err => {
                 console.error('Error fetching daily customer count:', err);
                 document.getElementById('dailyCustomerCount').textContent = 'N/A';
+            });
+
+        // Fetch Daily Bill Count
+        fetch('/daily-bill-count')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('dailyBillCount').textContent = data.dailyBillCount;
+            })
+            .catch(err => {
+                console.error('Error fetching daily bill count:', err);
+                document.getElementById('dailyBillCount').textContent = 'N/A';
             });
 
     </script>

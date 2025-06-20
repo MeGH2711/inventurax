@@ -566,9 +566,10 @@ app.get('/total-products-count', async (req, res) => {
 });
 
 // Fetch Daily Income
+
 app.get('/daily-income', async (req, res) => {
     try {
-        const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+        const today = new Date().toISOString().split('T')[0];
         const result = await Bill.aggregate([
             { $match: { billingDate: today } },
             { $group: { _id: null, total: { $sum: "$finalTotal" } } }
@@ -582,6 +583,7 @@ app.get('/daily-income', async (req, res) => {
 });
 
 // Fetch Daily Customer Count
+
 app.get('/daily-customer-count', async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
@@ -601,6 +603,19 @@ app.get('/daily-customer-count', async (req, res) => {
         res.json({ dailyCustomerCount: count });
     } catch (err) {
         console.error('Error fetching daily customer count:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Fetch Daily Bill Count
+
+app.get('/daily-bill-count', async (req, res) => {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const count = await Bill.countDocuments({ billingDate: today });
+        res.json({ dailyBillCount: count });
+    } catch (err) {
+        console.error('Error fetching daily bill count:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });

@@ -140,7 +140,6 @@
 
 .gradient-card .card-title,
 .gradient-card3 .card-title,
-#dailyStatsHeading,
 .product-card .card-title {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
@@ -163,6 +162,12 @@
 
 .dashboardCardText {
   font-weight: 300;
+}
+
+.dailyStatsHeader h5 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Rounded Table Corner */
