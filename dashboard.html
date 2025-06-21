@@ -273,7 +273,6 @@
                 document.getElementById('dailyCustomerCount').textContent = 'N/A';
             });
 
-        // Fetch Daily Bill Count
         fetch('/daily-bill-count')
             .then(res => res.json())
             .then(data => {
