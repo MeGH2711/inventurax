@@ -123,7 +123,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12" id="customerLogContainer">
-                        <div class="card" id="customerTableCard"></div>
+                        <div class="card roundedTableCard" id="customerTableCard"></div>
                     </div>
                 </div>
             </div>
@@ -242,7 +242,7 @@
                 customers.sort((a, b) => a.name.localeCompare(b.name));
 
                 const table = document.createElement('table');
-                table.className = 'table table-bordered table-sm';
+                table.className = 'table table-bordered table-sm roundedTable';
                 table.id = 'customerTable';
 
                 const thead = `

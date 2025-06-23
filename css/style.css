@@ -45,6 +45,7 @@
 }
 
 /* Custom Scrollbar for Sidebar */
+
 .sidebar-content::-webkit-scrollbar {
   width: 8px;
 }
@@ -54,18 +55,11 @@
 }
 
 .sidebar-content::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.6);
 }
 
 .sidebar-content {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
 #sidebar-wrapper .list-group-item-sidebar {
@@ -170,56 +164,52 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+.analyticsCard .card-header {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.analyticsCard .card-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.analyticsCard .card-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.analyticsCard .card-body::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
+
+.analyticsCard .card-body {
+  scrollbar-width: thin;
+}
+
 /* Rounded Table Corner */
 
-#productTable,
-#billlogsTable,
-#customerTable {
+.roundedTable {
   margin-bottom: 0 !important;
 }
 
-#productTable thead tr:first-child,
-#customerTable thead tr:first-child,
-#billlogsTable thead tr:first-child {
+.roundedTable thead tr:first-child {
   border-top: 0;
 }
 
-#productTable tbody tr:last-child,
-#productTable tfoot tr:last-child,
-#customerTable tbody tr:last-child,
-#customerTable tfoot tr:last-child,
-#billlogsTable tbody tr:last-child,
-#billlogsTable tfoot tr:last-child {
+.roundedTable tbody tr:last-child,
+.roundedTable tfoot tr:last-child {
   border-bottom: 0;
 }
 
-#productTable thead tr:first-child th:first-child,
-#productTable tbody tr td:first-child,
-#productTable tfoot tr td:first-child,
-#productTable tfoot tr:last-child td:first-child,
-#customerTable thead tr:first-child th:first-child,
-#customerTable tbody tr td:first-child,
-#customerTable tfoot tr td:first-child,
-#customerTable tfoot tr:last-child td:first-child,
-#billlogsTable thead tr:first-child th:first-child,
-#billlogsTable tbody tr td:first-child,
-#billlogsTable tfoot tr td:first-child,
-#billlogsTable tfoot tr:last-child td:first-child {
+.roundedTable thead tr:first-child th:first-child,
+.roundedTable tbody tr td:first-child,
+.roundedTable tfoot tr td:first-child,
+.roundedTable tfoot tr:last-child td:first-child {
   border-left: 0;
 }
 
-#productTable thead tr:first-child th:last-child,
-#productTable tbody tr td:last-child,
-#productTable tfoot tr td:last-child,
-#productTable tfoot tr:last-child td:last-child,
-#customerTable thead tr:first-child th:last-child,
-#customerTable tbody tr td:last-child,
-#customerTable tfoot tr td:last-child,
-#customerTable tfoot tr:last-child td:last-child,
-#billlogsTable thead tr:first-child th:last-child,
-#billlogsTable tbody tr td:last-child,
-#billlogsTable tfoot tr td:last-child,
-#billlogsTable tfoot tr:last-child td:last-child {
+.roundedTable thead tr:first-child th:last-child,
+.roundedTable tbody tr td:last-child,
+.roundedTable tfoot tr td:last-child,
+.roundedTable tfoot tr:last-child td:last-child {
   border-right: 0;
 }
 
@@ -296,31 +286,4 @@
 
 #dailyStatsDate {
   font-size: 1rem;
-}
-
-/* Comming Soon */
-
-.coming-soon-text {
-  font-size: 4rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  animation: pulse 1.5s infinite;
-  letter-spacing: 5px;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-
-  50% {
-    transform: scale(1.025);
-    opacity: 1;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
 }

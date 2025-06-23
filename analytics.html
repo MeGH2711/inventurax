@@ -72,9 +72,82 @@
                 </div>
             </div>
 
-            <div class="container-fluid d-flex justify-content-center align-items-center h-100">
-                <div class="coming-soon-container d-flex justify-content-center align-items-center">
-                    <h1 class="coming-soon-text">COMING SOON</h1>
+            <div class="container-fluid my-4">
+                <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden analyticsCard">
+                    <div class="card-header py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center">
+                                <i class="gsymbols-round gicon-bar_chart fs-3 me-2"></i>
+                                <span class="fw-semibold fs-5">Sales Overview</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 flex-row">
+
+                                <!-- Sales Group Picker -->
+                                <select id="salesGrouping" class="form-select form-select-sm w-auto ms-2">
+                                    <option value="daily" selected>Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+
+                                <!-- Date Range Picker -->
+                                <div class="input-group input-group-sm">
+                                    <input type="date" id="salesStartDate" class="form-control form-control-sm">
+                                    <span class="input-group-text">to</span>
+                                    <input type="date" id="salesEndDate" class="form-control form-control-sm">
+                                    <button class="btn btn-sm btn-darkblue" id="salesApplyDateFilter">Apply</button>
+                                </div>
+
+                                <!-- Chart/Table Toggle -->
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-light active" type="button" id="salesChartViewBtn"
+                                        title="Chart View">
+                                        <i class="gsymbols-round gicon-bar_chart"></i>
+                                    </button>
+                                    <button class="btn btn-outline-light" type="button" id="salesTableViewBtn"
+                                        title="Table View">
+                                        <i class="gsymbols-round gicon-table"></i>
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body bg-light-subtle p-0" style="height: 400px; overflow: hidden;">
+                        <div id="salesChartContainer" class="h-100 overflow-auto p-3">
+                            <canvas id="salesBarChart" style="width: 100%; height: 300px;"></canvas>
+                        </div>
+                        <div id="salesTableContainer" class="d-none h-100 overflow-auto p-3">
+                            <div class="card border-1 roundedTableCard">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered align-middle text-center roundedTable"
+                                        id="salesTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Sr. No.</th>
+                                                <th class="text-center">Date</th>
+                                                <th class="text-center">Total Sales (₹)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td class="text-center bg-transparent fw-bold" colspan="2">Total Sales
+                                                    </th>
+                                                <td class="text-center bg-transparent fw-bold" id="totalSalesCell">₹
+                                                    0.00</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center bg-transparent fw-bold" colspan="2">Average
+                                                    Amount</th>
+                                                <td class="text-center bg-transparent fw-bold" id="averageSalesCell">₹
+                                                    0.00</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -107,6 +180,8 @@
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="js/chart.umd.js"></script>
+
     <script>
         // Session check
         fetch('/session-check')
@@ -121,6 +196,193 @@
             .catch(() => {
                 window.location.href = '/';
             });
+
+        $(document).ready(function () {
+            fetch('/get-bills')
+                .then(res => res.json())
+                .then(data => {
+                    allBills = data;
+
+                    const dates = allBills.map(bill => bill.billingDate.split('T')[0]);
+                    dates.sort();
+
+                    const minDate = dates[0];
+                    const maxDate = dates[dates.length - 1];
+
+                    // Prefill date inputs
+                    $('#salesStartDate').val(minDate);
+                    $('#salesEndDate').val(maxDate);
+
+                    // Render sales initially with full range
+                    renderSales(allBills);
+                });
+
+            $('#salesApplyDateFilter').on('click', function () {
+                const start = $('#salesStartDate').val();
+                const end = $('#salesEndDate').val();
+
+                if (!start || !end) {
+                    showToast('Please select both start and end dates.', 'text-bg-warning');
+                    return;
+                }
+
+                const filtered = allBills.filter(bill => {
+                    const billDate = bill.billingDate.split('T')[0];
+                    return billDate >= start && billDate <= end;
+                });
+
+                renderSales(filtered);
+            });
+
+        });
+
+        // Toggle functionality
+        $('#salesChartViewBtn').on('click', function () {
+            $('#salesChartContainer').removeClass('d-none');
+            $('#salesTableContainer').addClass('d-none');
+            $('#salesChartViewBtn').addClass('active');
+            $('#salesTableViewBtn').removeClass('active');
+        });
+
+        $('#salesTableViewBtn').on('click', function () {
+            $('#salesChartContainer').addClass('d-none');
+            $('#salesTableContainer').removeClass('d-none');
+            $('#salesChartViewBtn').removeClass('active');
+            $('#salesTableViewBtn').addClass('active');
+        });
+
+        $('#salesGrouping').on('change', function () {
+            const start = $('#salesStartDate').val();
+            const end = $('#salesEndDate').val();
+
+            const filtered = allBills.filter(bill => {
+                const billDate = bill.billingDate.split('T')[0];
+                return billDate >= start && billDate <= end;
+            });
+
+            renderSales(filtered);
+        });
+
+        let allBills = [];
+
+        function renderSales(filteredData) {
+            const grouping = $('#salesGrouping').val();
+            const salesGrouped = {};
+
+            const formatDisplayDate = (isoDate, mode) => {
+                const date = new Date(isoDate);
+                if (isNaN(date)) return 'Invalid Date';
+                const year = date.getFullYear();
+                const month = date.toLocaleString('en-US', { month: 'short' });
+                const day = String(date.getDate()).padStart(2, '0');
+                const weekday = date.toLocaleString('en-US', { weekday: 'short' });
+
+                if (mode === 'yearly') return `${year}`;
+                if (mode === 'monthly') return `${month}/${year}`;
+                return `${day}/${month}/${year}, ${weekday}`;
+            };
+
+            filteredData.forEach(bill => {
+                const dateObj = new Date(bill.billingDate);
+                let key;
+
+                switch (grouping) {
+                    case 'yearly':
+                        key = `${dateObj.getFullYear()}`;
+                        break;
+                    case 'monthly':
+                        key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+                        break;
+                    default:
+                        key = bill.billingDate.split('T')[0]; // daily
+                }
+
+                salesGrouped[key] = (salesGrouped[key] || 0) + bill.finalTotal;
+            });
+
+            const sortedKeys = Object.keys(salesGrouped).sort();
+            const tbody = $('#salesTable tbody');
+            tbody.empty();
+
+            let total = 0;
+            sortedKeys.forEach((key, i) => {
+                const value = salesGrouped[key];
+                total += value;
+
+                const displayDate = formatDisplayDate(
+                    grouping === 'daily' ? key : key + '-01',
+                    grouping
+                );
+
+                const row = `
+                    <tr>
+                        <td class="text-center">${i + 1}</td>
+                        <td class="text-center">${displayDate}</td>
+                        <td class="text-center">${value.toFixed(2)}</td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+
+            const average = total / sortedKeys.length || 0;
+            $('#totalSalesCell').text(`₹ ${total.toFixed(2)}`);
+            $('#averageSalesCell').text(`₹ ${average.toFixed(2)}`);
+
+            const labels = sortedKeys.map(k =>
+                formatDisplayDate(grouping === 'daily' ? k : k + '-01', grouping)
+            );
+
+            const sales = sortedKeys.map(k => salesGrouped[k]);
+
+            const ctx = document.getElementById('salesBarChart').getContext('2d');
+            if (window.salesChart) window.salesChart.destroy();
+
+            window.salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Total Sales',
+                            data: sales,
+                            backgroundColor: 'rgba(10, 47, 79, 0.8)',
+                            borderColor: 'rgba(10, 47, 79)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Average',
+                            data: new Array(sales.length).fill(average),
+                            type: 'line',
+                            borderColor: 'rgba(10, 47, 79)',
+                            borderWidth: 2,
+                            borderDash: [3, 3],
+                            pointRadius: 1.5,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    const label = ctx.dataset.label;
+                                    return label === 'Average'
+                                        ? ` Average: ₹ ${ctx.raw.toFixed(2)}`
+                                        : ` Total Sales: ₹ ${ctx.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         // Reusable Toast Function
 

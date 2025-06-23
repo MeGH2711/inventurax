@@ -1,6 +1,6 @@
 :root {
   --main-page-bg: #f8f9fa;
-  --main-bg: #0A2F4F;
+  --main-bg: rgb(10, 47, 79);
   --white: #ffffff;
   --black: #000000;
   --danger-color: #ff0000;
@@ -16,6 +16,19 @@ body {
 #sidebar-wrapper {
   background-color: var(--main-bg);
   color: var(--white);
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.sidebar-content {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
 .list-group-item-sidebar {
@@ -126,7 +139,8 @@ body {
   border-radius: 1rem;
 }
 
-.dailyStatsHeader {
+.analyticsCard,
+.dailyStatsCard {
   background: linear-gradient(135deg, var(--main-bg), #13558D);
   color: var(--white);
 }
@@ -138,6 +152,20 @@ body {
 
 .product-card:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.analyticsCard .card-body::-webkit-scrollbar-thumb {
+  background-color: rgba(10, 47, 79, 0.6);
+  transition: background-color 0.2s ease;
+}
+
+.analyticsCard .card-body::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(10, 47, 79, 0.6);
+}
+
+.analyticsCard .card-body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(10, 47, 79, 0.6) transparent;
 }
 
 /* Profile Button */
@@ -199,10 +227,4 @@ table tbody tr td {
 .highlightedTextDropdown {
   background-color: #b3c7ff;
   color: var(--black);
-}
-
-/* Comming Soon */
-
-.coming-soon-text {
-  color: var(--main-bg);
 }
