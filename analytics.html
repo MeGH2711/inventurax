@@ -109,6 +109,13 @@
                                     </button>
                                 </div>
 
+                                <!-- Expand Button -->
+                                <div>
+                                    <button class="btn btn-sm btn-light" id="expandSalesCardBtn">
+                                        <i class="gsymbols-round gicon-open_in_full"></i>
+                                    </button>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -163,6 +170,83 @@
 
     <!-- Modal -->
 
+    <!-- Fullscreen Modal for Sales Overview -->
+    <div class="modal fade" id="salesFullscreenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content analyticsModal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="gsymbols-round gicon-bar_chart fs-3 me-2"></i>Sales Overview
+                        (Fullscreen)
+                    </h5>
+                    <button type="button" class="btn-close"
+                        style="filter: invert(1) grayscale(100%) brightness(200%); opacity: 1;" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="d-flex justify-content-between align-items-center flex-row gap-2 mb-3">
+                            <!-- Controls -->
+                            <div class="d-flex align-items-center gap-2 flex-row">
+                                <select id="modalSalesGrouping" class="form-select form-select-sm w-auto">
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                                <div class="input-group input-group-sm">
+                                    <input type="date" id="modalSalesStartDate" class="form-control">
+                                    <span class="input-group-text">to</span>
+                                    <input type="date" id="modalSalesEndDate" class="form-control">
+                                    <button class="btn btn-sm btn-darkblue"
+                                        id="modalSalesApplyDateFilter">Apply</button>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-darkblue active" id="modalSalesChartViewBtn"><i
+                                            class="gsymbols-round gicon-bar_chart"></i></button>
+                                    <button class="btn btn-outline-darkblue" id="modalSalesTableViewBtn"><i
+                                            class="gsymbols-round gicon-table"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart/Table Containers -->
+                        <div class="p-2" style="height: 80vh;">
+                            <div id="modalSalesChartContainer" class="h-100 overflow-auto p-2">
+                                <canvas id="modalSalesBarChart" style="width: 100%; height: 100%;"></canvas>
+                            </div>
+                            <div id="modalSalesTableContainer" class="d-none h-100 overflow-auto p-2">
+                                <div class="card roundedTableCard">
+                                    <table class="table table-sm table-bordered text-center roundedTable"
+                                        id="modalSalesTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Sr. No.</th>
+                                                <th>Date</th>
+                                                <th>Total Sales (₹)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="2">Total Sales</td>
+                                                <td id="modalTotalSalesCell">₹ 0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">Average</td>
+                                                <td id="modalAverageSalesCell">₹ 0.00</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
         <div id="mainToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
@@ -201,6 +285,7 @@
             fetch('/get-bills')
                 .then(res => res.json())
                 .then(data => {
+
                     allBills = data;
 
                     const dates = allBills.map(bill => bill.billingDate.split('T')[0]);
@@ -209,11 +294,9 @@
                     const minDate = dates[0];
                     const maxDate = dates[dates.length - 1];
 
-                    // Prefill date inputs
                     $('#salesStartDate').val(minDate);
                     $('#salesEndDate').val(maxDate);
 
-                    // Render sales initially with full range
                     renderSales(allBills);
                 });
 
@@ -226,41 +309,50 @@
                     return;
                 }
 
+                currentStartDate = start;
+                currentEndDate = end;
+
+                $('#modalSalesStartDate').val(currentStartDate);
+                $('#modalSalesEndDate').val(currentEndDate);
+
                 const filtered = allBills.filter(bill => {
                     const billDate = bill.billingDate.split('T')[0];
                     return billDate >= start && billDate <= end;
                 });
 
                 renderSales(filtered);
+
+                if ($('#salesFullscreenModal').hasClass('show')) {
+                    renderModalSales(filtered);
+                }
             });
 
         });
 
         // Toggle functionality
         $('#salesChartViewBtn').on('click', function () {
+            currentViewMode = 'chart';
             $('#salesChartContainer').removeClass('d-none');
             $('#salesTableContainer').addClass('d-none');
             $('#salesChartViewBtn').addClass('active');
             $('#salesTableViewBtn').removeClass('active');
+
+            syncModalViewWithMain();
         });
 
         $('#salesTableViewBtn').on('click', function () {
+            currentViewMode = 'table';
             $('#salesChartContainer').addClass('d-none');
             $('#salesTableContainer').removeClass('d-none');
             $('#salesChartViewBtn').removeClass('active');
             $('#salesTableViewBtn').addClass('active');
+
+            syncModalViewWithMain();
         });
 
         $('#salesGrouping').on('change', function () {
-            const start = $('#salesStartDate').val();
-            const end = $('#salesEndDate').val();
-
-            const filtered = allBills.filter(bill => {
-                const billDate = bill.billingDate.split('T')[0];
-                return billDate >= start && billDate <= end;
-            });
-
-            renderSales(filtered);
+            $('#modalSalesGrouping').val(this.value);
+            $('#salesApplyDateFilter').click();
         });
 
         let allBills = [];
@@ -374,6 +466,212 @@
                                 label: function (ctx) {
                                     const label = ctx.dataset.label;
                                     return label === 'Average'
+                                        ? ` Average: ₹ ${ctx.raw.toFixed(2)}`
+                                        : ` Total Sales: ₹ ${ctx.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let modalSalesChart;
+
+        let currentViewMode = 'chart';
+
+        let currentStartDate = '';
+        let currentEndDate = '';
+
+        $('#expandSalesCardBtn').on('click', function () {
+            // Sync dates
+            $('#modalSalesStartDate').val(currentStartDate || $('#salesStartDate').val());
+            $('#modalSalesEndDate').val(currentEndDate || $('#salesEndDate').val());
+
+            // Sync grouping
+            $('#modalSalesGrouping').val($('#salesGrouping').val());
+
+            // Filter and render both
+            const filtered = allBills.filter(bill => {
+                const billDate = bill.billingDate.split('T')[0];
+                return billDate >= $('#modalSalesStartDate').val() &&
+                    billDate <= $('#modalSalesEndDate').val();
+            });
+
+            renderModalSales(filtered);
+            syncModalViewWithMain();
+
+            const modal = new bootstrap.Modal(document.getElementById('salesFullscreenModal'));
+            modal.show();
+
+            setTimeout(() => {
+                if (modalSalesChart) modalSalesChart.resize();
+            }, 500);
+        });
+
+        // Modal event handlers
+        $('#modalSalesApplyDateFilter').on('click', function () {
+            const start = $('#modalSalesStartDate').val();
+            const end = $('#modalSalesEndDate').val();
+
+            if (!start || !end) {
+                showToast('Please select both start and end dates.', 'text-bg-warning');
+                return;
+            }
+
+            currentStartDate = start;
+            currentEndDate = end;
+
+            // Apply to main card
+            $('#salesStartDate').val(currentStartDate);
+            $('#salesEndDate').val(currentEndDate);
+
+            const filtered = allBills.filter(bill => {
+                const billDate = bill.billingDate.split('T')[0];
+                return billDate >= start && billDate <= end;
+            });
+
+            renderModalSales(filtered);
+            renderSales(filtered);
+        });
+
+        $('#modalSalesGrouping').on('change', function () {
+            $('#salesGrouping').val(this.value);
+            $('#modalSalesApplyDateFilter').click();
+        });
+
+        $('#modalSalesChartViewBtn').on('click', function () {
+            currentViewMode = 'chart';
+            $('#modalSalesChartContainer').removeClass('d-none');
+            $('#modalSalesTableContainer').addClass('d-none');
+            $('#modalSalesChartViewBtn').addClass('active');
+            $('#modalSalesTableViewBtn').removeClass('active');
+
+            // Sync main card view
+            syncMainViewWithModal();
+        });
+
+        $('#modalSalesTableViewBtn').on('click', function () {
+            currentViewMode = 'table';
+            $('#modalSalesChartContainer').addClass('d-none');
+            $('#modalSalesTableContainer').removeClass('d-none');
+            $('#modalSalesChartViewBtn').removeClass('active');
+            $('#modalSalesTableViewBtn').addClass('active');
+
+            // Sync main card view
+            syncMainViewWithModal();
+        });
+
+        function syncModalViewWithMain() {
+            if (currentViewMode === 'chart') {
+                $('#modalSalesChartContainer').removeClass('d-none');
+                $('#modalSalesTableContainer').addClass('d-none');
+                $('#modalSalesChartViewBtn').addClass('active');
+                $('#modalSalesTableViewBtn').removeClass('active');
+            } else {
+                $('#modalSalesChartContainer').addClass('d-none');
+                $('#modalSalesTableContainer').removeClass('d-none');
+                $('#modalSalesChartViewBtn').removeClass('active');
+                $('#modalSalesTableViewBtn').addClass('active');
+            }
+        }
+
+        function syncMainViewWithModal() {
+            if (currentViewMode === 'chart') {
+                $('#salesChartContainer').removeClass('d-none');
+                $('#salesTableContainer').addClass('d-none');
+                $('#salesChartViewBtn').addClass('active');
+                $('#salesTableViewBtn').removeClass('active');
+            } else {
+                $('#salesChartContainer').addClass('d-none');
+                $('#salesTableContainer').removeClass('d-none');
+                $('#salesChartViewBtn').removeClass('active');
+                $('#salesTableViewBtn').addClass('active');
+            }
+        }
+
+        // Modal chart rendering
+        function renderModalSales(data) {
+            const grouping = $('#modalSalesGrouping').val();
+            const salesGrouped = {};
+
+            const formatDisplayDate = (isoDate, mode) => {
+                const date = new Date(isoDate);
+                const year = date.getFullYear();
+                const month = date.toLocaleString('en-US', { month: 'short' });
+                const day = String(date.getDate()).padStart(2, '0');
+                const weekday = date.toLocaleString('en-US', { weekday: 'short' });
+
+                if (mode === 'yearly') return `${year}`;
+                if (mode === 'monthly') return `${month}/${year}`;
+                return `${day}/${month}/${year}, ${weekday}`;
+            };
+
+            data.forEach(bill => {
+                const dateObj = new Date(bill.billingDate);
+                let key = bill.billingDate.split('T')[0];
+
+                if (grouping === 'monthly')
+                    key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+                else if (grouping === 'yearly')
+                    key = `${dateObj.getFullYear()}`;
+
+                salesGrouped[key] = (salesGrouped[key] || 0) + bill.finalTotal;
+            });
+
+            const keys = Object.keys(salesGrouped).sort();
+            const tbody = $('#modalSalesTable tbody').empty();
+
+            let total = 0;
+            keys.forEach((k, i) => {
+                const val = salesGrouped[k];
+                total += val;
+                const display = formatDisplayDate(grouping === 'daily' ? k : k + '-01', grouping);
+                tbody.append(`<tr><td>${i + 1}</td><td>${display}</td><td>${val.toFixed(2)}</td></tr>`);
+            });
+
+            const avg = total / keys.length || 0;
+            $('#modalTotalSalesCell').text(`₹ ${total.toFixed(2)}`);
+            $('#modalAverageSalesCell').text(`₹ ${avg.toFixed(2)}`);
+
+            const labels = keys.map(k => formatDisplayDate(grouping === 'daily' ? k : k + '-01', grouping));
+            const values = keys.map(k => salesGrouped[k]);
+
+            const ctx = document.getElementById('modalSalesBarChart').getContext('2d');
+            if (modalSalesChart) modalSalesChart.destroy();
+
+            modalSalesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Total Sales',
+                            data: values,
+                            backgroundColor: 'rgba(10,47,79,0.8)',
+                            borderColor: 'rgba(10,47,79)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Average',
+                            data: new Array(values.length).fill(avg),
+                            type: 'line',
+                            borderColor: 'rgba(10,47,79)',
+                            borderDash: [3, 3],
+                            pointRadius: 2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    return ctx.dataset.label === 'Average'
                                         ? ` Average: ₹ ${ctx.raw.toFixed(2)}`
                                         : ` Total Sales: ₹ ${ctx.raw.toFixed(2)}`;
                                 }
