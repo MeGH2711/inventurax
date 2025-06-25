@@ -230,6 +230,8 @@ table tbody tr td {
   color: var(--black);
 }
 
+/* Final Total Box Billing Page */
+
 #finalTotalFixedBox {
   background-color: var(--main-bg);
   box-shadow: -2px -2px 8px rgba(0, 0, 0, 0.2);
