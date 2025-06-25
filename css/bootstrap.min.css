@@ -1,4 +1,5 @@
 @charset "UTF-8";
+
 :root,
 [data-bs-theme=light] {
     --bs-blue: #0d6efd;

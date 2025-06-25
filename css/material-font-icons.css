@@ -11,7 +11,8 @@
     font-family: 'Material Icons outlined';
     font-style: normal;
     font-weight: 400;
-    src: url(../fonts/MaterialIcons-Outlined.eot); /* For IE6-8 */
+    src: url(../fonts/MaterialIcons-Outlined.eot);
+    /* For IE6-8 */
     src: local('Material Icons outlined'), local('MaterialIcons-Outlined'), url(../fonts/MaterialIcons-Outlined.woff2) format('woff2'), url(../fonts/MaterialIcons-Outlined.woff) format('woff'), url(../fonts/MaterialIcons-Outlined.ttf) format('truetype');
 }
 
@@ -105,6 +106,7 @@
 .md-48 {
     font-size: 48px !important;
 }
+
 /*-- Google Material Font Icons*/
 
 .gsymbols-round {
@@ -13116,4 +13118,3 @@
 .gicon-zoom_out_map:before {
     content: "\e56b";
 }
-

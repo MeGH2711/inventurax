@@ -692,6 +692,30 @@ app.get('/customer-purchases', isAuthenticated, async (req, res) => {
     }
 });
 
+// Fetch top selling products by quantity
+app.get('/top-selling-products', isAuthenticated, async (req, res) => {
+    try {
+        const result = await Bill.aggregate([
+            { $unwind: "$products" },
+            {
+                $group: {
+                    _id: "$products.name",
+                    totalQuantity: { $sum: "$products.quantity" }
+                }
+            },
+            { $sort: { totalQuantity: -1 } },
+        ]);
+
+        res.json(result.map(p => ({
+            name: p._id,
+            quantity: p.totalQuantity
+        })));
+    } catch (err) {
+        console.error('Error fetching top products:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Routes
 
 app.get('/', (req, res) => {

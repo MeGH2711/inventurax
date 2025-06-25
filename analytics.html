@@ -73,89 +73,221 @@
             </div>
 
             <div class="container-fluid my-4">
-                <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden analyticsCard">
-                    <div class="card-header py-3">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex align-items-center">
-                                <i class="gsymbols-round gicon-bar_chart fs-3 me-2"></i>
-                                <span class="fw-semibold fs-5">Sales Overview</span>
+
+                <div class="row">
+
+                    <!-- Daily Stats Section -->
+                    <div class="col-12">
+                        <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden dailyStatsCard">
+                            <div class="card-header dailyStatsHeader py-3">
+                                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <i class="gsymbols-round gicon-today fs-3 me-2"></i> Daily Stats
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span id="dailyStatsDate" class="fw-light text-light"></span>
+                                    </div>
+                                </h5>
                             </div>
-                            <div class="d-flex align-items-center gap-2 flex-row">
+                            <div class="card-body bg-light-subtle">
+                                <div class="row g-4">
 
-                                <!-- Sales Group Picker -->
-                                <select id="salesGrouping" class="form-select form-select-sm w-auto ms-2">
-                                    <option value="daily" selected>Daily</option>
-                                    <option value="monthly">Monthly</option>
-                                    <option value="yearly">Yearly</option>
-                                </select>
+                                    <!-- Daily Income Card -->
+                                    <div class="col-md-4">
+                                        <div class="card h-100 border-0 gradient-card3 shadow-sm rounded-4">
+                                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <h6 class="card-title text-muted fw-semibold">Daily Income</h6>
+                                                </div>
+                                                <p id="dailyIncome" class="card-text display-5 fw-bold text-dark mb-0">₹
+                                                    --
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                <!-- Date Range Picker -->
-                                <div class="input-group input-group-sm">
-                                    <input type="date" id="salesStartDate" class="form-control form-control-sm">
-                                    <span class="input-group-text">to</span>
-                                    <input type="date" id="salesEndDate" class="form-control form-control-sm">
-                                    <button class="btn btn-sm btn-darkblue" id="salesApplyDateFilter">Apply</button>
-                                </div>
+                                    <!-- Daily Customer Count Card -->
+                                    <div class="col-md-4">
+                                        <div class="card h-100 border-0 gradient-card3 shadow-sm rounded-4">
+                                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <h6 class="card-title text-muted fw-semibold">Daily Customers</h6>
+                                                </div>
+                                                <p id="dailyCustomerCount"
+                                                    class="card-text display-5 fw-bold text-dark mb-0">--
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                <!-- Chart/Table Toggle -->
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button class="btn btn-outline-light active" type="button" id="salesChartViewBtn"
-                                        title="Chart View">
-                                        <i class="gsymbols-round gicon-bar_chart"></i>
-                                    </button>
-                                    <button class="btn btn-outline-light" type="button" id="salesTableViewBtn"
-                                        title="Table View">
-                                        <i class="gsymbols-round gicon-table"></i>
-                                    </button>
-                                </div>
+                                    <!-- Daily Bill Count Card -->
+                                    <div class="col-md-4">
+                                        <div class="card h-100 border-0 gradient-card3 shadow-sm rounded-4">
+                                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <h6 class="card-title text-muted fw-semibold">Bills Generated Today
+                                                    </h6>
+                                                </div>
+                                                <p id="dailyBillCount" class="card-text display-5 fw-bold mb-0">--</p>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                <!-- Expand Button -->
-                                <div>
-                                    <button class="btn btn-sm btn-light" id="expandSalesCardBtn">
-                                        <i class="gsymbols-round gicon-open_in_full"></i>
-                                    </button>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body bg-light-subtle p-0" style="height: 400px; overflow: hidden;">
-                        <div id="salesChartContainer" class="h-100 overflow-auto p-3">
-                            <canvas id="salesBarChart" style="width: 100%; height: 300px;"></canvas>
-                        </div>
-                        <div id="salesTableContainer" class="d-none h-100 overflow-auto p-3">
-                            <div class="card border-1 roundedTableCard">
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered align-middle text-center roundedTable"
-                                        id="salesTable">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center">Sr. No.</th>
-                                                <th class="text-center">Date</th>
-                                                <th class="text-center">Total Sales (₹)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td class="text-center bg-transparent fw-bold" colspan="2">Total Sales
-                                                    </th>
-                                                <td class="text-center bg-transparent fw-bold" id="totalSalesCell">₹
-                                                    0.00</th>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-center bg-transparent fw-bold" colspan="2">Average
-                                                    Amount</th>
-                                                <td class="text-center bg-transparent fw-bold" id="averageSalesCell">₹
-                                                    0.00</th>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Sales Section -->
+                    <div class="col-12">
+                        <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden analyticsCard">
+                            <div class="card-header py-3">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="gsymbols-round gicon-bar_chart fs-3 me-2"></i>
+                                        <span class="fw-semibold fs-5">Sales Overview</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 flex-row">
+
+                                        <!-- Sales Group Picker -->
+                                        <select id="salesGrouping" class="form-select form-select-sm w-auto ms-2">
+                                            <option value="daily" selected>Daily</option>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="yearly">Yearly</option>
+                                        </select>
+
+                                        <!-- Date Range Picker -->
+                                        <div class="input-group input-group-sm">
+                                            <input type="date" id="salesStartDate" class="form-control form-control-sm">
+                                            <span class="input-group-text">to</span>
+                                            <input type="date" id="salesEndDate" class="form-control form-control-sm">
+                                            <button class="btn btn-sm btn-darkblue"
+                                                id="salesApplyDateFilter">Apply</button>
+                                        </div>
+
+                                        <!-- Chart/Table Toggle -->
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button class="btn btn-outline-light active" type="button"
+                                                id="salesChartViewBtn" title="Chart View">
+                                                <i class="gsymbols-round gicon-bar_chart"></i>
+                                            </button>
+                                            <button class="btn btn-outline-light" type="button" id="salesTableViewBtn"
+                                                title="Table View">
+                                                <i class="gsymbols-round gicon-table"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Expand Button -->
+                                        <div>
+                                            <button class="btn btn-sm btn-light" id="expandSalesCardBtn">
+                                                <i class="gsymbols-round gicon-open_in_full"></i>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body bg-light-subtle p-0" style="height: 400px; overflow: hidden;">
+                                <div id="salesChartContainer" class="h-100 overflow-auto p-3">
+                                    <canvas id="salesBarChart" style="width: 100%; height: 300px;"></canvas>
+                                </div>
+                                <div id="salesTableContainer" class="d-none h-100 overflow-auto p-3">
+                                    <div class="card border-1 roundedTableCard">
+                                        <div class="table-responsive">
+                                            <table
+                                                class="table table-sm table-bordered align-middle text-center roundedTable"
+                                                id="salesTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center">Sr. No.</th>
+                                                        <th class="text-center">Date</th>
+                                                        <th class="text-center">Total Sales (₹)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td class="text-center bg-transparent fw-bold" colspan="2">Total
+                                                            Sales
+                                                            </th>
+                                                        <td class="text-center bg-transparent fw-bold"
+                                                            id="totalSalesCell">₹
+                                                            0.00</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center bg-transparent fw-bold" colspan="2">
+                                                            Average
+                                                            Amount</th>
+                                                        <td class="text-center bg-transparent fw-bold"
+                                                            id="averageSalesCell">₹
+                                                            0.00</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Selling Product Quantitywise -->
+                    <div class="col-12">
+                        <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden analyticsCard">
+                            <div class="card-header py-3">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="gsymbols-round gicon-local_mall fs-3 me-2"></i>
+                                        <span class="fw-semibold fs-5">Top Selling Products</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 flex-row">
+
+                                        <!-- Sales Group Picker -->
+                                        <select id="tspGrouping" class="form-select form-select-sm w-auto ms-2">
+                                            <option value="daily" selected>Daily</option>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="yearly">Yearly</option>
+                                        </select>
+
+                                        <!-- Date Range Picker -->
+                                        <div class="input-group input-group-sm">
+                                            <input type="date" id="tspStartDate" class="form-control form-control-sm">
+                                            <span class="input-group-text">to</span>
+                                            <input type="date" id="tspEndDate" class="form-control form-control-sm">
+                                            <button class="btn btn-sm btn-darkblue"
+                                                id="tspApplyDateFilter">Apply</button>
+                                        </div>
+
+                                        <!-- Chart/Table Toggle -->
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button class="btn btn-outline-light active" type="button"
+                                                id="tspChartViewBtn" title="Chart View">
+                                                <i class="gsymbols-round gicon-bar_chart"></i>
+                                            </button>
+                                            <button class="btn btn-outline-light" type="button" id="tspTableViewBtn"
+                                                title="Table View">
+                                                <i class="gsymbols-round gicon-table"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Expand Button -->
+                                        <div>
+                                            <button class="btn btn-sm btn-light" id="expandTspCardBtn">
+                                                <i class="gsymbols-round gicon-open_in_full"></i>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body bg-light-subtle" style="height: 400px; overflow: hidden;">
+                                <canvas id="topProductsBarChart" style="width: 100%; height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
 
             <!-- Footer Section -->
@@ -229,11 +361,13 @@
                                         <tfoot>
                                             <tr>
                                                 <td class="bg-transparent fw-bold" colspan="2">Total Sales</td>
-                                                <td class="bg-transparent fw-bold" id="modalTotalSalesCell">₹ 0.00</td>
+                                                <td class="bg-transparent fw-bold" id="modalTotalSalesCell">₹ 0.00
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td class="bg-transparent fw-bold" colspan="2">Average</td>
-                                                <td class="bg-transparent fw-bold" id="modalAverageSalesCell">₹ 0.00</td>
+                                                <td class="bg-transparent fw-bold" id="modalAverageSalesCell">₹ 0.00
+                                                </td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -279,6 +413,47 @@
             })
             .catch(() => {
                 window.location.href = '/';
+            });
+
+        // Daily Stats
+
+        const today = new Date();
+
+        const day = today.toLocaleDateString('en-IN', { weekday: 'long' });
+        const date = today.getDate().toString().padStart(2, '0');
+        const month = today.toLocaleDateString('en-IN', { month: 'long' });
+        const year = today.getFullYear();
+
+        document.getElementById('dailyStatsDate').textContent = `${day}, ${date} ${month}, ${year}`;
+
+        fetch('/daily-income')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('dailyIncome').textContent = `₹ ${data.dailyIncome.toLocaleString()}`;
+            })
+            .catch(err => {
+                console.error('Error fetching daily income:', err);
+                document.getElementById('dailyIncome').textContent = 'N/A';
+            });
+
+        fetch('/daily-customer-count')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('dailyCustomerCount').textContent = data.dailyCustomerCount;
+            })
+            .catch(err => {
+                console.error('Error fetching daily customer count:', err);
+                document.getElementById('dailyCustomerCount').textContent = 'N/A';
+            });
+
+        fetch('/daily-bill-count')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('dailyBillCount').textContent = data.dailyBillCount;
+            })
+            .catch(err => {
+                console.error('Error fetching daily bill count:', err);
+                document.getElementById('dailyBillCount').textContent = 'N/A';
             });
 
         $(document).ready(function () {
@@ -327,9 +502,12 @@
                 }
             });
 
+            renderTopProductsChart();
+
         });
 
         // Toggle functionality
+
         $('#salesChartViewBtn').on('click', function () {
             currentViewMode = 'chart';
             $('#salesChartContainer').removeClass('d-none');
@@ -591,6 +769,7 @@
         }
 
         // Modal chart rendering
+
         function renderModalSales(data) {
             const grouping = $('#modalSalesGrouping').val();
             const salesGrouped = {};
@@ -680,6 +859,51 @@
                     }
                 }
             });
+        }
+
+        // Top Selling Products
+
+        function renderTopProductsChart() {
+            fetch('/top-selling-products')
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(p => p.name);
+                    const quantities = data.map(p => p.quantity);
+
+                    const ctx = document.getElementById('topProductsBarChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Total Quantity Sold',
+                                data: quantities,
+                                backgroundColor: 'rgba(10, 47, 79, 0.8)',
+                                borderColor: 'rgba(10, 47, 79, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => ` Quantity: ${ctx.raw}`
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error('Error fetching top products chart data:', err);
+                });
         }
 
         // Reusable Toast Function
