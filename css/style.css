@@ -287,3 +287,14 @@
 #dailyStatsDate {
   font-size: 1rem;
 }
+
+#finalTotalFixedBox {
+  position: fixed;
+  bottom: 61px;
+  right: 0;
+  z-index: 1050;
+  font-weight: bold;
+  font-size: 14px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}

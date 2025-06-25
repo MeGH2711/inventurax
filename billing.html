@@ -202,6 +202,10 @@
                 </div>
             </footer>
 
+            <div id="finalTotalFixedBox" class="shadow-sm text-white px-3 py-2">
+                Final Total (After Discount): ₹ <span id="finalTotalFixedValue">0.00</span>
+            </div>
+
         </div>
     </div>
 
@@ -571,6 +575,7 @@
                 }
 
                 $('#finalTotalInput').val(finalTotal.toFixed(2));
+                $('#finalTotalFixedValue').text(finalTotal.toFixed(2));
             }
 
             // When user edits Final Total, recalculate Overall Discount

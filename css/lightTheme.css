@@ -229,3 +229,8 @@ table tbody tr td {
   background-color: #b3c7ff;
   color: var(--black);
 }
+
+#finalTotalFixedBox {
+  background-color: var(--main-bg);
+  box-shadow: -2px -2px 8px rgba(0, 0, 0, 0.2);
+}
