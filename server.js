@@ -692,7 +692,7 @@ app.get('/customer-purchases', isAuthenticated, async (req, res) => {
     }
 });
 
-// Fetch top selling products by quantity
+// Fetch Top Selling Products
 
 app.get('/top-selling-products', isAuthenticated, async (req, res) => {
     const { startDate, endDate, grouping = 'daily' } = req.query;
@@ -729,6 +729,133 @@ app.get('/top-selling-products', isAuthenticated, async (req, res) => {
         name: p._id,
         quantity: p.totalQuantity
     })));
+});
+
+// Product Distribution by Category
+
+app.get('/product-category-distribution', isAuthenticated, async (req, res) => {
+    try {
+        const result = await Bill.aggregate([
+            { $unwind: "$products" },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "products.name",
+                    foreignField: "name",
+                    as: "productDetails"
+                }
+            },
+            { $unwind: "$productDetails" },
+            {
+                $group: {
+                    _id: "$productDetails.category",
+                    totalQuantity: { $sum: "$products.quantity" }
+                }
+            },
+            { $sort: { totalQuantity: -1 } }
+        ]);
+
+        res.json(result.map(c => ({
+            category: c._id,
+            quantity: c.totalQuantity
+        })));
+    } catch (err) {
+        console.error("Error fetching category distribution:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// Mode of Payments Distribution
+
+app.get('/mode-of-payments-distribution', isAuthenticated, async (req, res) => {
+    try {
+        const result = await Bill.aggregate([
+            {
+                $group: {
+                    _id: "$modeOfPayment",
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { count: -1 } }
+        ]);
+
+        res.json(result.map(p => ({
+            mode: p._id || 'Unknown',
+            count: p.count
+        })));
+    } catch (err) {
+        console.error('Error fetching payment mode distribution:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Mode of Delivery Distribution
+
+app.get('/mode-of-delivery-distribution', isAuthenticated, async (req, res) => {
+    try {
+        const result = await Bill.aggregate([
+            {
+                $group: {
+                    _id: "$modeOfDelivery",
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { count: -1 } }
+        ]);
+
+        res.json(result.map(d => ({
+            mode: d._id || 'Unknown',
+            count: d.count
+        })));
+    } catch (err) {
+        console.error('Error fetching delivery mode distribution:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Customer Count
+
+app.get('/customer-count-grouped', async (req, res) => {
+    const { grouping = 'daily' } = req.query;
+
+    try {
+        const groupId =
+            grouping === 'yearly' ? { year: { $substr: ["$billingDate", 0, 4] } } :
+                grouping === 'monthly' ? { month: { $substr: ["$billingDate", 0, 7] } } :
+                    { day: "$billingDate" };
+
+        const result = await Bill.aggregate([
+            {
+                $match: {
+                    customerName: { $ne: "Unknown" }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        name: "$customerName",
+                        number: "$customerNumber",
+                        ...groupId
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: `$_id.${grouping === 'yearly' ? 'year' : grouping === 'monthly' ? 'month' : 'day'}`,
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        res.json(result.map(r => ({
+            date: r._id,
+            count: r.count
+        })));
+    } catch (err) {
+        console.error('Error fetching grouped customer count:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // Routes

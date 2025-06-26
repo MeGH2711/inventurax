@@ -77,8 +77,8 @@
                 <div class="row">
 
                     <!-- Daily Stats Section -->
-                    <div class="col-12">
-                        <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden dailyStatsCard">
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm border-0 rounded-3 overflow-hidden dailyStatsCard">
                             <div class="card-header dailyStatsHeader py-3">
                                 <h5 class="mb-0 d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center">
@@ -139,8 +139,8 @@
                     </div>
 
                     <!-- Sales Section -->
-                    <div class="col-12">
-                        <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden analyticsCard">
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
                             <div class="card-header py-3">
                                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div class="d-flex align-items-center">
@@ -150,7 +150,7 @@
                                     <div class="d-flex align-items-center gap-2 flex-row">
 
                                         <!-- Sales Group Picker -->
-                                        <select id="salesGrouping" class="form-select form-select-sm w-auto ms-2">
+                                        <select id="salesGrouping" class="form-select form-select-sm w-auto">
                                             <option value="daily" selected>Daily</option>
                                             <option value="monthly">Monthly</option>
                                             <option value="yearly">Yearly</option>
@@ -232,8 +232,8 @@
                     </div>
 
                     <!-- Top Selling Product Quantitywise -->
-                    <div class="col-12">
-                        <div class="card shadow-sm mb-4 border-0 rounded-3 overflow-hidden analyticsCard">
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
                             <div class="card-header py-3">
                                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div class="d-flex align-items-center">
@@ -302,6 +302,88 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Distribution by Category -->
+                    <div class="col-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="gsymbols-round gicon-pie_chart fs-4 me-2"></i>
+                                    <span class="fw-semibold fs-6">Product Distribution by Category</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-light" id="expandCategoryChartBtn">
+                                        <i class="gsymbols-round gicon-open_in_full"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body bg-light-subtle d-flex justify-content-center align-items-center"
+                                style="height: 400px;">
+                                <canvas id="categoryPieChart" style="width: 100%; height: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode of Payment Pie Chart -->
+                    <div class="col-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="gsymbols-round gicon-payments fs-3 me-2"></i>
+                                    <span class="fw-semibold fs-5">Payment Mode Distribution</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-light" id="expandPaymentChartBtn">
+                                        <i class="gsymbols-round gicon-open_in_full"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body bg-light-subtle d-flex justify-content-center align-items-center"
+                                style="height: 400px;">
+                                <canvas id="paymentPieChart" style="width: 100%; height: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode of Delivery Pie Chart -->
+                    <div class="col-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="gsymbols-round gicon-local_shipping fs-3 me-2"></i>
+                                    <span class="fw-semibold fs-5">Delivery Mode Distribution</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-light" id="expandDeliveryChartBtn">
+                                        <i class="gsymbols-round gicon-open_in_full"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body bg-light-subtle d-flex justify-content-center align-items-center"
+                                style="height: 400px;">
+                                <canvas id="deliveryPieChart" style="width: 100%; height: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="gsymbols-round gicon-group fs-3 me-2"></i>
+                                    <span class="fw-semibold fs-5">Customer Count</span>
+                                </div>
+                                <select id="customerGrouping" class="form-select form-select-sm w-auto">
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="card-body bg-light-subtle p-3" style="height: 400px;">
+                                <canvas id="customerAreaChart" style="width: 100%; height: 100%;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -464,6 +546,74 @@
         </div>
     </div>
 
+    <!-- Fullscreen Modal for Product Distribution by Category -->
+    <div class="modal fade" id="categoryFullscreenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content analyticsModal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="gsymbols-round gicon-pie_chart fs-3 me-2"></i>Product Distribution by Category
+                        (Fullscreen)
+                    </h5>
+                    <button type="button" class="btn-close"
+                        style="filter: invert(1) grayscale(100%) brightness(200%); opacity: 1;" data-bs-dismiss="modal"
+                        aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 85vh;">
+                        <canvas id="modalCategoryPieChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Modal for Payment Mode Pie Chart -->
+    <div class="modal fade" id="paymentFullscreenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content analyticsModal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="gsymbols-round gicon-payments fs-3 me-2"></i>Payment Mode Distribution (Fullscreen)
+                    </h5>
+                    <button type="button" class="btn-close"
+                        style="filter: invert(1) grayscale(100%) brightness(200%); opacity: 1;" data-bs-dismiss="modal"
+                        aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 85vh;">
+                        <canvas id="modalPaymentPieChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Modal for Delivery Mode Pie Chart -->
+    <div class="modal fade" id="deliveryFullscreenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content analyticsModal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="gsymbols-round gicon-local_shipping fs-3 me-2"></i>Delivery Mode Distribution
+                        (Fullscreen)
+                    </h5>
+                    <button type="button" class="btn-close"
+                        style="filter: invert(1) grayscale(100%) brightness(200%); opacity: 1;" data-bs-dismiss="modal"
+                        aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 85vh;">
+                        <canvas id="modalDeliveryPieChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
         <div id="mainToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
@@ -482,6 +632,7 @@
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/sidebar.js"></script>
     <script src="js/chart.umd.js"></script>
+    <script src="js/chartjs-plugin-datalabels@2.js"></script>
 
     <script>
         // Session check
@@ -604,6 +755,9 @@
             });
 
             renderTopProductsChart(minDate, maxDate);
+            renderCategoryPieChart();
+            renderPaymentPieChart();
+            renderDeliveryPieChart();
 
         });
 
@@ -964,6 +1118,8 @@
 
         // Top Selling Products
 
+        let tspViewMode = 'chart';
+
         function renderTopProductsChart(startDate, endDate) {
             const grouping = $('#tspGrouping').val();
             const query = { grouping };
@@ -1087,7 +1243,7 @@
         }
 
         function syncTspModalViewWithMain() {
-            if ($('#tspChartContainer').is(':visible')) {
+            if (tspViewMode === 'chart') {
                 $('#modalTspChartContainer').removeClass('d-none');
                 $('#modalTspTableContainer').addClass('d-none');
                 $('#modalTspChartViewBtn').addClass('active');
@@ -1101,6 +1257,7 @@
         }
 
         $('#tspChartViewBtn').on('click', function () {
+            tspViewMode = 'chart';
             $('#tspChartContainer').removeClass('d-none');
             $('#tspTableContainer').addClass('d-none');
             $('#tspChartViewBtn').addClass('active');
@@ -1108,6 +1265,7 @@
         });
 
         $('#tspTableViewBtn').on('click', function () {
+            tspViewMode = 'table';
             $('#tspChartContainer').addClass('d-none');
             $('#tspTableContainer').removeClass('d-none');
             $('#tspChartViewBtn').removeClass('active');
@@ -1147,17 +1305,31 @@
         });
 
         $('#modalTspChartViewBtn').on('click', function () {
+            tspViewMode = 'chart';
             $('#modalTspChartContainer').removeClass('d-none');
             $('#modalTspTableContainer').addClass('d-none');
             $('#modalTspChartViewBtn').addClass('active');
             $('#modalTspTableViewBtn').removeClass('active');
+
+            // Sync main view
+            $('#tspChartContainer').removeClass('d-none');
+            $('#tspTableContainer').addClass('d-none');
+            $('#tspChartViewBtn').addClass('active');
+            $('#tspTableViewBtn').removeClass('active');
         });
 
         $('#modalTspTableViewBtn').on('click', function () {
+            tspViewMode = 'table';
             $('#modalTspChartContainer').addClass('d-none');
             $('#modalTspTableContainer').removeClass('d-none');
             $('#modalTspChartViewBtn').removeClass('active');
             $('#modalTspTableViewBtn').addClass('active');
+
+            // Sync main view
+            $('#tspChartContainer').addClass('d-none');
+            $('#tspTableContainer').removeClass('d-none');
+            $('#tspChartViewBtn').removeClass('active');
+            $('#tspTableViewBtn').addClass('active');
         });
 
         $('#modalTspApplyDateFilter').on('click', function () {
@@ -1175,6 +1347,421 @@
 
         $('#modalTspGrouping').on('change', function () {
             $('#modalTspApplyDateFilter').click();
+        });
+
+        // Product Distribution by Category
+
+        function renderCategoryPieChart() {
+            fetch('/product-category-distribution')
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(c => c.category);
+                    const quantities = data.map(c => c.quantity);
+
+                    const colors = labels.map((_, i) => `rgba(10, 47, 79, ${1 - (i * 0.05)})`);
+
+                    const ctx = document.getElementById('categoryPieChart').getContext('2d');
+                    if (window.categoryChart) window.categoryChart.destroy();
+
+                    window.categoryChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: quantities,
+                                backgroundColor: colors,
+                                borderColor: '#ffffff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                datalabels: {
+                                    color: '#fff',
+                                    formatter: (value, context) => {
+                                        const data = context.chart.data.datasets[0].data;
+                                        const total = data.reduce((sum, val) => sum + val, 0);
+                                        const percent = ((value / total) * 100).toFixed(1);
+                                        return `${percent}%`;
+                                    },
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (ctx) {
+                                            const label = ctx.label || '';
+                                            const value = ctx.raw;
+                                            return `${label}: ${value}`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading category pie chart:', err);
+                });
+        }
+
+        function renderModalCategoryPieChart() {
+            fetch('/product-category-distribution')
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(c => c.category);
+                    const quantities = data.map(c => c.quantity);
+                    const colors = labels.map((_, i) => `rgba(10, 47, 79, ${1 - (i * 0.05)})`);
+
+                    const ctx = document.getElementById('modalCategoryPieChart').getContext('2d');
+                    if (window.modalCategoryChart) window.modalCategoryChart.destroy();
+
+                    window.modalCategoryChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data: quantities,
+                                backgroundColor: colors,
+                                borderColor: '#ffffff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                datalabels: {
+                                    color: '#fff',
+                                    formatter: (value, context) => {
+                                        const data = context.chart.data.datasets[0].data;
+                                        const total = data.reduce((sum, val) => sum + val, 0);
+                                        const percent = ((value / total) * 100).toFixed(1);
+                                        return `${percent}%`;
+                                    },
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (ctx) {
+                                            const label = ctx.label || '';
+                                            const value = ctx.raw;
+                                            return `${label}: ${value}`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading modal category pie chart:', err);
+                });
+        }
+
+        $('#expandCategoryChartBtn').on('click', function () {
+            renderModalCategoryPieChart();
+            const modal = new bootstrap.Modal(document.getElementById('categoryFullscreenModal'));
+            modal.show();
+
+            setTimeout(() => {
+                if (window.modalCategoryChart) window.modalCategoryChart.resize();
+            }, 500);
+        });
+
+        // Payment Mode Distribution
+
+        function renderPaymentPieChart() {
+            fetch('/mode-of-payments-distribution')
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(p => p.mode);
+                    const counts = data.map(p => p.count);
+                    const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.9 - (i * 0.05)})`);
+
+                    const ctx = document.getElementById('paymentPieChart').getContext('2d');
+                    if (window.paymentChart) window.paymentChart.destroy();
+
+                    window.paymentChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: colors,
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'top' },
+                                datalabels: {
+                                    color: '#fff',
+                                    formatter: (value, ctx) => {
+                                        const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        return `${((value / total) * 100).toFixed(1)}%`;
+                                    },
+                                    font: { weight: 'bold' }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => `${ctx.label}: ${ctx.raw}`
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading payment chart:', err);
+                });
+        }
+
+        function renderModalPaymentPieChart() {
+            fetch('/mode-of-payments-distribution')
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(p => p.mode);
+                    const counts = data.map(p => p.count);
+                    const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.9 - (i * 0.05)})`);
+
+                    const ctx = document.getElementById('modalPaymentPieChart').getContext('2d');
+                    if (window.modalPaymentChart) window.modalPaymentChart.destroy();
+
+                    window.modalPaymentChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: colors,
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'top' },
+                                datalabels: {
+                                    color: '#fff',
+                                    formatter: (value, ctx) => {
+                                        const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        return `${((value / total) * 100).toFixed(1)}%`;
+                                    },
+                                    font: { weight: 'bold' }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => `${ctx.label}: ${ctx.raw}`
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading modal payment chart:', err);
+                });
+        }
+
+        $('#expandPaymentChartBtn').on('click', function () {
+            renderModalPaymentPieChart();
+            const modal = new bootstrap.Modal(document.getElementById('paymentFullscreenModal'));
+            modal.show();
+
+            setTimeout(() => {
+                if (window.modalCategoryChart) window.modalCategoryChart.resize();
+            }, 500);
+        });
+
+        // Mode of Delivery Distribution
+
+        function renderDeliveryPieChart() {
+            fetch('/mode-of-delivery-distribution')
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(d => d.mode);
+                    const counts = data.map(d => d.count);
+                    const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.85 - (i * 0.05)})`);
+
+                    const ctx = document.getElementById('deliveryPieChart').getContext('2d');
+                    if (window.deliveryChart) window.deliveryChart.destroy();
+
+                    window.deliveryChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: colors,
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'top' },
+                                datalabels: {
+                                    color: '#fff',
+                                    anchor: 'center',
+                                    align: 'center',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    formatter: (value, ctx) => {
+                                        const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        return `${((value / total) * 100).toFixed(1)}%`;
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => `${ctx.label}: ${ctx.raw}`
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading delivery chart:', err);
+                });
+        }
+
+        function renderModalDeliveryPieChart() {
+            fetch('/mode-of-delivery-distribution')
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(d => d.mode);
+                    const counts = data.map(d => d.count);
+                    const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.85 - (i * 0.05)})`);
+
+                    const ctx = document.getElementById('modalDeliveryPieChart').getContext('2d');
+                    if (window.modalDeliveryChart) window.modalDeliveryChart.destroy();
+
+                    window.modalDeliveryChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: colors,
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'top' },
+                                datalabels: {
+                                    color: '#fff',
+                                    anchor: 'center',
+                                    align: 'center',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    formatter: (value, ctx) => {
+                                        const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        return `${((value / total) * 100).toFixed(1)}%`;
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => `${ctx.label}: ${ctx.raw}`
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading modal delivery chart:', err);
+                });
+        }
+
+        $('#expandDeliveryChartBtn').on('click', function () {
+            renderModalDeliveryPieChart();
+            const modal = new bootstrap.Modal(document.getElementById('deliveryFullscreenModal'));
+            modal.show();
+
+            setTimeout(() => {
+                if (window.modalCategoryChart) window.modalCategoryChart.resize();
+            }, 500);
+        });
+
+        function renderCustomerCountChart(grouping = 'daily') {
+            fetch(`/customer-count-grouped?grouping=${grouping}`)
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(d => {
+                        const date = new Date(d.date);
+                        return grouping === 'yearly'
+                            ? date.getFullYear()
+                            : grouping === 'monthly'
+                                ? date.toLocaleString('default', { month: 'short', year: 'numeric' })
+                                : new Date(d.date).toLocaleDateString('en-IN');
+                    });
+
+                    const counts = data.map(d => d.count);
+
+                    const ctx = document.getElementById('customerAreaChart').getContext('2d');
+                    if (window.customerAreaChart instanceof Chart) {
+                        window.customerAreaChart.destroy();
+                    }
+
+                    window.customerAreaChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Customer Count',
+                                data: counts,
+                                backgroundColor: 'rgba(10, 47, 79, 0.2)',
+                                borderColor: 'rgba(10, 47, 79, 1)',
+                                fill: true,
+                                tension: 0,
+                                pointRadius: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading customer count chart:', err);
+                });
+        }
+
+        $('#customerGrouping').on('change', function () {
+            renderCustomerCountChart(this.value);
+        });
+
+        $(document).ready(() => {
+            renderCustomerCountChart();
         });
 
         // Reusable Toast Function
