@@ -813,37 +813,6 @@ app.get('/mode-of-delivery-distribution', isAuthenticated, async (req, res) => {
     }
 });
 
-// Customer Count
-
-app.get('/customer-count-grouped', async (req, res) => {
-    const { grouping = 'daily' } = req.query;
-
-    try {
-        const dateKey =
-            grouping === 'yearly' ? { $substr: ["$billingDate", 0, 4] } :
-                grouping === 'monthly' ? { $substr: ["$billingDate", 0, 7] } :
-                    "$billingDate"; // daily
-
-        const result = await Bill.aggregate([
-            {
-                $group: {
-                    _id: dateKey,
-                    count: { $sum: 1 } // count of bills (orders)
-                }
-            },
-            { $sort: { _id: 1 } }
-        ]);
-
-        res.json(result.map(r => ({
-            date: r._id,
-            count: r.count
-        })));
-    } catch (err) {
-        console.error('Error fetching order count:', err);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
 // Routes
 
 app.get('/', (req, res) => {
