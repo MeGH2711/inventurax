@@ -819,30 +819,16 @@ app.get('/customer-count-grouped', async (req, res) => {
     const { grouping = 'daily' } = req.query;
 
     try {
-        const groupId =
-            grouping === 'yearly' ? { year: { $substr: ["$billingDate", 0, 4] } } :
-                grouping === 'monthly' ? { month: { $substr: ["$billingDate", 0, 7] } } :
-                    { day: "$billingDate" };
+        const dateKey =
+            grouping === 'yearly' ? { $substr: ["$billingDate", 0, 4] } :
+                grouping === 'monthly' ? { $substr: ["$billingDate", 0, 7] } :
+                    "$billingDate"; // daily
 
         const result = await Bill.aggregate([
             {
-                $match: {
-                    customerName: { $ne: "Unknown" }
-                }
-            },
-            {
                 $group: {
-                    _id: {
-                        name: "$customerName",
-                        number: "$customerNumber",
-                        ...groupId
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: `$_id.${grouping === 'yearly' ? 'year' : grouping === 'monthly' ? 'month' : 'day'}`,
-                    count: { $sum: 1 }
+                    _id: dateKey,
+                    count: { $sum: 1 } // count of bills (orders)
                 }
             },
             { $sort: { _id: 1 } }
@@ -853,7 +839,7 @@ app.get('/customer-count-grouped', async (req, res) => {
             count: r.count
         })));
     } catch (err) {
-        console.error('Error fetching grouped customer count:', err);
+        console.error('Error fetching order count:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
