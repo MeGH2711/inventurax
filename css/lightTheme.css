@@ -176,15 +176,11 @@ body {
 }
 
 .profileButton ul li a {
-  background-color: var(--main-page-bg) !important;
+  background-color: transparent !important;
 }
 
 .profileButton ul li a:hover {
-  background-color: #d8ecff !important;
-}
-
-.profileButton ul li a.dropdown-item-signout:hover {
-  color: var(--danger-color) !important;
+  background-color: transparent !important;
 }
 
 .dropdown-item-signout {
