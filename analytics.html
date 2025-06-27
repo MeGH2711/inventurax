@@ -314,7 +314,17 @@
                                     <i class="gsymbols-round gicon-pie_chart fs-4 me-2"></i>
                                     <span class="fw-semibold fs-6">Product Distribution by Category</span>
                                 </div>
-                                <div>
+                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-light active" id="categoryChartViewBtn"
+                                            title="Chart View">
+                                            <i class="gsymbols-round gicon-pie_chart"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" id="categoryTableViewBtn"
+                                            title="Table View">
+                                            <i class="gsymbols-round gicon-table"></i>
+                                        </button>
+                                    </div>
                                     <button class="btn btn-sm btn-light" id="expandCategoryChartBtn">
                                         <i class="gsymbols-round gicon-open_in_full"></i>
                                     </button>
@@ -322,7 +332,25 @@
                             </div>
                             <div class="card-body bg-light-subtle d-flex justify-content-center align-items-center"
                                 style="height: 400px;">
-                                <canvas id="categoryPieChart" style="width: 100%; height: 100%;"></canvas>
+                                <div id="categoryChartContainer"
+                                    class="d-flex justify-content-center align-items-center h-100">
+                                    <canvas id="categoryPieChart" style="width: 100%; height: 100%;"></canvas>
+                                </div>
+                                <div id="categoryTableContainer" class="d-none h-100 w-100 p-3">
+                                    <div class="table-responsive card roundedTableCard">
+                                        <table class="table table-sm table-bordered text-center roundedTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Category</th>
+                                                    <th>Count</th>
+                                                    <th>Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="categoryTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -332,10 +360,21 @@
                         <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
                             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    <i class="gsymbols-round gicon-payments fs-3 me-2"></i>
-                                    <span class="fw-semibold fs-5">Payment Mode Distribution</span>
+                                    <i class="gsymbols-round gicon-payments fs-4 me-2"></i>
+                                    <span class="fw-semibold fs-6">Payment Mode Distribution</span>
                                 </div>
-                                <div>
+                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <div class=" btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-light active" id="paymentChartViewBtn"
+                                            title="Chart View">
+                                            <i class="gsymbols-round gicon-pie_chart"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" id="paymentTableViewBtn"
+                                            title="Table View">
+                                            <i class="gsymbols-round gicon-table"></i>
+                                        </button>
+                                    </div>
+
                                     <button class="btn btn-sm btn-light" id="expandPaymentChartBtn">
                                         <i class="gsymbols-round gicon-open_in_full"></i>
                                     </button>
@@ -343,7 +382,25 @@
                             </div>
                             <div class="card-body bg-light-subtle d-flex justify-content-center align-items-center"
                                 style="height: 400px;">
-                                <canvas id="paymentPieChart" style="width: 100%; height: 100%;"></canvas>
+                                <div id="paymentChartContainer"
+                                    class="h-100 d-flex justify-content-center align-items-center">
+                                    <canvas id="paymentPieChart" style="width: 100%; height: 100%;"></canvas>
+                                </div>
+                                <div id="paymentTableContainer" class="d-none h-100 w-100 p-3">
+                                    <div class="table-responsive card roundedTableCard">
+                                        <table class="table table-sm table-bordered text-center roundedTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Mode</th>
+                                                    <th>Count</th>
+                                                    <th>Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="paymentTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -353,10 +410,20 @@
                         <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
                             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    <i class="gsymbols-round gicon-local_shipping fs-3 me-2"></i>
-                                    <span class="fw-semibold fs-5">Delivery Mode Distribution</span>
+                                    <i class="gsymbols-round gicon-local_shipping fs-4 me-2"></i>
+                                    <span class="fw-semibold fs-6">Delivery Mode Distribution</span>
                                 </div>
-                                <div>
+                                <div class="d-flex justify-content-end align-items-center gap-2">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-light active" id="deliveryChartViewBtn"
+                                            title="Chart View">
+                                            <i class="gsymbols-round gicon-pie_chart"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" id="deliveryTableViewBtn"
+                                            title="Table View">
+                                            <i class="gsymbols-round gicon-table"></i>
+                                        </button>
+                                    </div>
                                     <button class="btn btn-sm btn-light" id="expandDeliveryChartBtn">
                                         <i class="gsymbols-round gicon-open_in_full"></i>
                                     </button>
@@ -364,7 +431,25 @@
                             </div>
                             <div class="card-body bg-light-subtle d-flex justify-content-center align-items-center"
                                 style="height: 400px;">
-                                <canvas id="deliveryPieChart" style="width: 100%; height: 100%;"></canvas>
+                                <div id="deliveryChartContainer"
+                                    class="d-flex justify-content-center align-items-center h-100">
+                                    <canvas id="deliveryPieChart" style="width: 100%; height: 100%;"></canvas>
+                                </div>
+                                <div id="deliveryTableContainer" class="d-none h-100 w-100 p-3">
+                                    <div class="table-responsive card roundedTableCard">
+                                        <table class="table table-sm table-bordered text-center roundedTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Mode</th>
+                                                    <th>Count</th>
+                                                    <th>Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="deliveryTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -542,8 +627,35 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 85vh;">
-                        <canvas id="modalCategoryPieChart" style="width: 100%; height: 100%;"></canvas>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="btn-group btn-group-sm ms-3" role="group">
+                                <button class="btn btn-outline-darkblue active" id="modalCategoryChartViewBtn"><i
+                                        class="gsymbols-round gicon-pie_chart"></i></button>
+                                <button class="btn btn-outline-darkblue" id="modalCategoryTableViewBtn"><i
+                                        class="gsymbols-round gicon-table"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-fluid p-3" style="height: 80vh;">
+                        <div id="modalCategoryChartContainer" class="h-100 d-flex justify-content-center">
+                            <canvas id="modalCategoryPieChart" style="width: 100%; height: 100%;"></canvas>
+                        </div>
+                        <div id="modalCategoryTableContainer" class="d-none h-100 overflow-auto">
+                            <div class="table-responsive card roundedTableCard">
+                                <table class="table table-sm table-bordered text-center roundedTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Category</th>
+                                            <th>Count</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalCategoryTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -564,9 +676,39 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 85vh;">
-                        <canvas id="modalPaymentPieChart" style="width: 100%; height: 100%;"></canvas>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="btn-group btn-group-sm ms-3" role="group">
+                                <button class="btn btn-outline-darkblue active" id="modalPaymentChartViewBtn">
+                                    <i class="gsymbols-round gicon-pie_chart"></i>
+                                </button>
+                                <button class="btn btn-outline-darkblue" id="modalPaymentTableViewBtn">
+                                    <i class="gsymbols-round gicon-table"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    <div class="container-fluid p-3" style="height: 80vh;">
+                        <div id="modalPaymentChartContainer" class="d-flex justify-content-center h-100">
+                            <canvas id="modalPaymentPieChart" style="width: 100%; height: 100%;"></canvas>
+                        </div>
+                        <div id="modalPaymentTableContainer" class="d-none h-100 overflow-auto">
+                            <div class="table-responsive card roundedTableCard">
+                                <table class="table table-sm table-bordered text-center roundedTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Mode</th>
+                                            <th>Count</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalPaymentTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -587,9 +729,39 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 85vh;">
-                        <canvas id="modalDeliveryPieChart" style="width: 100%; height: 100%;"></canvas>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="btn-group btn-group-sm ms-3" role="group">
+                                <button class="btn btn-outline-darkblue active" id="modalDeliveryChartViewBtn">
+                                    <i class="gsymbols-round gicon-pie_chart"></i>
+                                </button>
+                                <button class="btn btn-outline-darkblue" id="modalDeliveryTableViewBtn">
+                                    <i class="gsymbols-round gicon-table"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    <div class="container-fluid p-3" style="height: 80vh;">
+                        <div id="modalDeliveryChartContainer" class=" d-flex justify-content-center h-100">
+                            <canvas id="modalDeliveryPieChart" style="width: 100%; height: 100%;"></canvas>
+                        </div>
+                        <div id="modalDeliveryTableContainer" class="d-none h-100 overflow-auto">
+                            <div class="table-responsive card roundedTableCard">
+                                <table class="table table-sm table-bordered text-center roundedTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Mode</th>
+                                            <th>Count</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalDeliveryTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -1333,10 +1505,27 @@
 
         // Product Distribution by Category
 
+        let categoryViewMode = 'chart';
+
         function renderCategoryPieChart() {
             fetch('/product-category-distribution')
                 .then(res => res.json())
                 .then(data => {
+
+                    const tbody = $('#categoryTableBody').empty();
+                    const total = data.reduce((sum, c) => sum + c.quantity, 0);
+                    data.forEach((c, i) => {
+                        const percent = ((c.quantity / total) * 100).toFixed(1);
+                        tbody.append(`
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${c.category}</td>
+                                <td>${c.quantity}</td>
+                                <td>${percent}%</td>
+                            </tr>
+                        `);
+                    });
+
                     const labels = data.map(c => c.category);
                     const quantities = data.map(c => c.quantity);
 
@@ -1397,6 +1586,21 @@
             fetch('/product-category-distribution')
                 .then(res => res.json())
                 .then(data => {
+
+                    const tbody = $('#modalCategoryTableBody').empty();
+                    const total = data.reduce((sum, c) => sum + c.quantity, 0);
+                    data.forEach((c, i) => {
+                        const percent = ((c.quantity / total) * 100).toFixed(1);
+                        tbody.append(`
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${c.category}</td>
+                                <td>${c.quantity}</td>
+                                <td>${percent}%</td>
+                            </tr>
+                        `);
+                    });
+
                     const labels = data.map(c => c.category);
                     const quantities = data.map(c => c.quantity);
                     const colors = labels.map((_, i) => `rgba(10, 47, 79, ${1 - (i * 0.05)})`);
@@ -1452,6 +1656,40 @@
                 });
         }
 
+        function syncCategoryViews() {
+            if (categoryViewMode === 'chart') {
+                $('#categoryChartContainer, #modalCategoryChartContainer').removeClass('d-none');
+                $('#categoryTableContainer, #modalCategoryTableContainer').addClass('d-none');
+                $('#categoryChartViewBtn, #modalCategoryChartViewBtn').addClass('active');
+                $('#categoryTableViewBtn, #modalCategoryTableViewBtn').removeClass('active');
+            } else {
+                $('#categoryChartContainer, #modalCategoryChartContainer').addClass('d-none');
+                $('#categoryTableContainer, #modalCategoryTableContainer').removeClass('d-none');
+                $('#categoryChartViewBtn, #modalCategoryChartViewBtn').removeClass('active');
+                $('#categoryTableViewBtn, #modalCategoryTableViewBtn').addClass('active');
+            }
+        }
+
+        $('#categoryChartViewBtn').on('click', () => {
+            categoryViewMode = 'chart';
+            syncCategoryViews();
+        });
+
+        $('#categoryTableViewBtn').on('click', () => {
+            categoryViewMode = 'table';
+            syncCategoryViews();
+        });
+
+        $('#modalCategoryChartViewBtn').on('click', () => {
+            categoryViewMode = 'chart';
+            syncCategoryViews();
+        });
+
+        $('#modalCategoryTableViewBtn').on('click', () => {
+            categoryViewMode = 'table';
+            syncCategoryViews();
+        });
+
         $('#expandCategoryChartBtn').on('click', function () {
             renderModalCategoryPieChart();
             const modal = new bootstrap.Modal(document.getElementById('categoryFullscreenModal'));
@@ -1464,10 +1702,27 @@
 
         // Payment Mode Distribution
 
+        let paymentViewMode = 'chart';
+
         function renderPaymentPieChart() {
             fetch('/mode-of-payments-distribution')
                 .then(res => res.json())
                 .then(data => {
+
+                    const tbody = $('#paymentTableBody').empty();
+                    const total = data.reduce((sum, p) => sum + p.count, 0);
+                    data.forEach((p, i) => {
+                        const percent = ((p.count / total) * 100).toFixed(1);
+                        tbody.append(`
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${p.mode}</td>
+                                <td>${p.count}</td>
+                                <td>${percent}%</td>
+                            </tr>
+                        `);
+                    });
+
                     const labels = data.map(p => p.mode);
                     const counts = data.map(p => p.count);
                     const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.9 - (i * 0.05)})`);
@@ -1517,6 +1772,21 @@
             fetch('/mode-of-payments-distribution')
                 .then(res => res.json())
                 .then(data => {
+
+                    const tbody = $('#modalPaymentTableBody').empty();
+                    const total = data.reduce((sum, p) => sum + p.count, 0);
+                    data.forEach((p, i) => {
+                        const percent = ((p.count / total) * 100).toFixed(1);
+                        tbody.append(`
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${p.mode}</td>
+                                <td>${p.count}</td>
+                                <td>${percent}%</td>
+                            </tr>
+                        `);
+                    });
+
                     const labels = data.map(p => p.mode);
                     const counts = data.map(p => p.count);
                     const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.9 - (i * 0.05)})`);
@@ -1562,6 +1832,40 @@
                 });
         }
 
+        function syncPaymentViews() {
+            if (paymentViewMode === 'chart') {
+                $('#paymentChartContainer, #modalPaymentChartContainer').removeClass('d-none');
+                $('#paymentTableContainer, #modalPaymentTableContainer').addClass('d-none');
+                $('#paymentChartViewBtn, #modalPaymentChartViewBtn').addClass('active');
+                $('#paymentTableViewBtn, #modalPaymentTableViewBtn').removeClass('active');
+            } else {
+                $('#paymentChartContainer, #modalPaymentChartContainer').addClass('d-none');
+                $('#paymentTableContainer, #modalPaymentTableContainer').removeClass('d-none');
+                $('#paymentChartViewBtn, #modalPaymentChartViewBtn').removeClass('active');
+                $('#paymentTableViewBtn, #modalPaymentTableViewBtn').addClass('active');
+            }
+        }
+
+        $('#paymentChartViewBtn').on('click', () => {
+            paymentViewMode = 'chart';
+            syncPaymentViews();
+        });
+
+        $('#paymentTableViewBtn').on('click', () => {
+            paymentViewMode = 'table';
+            syncPaymentViews();
+        });
+
+        $('#modalPaymentChartViewBtn').on('click', () => {
+            paymentViewMode = 'chart';
+            syncPaymentViews();
+        });
+
+        $('#modalPaymentTableViewBtn').on('click', () => {
+            paymentViewMode = 'table';
+            syncPaymentViews();
+        });
+
         $('#expandPaymentChartBtn').on('click', function () {
             renderModalPaymentPieChart();
             const modal = new bootstrap.Modal(document.getElementById('paymentFullscreenModal'));
@@ -1574,10 +1878,28 @@
 
         // Mode of Delivery Distribution
 
+        let deliveryViewMode = 'chart';
+
         function renderDeliveryPieChart() {
             fetch('/mode-of-delivery-distribution')
                 .then(res => res.json())
                 .then(data => {
+
+                    const tbody = $('#deliveryTableBody').empty();
+                    const total = data.reduce((sum, d) => sum + d.count, 0);
+                    data.forEach((d, i) => {
+                        const percent = ((d.count / total) * 100).toFixed(1);
+                        tbody.append(`
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${d.mode}</td>
+                                <td>${d.count}</td>
+                                <td>${percent}%</td>
+                            </tr>
+                        `);
+                    });
+
+
                     const labels = data.map(d => d.mode);
                     const counts = data.map(d => d.count);
                     const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.85 - (i * 0.05)})`);
@@ -1632,6 +1954,21 @@
             fetch('/mode-of-delivery-distribution')
                 .then(res => res.json())
                 .then(data => {
+
+                    const tbody = $('#modalDeliveryTableBody').empty();
+                    const total = data.reduce((sum, d) => sum + d.count, 0);
+                    data.forEach((d, i) => {
+                        const percent = ((d.count / total) * 100).toFixed(1);
+                        tbody.append(`
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${d.mode}</td>
+                                <td>${d.count}</td>
+                                <td>${percent}%</td>
+                            </tr>
+                        `);
+                    });
+
                     const labels = data.map(d => d.mode);
                     const counts = data.map(d => d.count);
                     const colors = labels.map((_, i) => `rgba(10, 47, 79, ${0.85 - (i * 0.05)})`);
@@ -1681,6 +2018,40 @@
                     console.error('Error loading modal delivery chart:', err);
                 });
         }
+
+        function syncDeliveryViews() {
+            if (deliveryViewMode === 'chart') {
+                $('#deliveryChartContainer, #modalDeliveryChartContainer').removeClass('d-none');
+                $('#deliveryTableContainer, #modalDeliveryTableContainer').addClass('d-none');
+                $('#deliveryChartViewBtn, #modalDeliveryChartViewBtn').addClass('active');
+                $('#deliveryTableViewBtn, #modalDeliveryTableViewBtn').removeClass('active');
+            } else {
+                $('#deliveryChartContainer, #modalDeliveryChartContainer').addClass('d-none');
+                $('#deliveryTableContainer, #modalDeliveryTableContainer').removeClass('d-none');
+                $('#deliveryChartViewBtn, #modalDeliveryChartViewBtn').removeClass('active');
+                $('#deliveryTableViewBtn, #modalDeliveryTableViewBtn').addClass('active');
+            }
+        }
+
+        $('#deliveryChartViewBtn').on('click', () => {
+            deliveryViewMode = 'chart';
+            syncDeliveryViews();
+        });
+
+        $('#deliveryTableViewBtn').on('click', () => {
+            deliveryViewMode = 'table';
+            syncDeliveryViews();
+        });
+
+        $('#modalDeliveryChartViewBtn').on('click', () => {
+            deliveryViewMode = 'chart';
+            syncDeliveryViews();
+        });
+
+        $('#modalDeliveryTableViewBtn').on('click', () => {
+            deliveryViewMode = 'table';
+            syncDeliveryViews();
+        });
 
         $('#expandDeliveryChartBtn').on('click', function () {
             renderModalDeliveryPieChart();
