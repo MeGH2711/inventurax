@@ -158,7 +158,9 @@
   font-weight: 300;
 }
 
-.dailyStatsHeader h5 {
+.dailyStatsHeader h5,
+.latestProductsHeader h5,
+.latestBillsHeader h5 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
   font-family: 'Montserrat', sans-serif;

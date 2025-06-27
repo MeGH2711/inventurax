@@ -620,6 +620,30 @@ app.get('/daily-bill-count', async (req, res) => {
     }
 });
 
+// Latest Products Added
+
+app.get('/latest-products', async (req, res) => {
+    try {
+        const products = await Product.find().sort({ _id: -1 }).limit(3);
+        res.json(products);
+    } catch (err) {
+        console.error('Error fetching latest products:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Latest Generated Bills
+
+app.get('/latest-bills', async (req, res) => {
+    try {
+        const bills = await Bill.find().sort({ createdAt: -1 }).limit(3);
+        res.json(bills);
+    } catch (err) {
+        console.error('Error fetching latest bills:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Fetch Unique Customers
 
 app.get('/get-unique-customers', isAuthenticated, async (req, res) => {

@@ -141,7 +141,9 @@ body {
 
 .analyticsCard,
 .analyticsModal .modal-header,
-.dailyStatsCard {
+.dailyStatsCard,
+.latestProductsCard,
+.latestBillsCard {
   background: linear-gradient(135deg, var(--main-bg), #13558D);
   color: var(--white);
 }
