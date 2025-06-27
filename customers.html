@@ -262,9 +262,13 @@
                     const waLink = `https://wa.me/91${c.number}`;
                     const fullAddress = c.address;
                     const shortAddress = fullAddress.length > 15 ? fullAddress.slice(0, 15) + '...' : fullAddress;
-                    const showTooltip = fullAddress.toLowerCase() !== "unknown";
+
+                    const showTooltip = fullAddress.toLowerCase() !== "unknown" && fullAddress.length > 15;
+
+                    const showCopyIcon = fullAddress.toLowerCase() !== "unknown";
+
                     const tooltipAttr = showTooltip ? `title="${fullAddress}" data-bs-toggle="tooltip" data-bs-placement="right"` : '';
-                    const copyIcon = showTooltip ? `<i class="gsymbols-round gicon-content_paste ms-2 copy-icon" data-address="${fullAddress}" role="button" title="Copy to clipboard"></i>` : '';
+                    const copyIcon = showCopyIcon ? `<i class="gsymbols-round gicon-content_paste ms-2 copy-icon" data-address="${fullAddress}" role="button" title="Copy to clipboard"></i>` : '';
 
                     return `
                         <tr>
