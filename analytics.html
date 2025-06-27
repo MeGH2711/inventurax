@@ -231,7 +231,7 @@
                         </div>
                     </div>
 
-                    <!-- Top Selling Product Quantitywise -->
+                    <!-- Top Selling Product -->
                     <div class="col-12 mb-4">
                         <div class="card shadow-sm border-0 rounded-3 overflow-hidden analyticsCard">
                             <div class="card-header py-3">
@@ -448,6 +448,86 @@
                                             </thead>
                                             <tbody id="deliveryTableBody"></tbody>
                                         </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bills Generated Chart -->
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm border-0 rounded-3 analyticsCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="gsymbols-round gicon-insert_chart fs-4 me-2"></i>
+                                    <span class="fw-semibold fs-5">Bills Generated</span>
+                                </div>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <select id="billCountGrouping" class="form-select form-select-sm w-auto">
+                                        <option value="daily" selected>Daily</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                    <div class="input-group input-group-sm">
+                                        <input type="date" id="billCountStart" class="form-control form-control-sm">
+                                        <span class="input-group-text">to</span>
+                                        <input type="date" id="billCountEnd" class="form-control form-control-sm">
+                                        <button class="btn btn-sm btn-darkblue" id="applyBillCountFilter">Apply</button>
+                                    </div>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-light active" id="billCountChartViewBtn"
+                                            title="Chart View">
+                                            <i class="gsymbols-round gicon-bar_chart"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" id="billCountTableViewBtn"
+                                            title="Table View">
+                                            <i class="gsymbols-round gicon-table"></i>
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-light" id="expandBillCountCardBtn">
+                                            <i class="gsymbols-round gicon-open_in_full"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body bg-light-subtle p-0" style="height: 400px; overflow: hidden;">
+                                <div id="billCountChartContainer" class="h-100 overflow-auto p-3">
+                                    <canvas id="billCountLineChart" style="width: 100%; height: 100%;"></canvas>
+                                </div>
+                                <div id="billCountTableContainer" class="d-none h-100 overflow-auto p-3">
+                                    <div class="card border-1 roundedTableCard">
+                                        <div class="table-responsive">
+                                            <table
+                                                class="table table-sm table-bordered align-middle text-center roundedTable"
+                                                id="billCountTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sr. No.</th>
+                                                        <th>Date</th>
+                                                        <th>Number of Bills</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="2" class="text-center fw-bold bg-transparent">Total
+                                                            Bills Generated
+                                                        </td>
+                                                        <td id="billCountTotalCell" class="fw-bold bg-transparent">0
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="text-center fw-bold bg-transparent">
+                                                            Average Bills Generated
+                                                        </td>
+                                                        <td id="billCountAverageCell" class="fw-bold bg-transparent">0
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -767,6 +847,84 @@
         </div>
     </div>
 
+    <!-- Fullscreen Modal for Bills Generated -->
+    <div class="modal fade" id="billCountFullscreenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content analyticsModal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="gsymbols-round gicon-insert_chart fs-3 me-2"></i>Bills Generated (Fullscreen)
+                    </h5>
+                    <button type="button" class="btn-close"
+                        style="filter: invert(1) grayscale(100%) brightness(200%); opacity: 1;" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+
+                        <!-- Controls -->
+                        <div class="d-flex justify-content-between align-items-center flex-row gap-2 mb-3">
+                            <div class="d-flex align-items-center gap-2 flex-row">
+                                <select id="modalBillCountGrouping" class="form-select form-select-sm w-auto">
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                                <div class="input-group input-group-sm">
+                                    <input type="date" id="modalBillCountStart" class="form-control">
+                                    <span class="input-group-text">to</span>
+                                    <input type="date" id="modalBillCountEnd" class="form-control">
+                                    <button class="btn btn-sm btn-darkblue" id="modalBillCountApply">Apply</button>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-darkblue active" id="modalBillCountChartViewBtn">
+                                        <i class="gsymbols-round gicon-bar_chart"></i>
+                                    </button>
+                                    <button class="btn btn-outline-darkblue" id="modalBillCountTableViewBtn">
+                                        <i class="gsymbols-round gicon-table"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart / Table containers -->
+                        <div class="p-2" style="height: 80vh;">
+                            <div id="modalBillCountChartContainer" class="h-100 overflow-auto p-2">
+                                <canvas id="modalBillCountChart" style="width: 100%; height: 100%;"></canvas>
+                            </div>
+                            <div id="modalBillCountTableContainer" class="d-none h-100 overflow-auto p-2">
+                                <div class="card roundedTableCard">
+                                    <table class="table table-sm table-bordered text-center roundedTable"
+                                        id="modalBillCountTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Sr. No.</th>
+                                                <th>Date</th>
+                                                <th>Number of Bills</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="2" class="bg-transparent fw-bold">Total</td>
+                                                <td id="modalBillCountTotalCell" class="bg-transparent fw-bold">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="bg-transparent fw-bold">Average</td>
+                                                <td id="modalBillCountAverageCell" class="bg-transparent fw-bold">0</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
         <div id="mainToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
@@ -866,6 +1024,12 @@
                     $('#tspEndDate').val(maxDate);
 
                     renderTopProductsChart(minDate, maxDate);
+
+                    $('#billCountStart').val(minDate);
+                    $('#billCountEnd').val(maxDate);
+
+                    renderBillCountChart(minDate, maxDate, $('#billCountGrouping').val());
+
                 });
 
             $('#salesApplyDateFilter').on('click', function () {
@@ -2061,6 +2225,291 @@
             setTimeout(() => {
                 if (window.modalCategoryChart) window.modalCategoryChart.resize();
             }, 500);
+        });
+
+        // Bill Count
+
+        let billCountChart;
+
+        let modalBillCountChart;
+        let billCountViewMode = 'chart';
+
+        function renderBillCountChart(startDate, endDate, grouping) {
+            const filtered = allBills.filter(bill => {
+                const date = bill.billingDate.split('T')[0];
+                return date >= startDate && date <= endDate;
+            });
+
+            const grouped = {};
+            filtered.forEach(bill => {
+                const date = bill.billingDate.split('T')[0];
+                let key = grouping === 'yearly' ? date.substr(0, 4)
+                    : grouping === 'monthly' ? date.substr(0, 7)
+                        : date;
+                grouped[key] = (grouped[key] || 0) + 1;
+            });
+
+            const sortedKeys = Object.keys(grouped).sort();
+            const labels = [], values = [];
+            const tbody = $('#billCountTable tbody').empty();
+
+            sortedKeys.forEach((k, i) => {
+                const d = new Date(
+                    grouping === 'yearly' ? `${k}-01-01` :
+                        grouping === 'monthly' ? `${k}-01` : k
+                );
+
+                const display = grouping === 'yearly'
+                    ? d.getFullYear()
+                    : grouping === 'monthly'
+                        ? `${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`
+                        : `${String(d.getDate()).padStart(2, '0')}/${d.toLocaleString('default', { month: 'short' })}/${d.getFullYear()}, ${d.toLocaleString('default', { weekday: 'short' })}`;
+
+                labels.push(display);
+                values.push(grouped[k]);
+
+                // Append table row
+                tbody.append(`
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${display}</td>
+                        <td>${grouped[k]}</td>
+                    </tr>
+                `);
+            });
+
+            const total = values.reduce((sum, v) => sum + v, 0);
+            const average = values.length ? (total / values.length) : 0;
+
+            $('#billCountTotalCell').text(total);
+            $('#billCountAverageCell').text(average.toFixed(2));
+
+            const ctx = document.getElementById('billCountLineChart').getContext('2d');
+            if (billCountChart) billCountChart.destroy();
+
+            billCountChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Number of Bills',
+                        data: values,
+                        borderColor: 'rgba(10, 47, 79, 0.8)',
+                        borderWidth: 2,
+                        backgroundColor: 'rgba(10, 47, 79, 0.2)',
+                        tension: 0,
+                        fill: true,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function renderModalBillCountChart() {
+            const start = $('#modalBillCountStart').val();
+            const end = $('#modalBillCountEnd').val();
+            const grouping = $('#modalBillCountGrouping').val();
+
+            const filtered = allBills.filter(b => {
+                const d = b.billingDate.split('T')[0];
+                return d >= start && d <= end;
+            });
+
+            const grouped = {};
+            filtered.forEach(b => {
+                const d = b.billingDate.split('T')[0];
+                const key = grouping === 'yearly' ? d.substr(0, 4) :
+                    grouping === 'monthly' ? d.substr(0, 7) : d;
+                grouped[key] = (grouped[key] || 0) + 1;
+            });
+
+            const keys = Object.keys(grouped).sort();
+            const labels = [], values = [];
+            const tbody = $('#modalBillCountTable tbody').empty();
+
+            keys.forEach((k, i) => {
+                const d = new Date(grouping === 'yearly' ? `${k}-01-01` :
+                    grouping === 'monthly' ? `${k}-01` : k);
+                const label = grouping === 'yearly'
+                    ? d.getFullYear()
+                    : grouping === 'monthly'
+                        ? `${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`
+                        : `${String(d.getDate()).padStart(2, '0')}/${d.toLocaleString('default', { month: 'short' })}/${d.getFullYear()}, ${d.toLocaleString('default', { weekday: 'short' })}`;
+
+                labels.push(label);
+                values.push(grouped[k]);
+                tbody.append(`<tr><td>${i + 1}</td><td>${label}</td><td>${grouped[k]}</td></tr>`);
+            });
+
+            const total = values.reduce((a, b) => a + b, 0);
+            const avg = values.length ? total / values.length : 0;
+
+            $('#modalBillCountTotalCell').text(total);
+            $('#modalBillCountAverageCell').text(avg.toFixed(2));
+
+            const ctx = document.getElementById('modalBillCountChart').getContext('2d');
+            if (modalBillCountChart) modalBillCountChart.destroy();
+
+            modalBillCountChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Number of Bills',
+                        data: values,
+                        borderColor: 'rgba(10, 47, 79, 0.8)',
+                        borderWidth: 2,
+                        backgroundColor: 'rgba(10, 47, 79, 0.2)',
+                        tension: 0,
+                        fill: true,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        $('#billCountGrouping').on('change', function () {
+            const start = $('#billCountStart').val();
+            const end = $('#billCountEnd').val();
+            const grouping = $(this).val();
+
+            if (!start || !end) return showToast('Select both start and end dates.', 'text-bg-warning');
+
+            renderBillCountChart(start, end, grouping);
+        });
+
+        $('#applyBillCountFilter').on('click', function () {
+            const start = $('#billCountStart').val();
+            const end = $('#billCountEnd').val();
+            const grouping = $('#billCountGrouping').val();
+
+            if (!start || !end) return showToast('Select both start and end dates.', 'text-bg-warning');
+
+            renderBillCountChart(start, end, grouping);
+        });
+
+        $('#billCountChartViewBtn').on('click', function () {
+            billCountViewMode = 'chart';
+
+            // Show chart in card
+            $('#billCountChartContainer').removeClass('d-none');
+            $('#billCountTableContainer').addClass('d-none');
+            $('#billCountChartViewBtn').addClass('active');
+            $('#billCountTableViewBtn').removeClass('active');
+
+            // Show chart in modal (if open)
+            $('#modalBillCountChartContainer').removeClass('d-none');
+            $('#modalBillCountTableContainer').addClass('d-none');
+            $('#modalBillCountChartViewBtn').addClass('active');
+            $('#modalBillCountTableViewBtn').removeClass('active');
+        });
+
+        $('#billCountTableViewBtn').on('click', function () {
+            billCountViewMode = 'table';
+
+            $('#billCountChartContainer').addClass('d-none');
+            $('#billCountTableContainer').removeClass('d-none');
+            $('#billCountChartViewBtn').removeClass('active');
+            $('#billCountTableViewBtn').addClass('active');
+
+            $('#modalBillCountChartContainer').addClass('d-none');
+            $('#modalBillCountTableContainer').removeClass('d-none');
+            $('#modalBillCountChartViewBtn').removeClass('active');
+            $('#modalBillCountTableViewBtn').addClass('active');
+        });
+
+        // Expand button handler
+        $('#expandBillCountCardBtn').on('click', function () {
+            // Sync controls
+            $('#modalBillCountStart').val($('#billCountStart').val());
+            $('#modalBillCountEnd').val($('#billCountEnd').val());
+            $('#modalBillCountGrouping').val($('#billCountGrouping').val());
+
+            // Render in modal
+            renderModalBillCountChart();
+            syncModalBillCountViewWithMain();
+
+            const modal = new bootstrap.Modal('#billCountFullscreenModal');
+            modal.show();
+
+            setTimeout(() => {
+                if (modalBillCountChart) modalBillCountChart.resize();
+            }, 300);
+        });
+
+        // Sync view buttons
+        function syncModalBillCountViewWithMain() {
+            if (billCountViewMode === 'chart') {
+                $('#modalBillCountChartContainer').removeClass('d-none');
+                $('#modalBillCountTableContainer').addClass('d-none');
+                $('#modalBillCountChartViewBtn').addClass('active');
+                $('#modalBillCountTableViewBtn').removeClass('active');
+            } else {
+                $('#modalBillCountChartContainer').addClass('d-none');
+                $('#modalBillCountTableContainer').removeClass('d-none');
+                $('#modalBillCountChartViewBtn').removeClass('active');
+                $('#modalBillCountTableViewBtn').addClass('active');
+            }
+        }
+
+        // View toggle buttons
+        $('#modalBillCountChartViewBtn').on('click', function () {
+            billCountViewMode = 'chart';
+
+            // Modal
+            $('#modalBillCountChartContainer').removeClass('d-none');
+            $('#modalBillCountTableContainer').addClass('d-none');
+            $('#modalBillCountChartViewBtn').addClass('active');
+            $('#modalBillCountTableViewBtn').removeClass('active');
+
+            // Card
+            $('#billCountChartContainer').removeClass('d-none');
+            $('#billCountTableContainer').addClass('d-none');
+            $('#billCountChartViewBtn').addClass('active');
+            $('#billCountTableViewBtn').removeClass('active');
+        });
+
+        $('#modalBillCountTableViewBtn').on('click', function () {
+            billCountViewMode = 'table';
+
+            $('#modalBillCountChartContainer').addClass('d-none');
+            $('#modalBillCountTableContainer').removeClass('d-none');
+            $('#modalBillCountChartViewBtn').removeClass('active');
+            $('#modalBillCountTableViewBtn').addClass('active');
+
+            $('#billCountChartContainer').addClass('d-none');
+            $('#billCountTableContainer').removeClass('d-none');
+            $('#billCountChartViewBtn').removeClass('active');
+            $('#billCountTableViewBtn').addClass('active');
+        });
+
+        // Apply button
+        $('#modalBillCountApply').on('click', function () {
+            const start = $('#modalBillCountStart').val();
+            const end = $('#modalBillCountEnd').val();
+            const grouping = $('#modalBillCountGrouping').val();
+
+            $('#billCountStart').val(start);
+            $('#billCountEnd').val(end);
+            $('#billCountGrouping').val(grouping);
+
+            renderBillCountChart(start, end, grouping);
+            renderModalBillCountChart();
+        });
+
+        // Grouping change
+        $('#modalBillCountGrouping').on('change', function () {
+            $('#modalBillCountApply').click();
         });
 
         // Reusable Toast Function

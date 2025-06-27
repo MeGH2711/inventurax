@@ -675,7 +675,10 @@
                     data: JSON.stringify(billData),
                     success: function (response) {
 
-                        bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal')).hide();
+                        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal'));
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
 
                         showToast('Bill saved successfully!', 'text-bg-success');
 
@@ -715,6 +718,23 @@
                         showToast('Failed to save bill', 'text-bg-danger');
                     }
                 });
+            });
+
+            // Handle Ctrl + S to save bill directly
+            $(document).on('keydown', function (e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault(); // Prevent browser save
+
+                    const hasProducts = $('#productTable tbody tr').not('#noProductRow').length > 0;
+
+                    if (!hasProducts) {
+                        showToast('Please enter items into cart', 'text-bg-danger');
+                        return;
+                    }
+
+                    // Trigger direct save without confirmation modal
+                    $('#confirmSaveBtn').trigger('click');
+                }
             });
 
             $('#customerNumber').on('input', function () {

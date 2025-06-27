@@ -813,6 +813,42 @@ app.get('/mode-of-delivery-distribution', isAuthenticated, async (req, res) => {
     }
 });
 
+// Bill Count Grouped by Time
+
+app.get('/bill-count-stats', isAuthenticated, async (req, res) => {
+    const { startDate, endDate, grouping = 'daily' } = req.query;
+    const matchStage = {};
+
+    if (startDate && endDate) {
+        matchStage.billingDate = { $gte: startDate, $lte: endDate };
+    }
+
+    const groupBy =
+        grouping === 'yearly'
+            ? { $substr: ['$billingDate', 0, 4] }
+            : grouping === 'monthly'
+                ? { $substr: ['$billingDate', 0, 7] }
+                : '$billingDate';
+
+    try {
+        const result = await Bill.aggregate([
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: groupBy,
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        res.json(result);
+    } catch (err) {
+        console.error('Error getting bill count stats:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Routes
 
 app.get('/', (req, res) => {
