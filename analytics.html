@@ -539,6 +539,57 @@
                         </div>
                     </div>
 
+                    <!-- Weekdays Performance -->
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm border-0 rounded-3 analyticsCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="gsymbols-round gicon-calendar_today fs-4 me-2"></i>
+                                    <span class="fw-semibold fs-5">Weekday Performance</span>
+                                </div>
+                                <div class="d-flex align-items-center flex-row gap-2">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-light active" id="weekdayChartViewBtn"
+                                            title="Chart View">
+                                            <i class="gsymbols-round gicon-bar_chart"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" id="weekdayTableViewBtn"
+                                            title="Table View">
+                                            <i class="gsymbols-round gicon-table"></i>
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-light" id="expandWeekdayCardBtn">
+                                            <i class="gsymbols-round gicon-open_in_full"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body bg-light-subtle p-0" style="height: 400px;">
+                                <div id="weekdayChartContainer" class="h-100 p-3">
+                                    <canvas id="weekdayBarChart" style="width: 100%; height: 100%;"></canvas>
+                                </div>
+                                <div id="weekdayTableContainer" class="d-none h-100 overflow-auto p-3">
+                                    <div class="card border-1 roundedTableCard">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered text-center roundedTable"
+                                                id="weekdayTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Weekday</th>
+                                                        <th>Total Sales (₹)</th>
+                                                        <th>Number of Bills</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
@@ -933,6 +984,55 @@
         </div>
     </div>
 
+    <!-- Fullscreen Modal for Weekdays Performance -->
+    <div class="modal fade" id="weekdayFullscreenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content analyticsModal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="gsymbols-round gicon-calendar_today fs-3 me-2"></i>Weekday Performance (Fullscreen)
+                    </h5>
+                    <button type="button" class="btn-close"
+                        style="filter: invert(1) grayscale(100%) brightness(200%); opacity: 1;" data-bs-dismiss="modal"
+                        aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="btn-group btn-group-sm mb-3" role="group">
+                            <button class="btn btn-outline-darkblue active" id="modalWeekdayChartViewBtn">
+                                <i class="gsymbols-round gicon-bar_chart"></i>
+                            </button>
+                            <button class="btn btn-outline-darkblue" id="modalWeekdayTableViewBtn">
+                                <i class="gsymbols-round gicon-table"></i>
+                            </button>
+                        </div>
+                        <div class="p-2" style="height: 75vh;">
+                            <div id="modalWeekdayChartContainer" class="h-100 overflow-auto">
+                                <canvas id="modalWeekdayBarChart" style="width: 100%; height: 100%;"></canvas>
+                            </div>
+                            <div id="modalWeekdayTableContainer" class="d-none h-100 overflow-auto">
+                                <div class="card roundedTableCard">
+                                    <table class="table table-sm table-bordered text-center roundedTable"
+                                        id="modalWeekdayTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Weekday</th>
+                                                <th>Total Sales (₹)</th>
+                                                <th>Number of Bills</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
         <div id="mainToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
@@ -1037,6 +1137,8 @@
                     $('#billCountEnd').val(maxDate);
 
                     renderBillCountChart(minDate, maxDate, $('#billCountGrouping').val());
+
+                    renderWeekdayPerformanceChart(minDate, maxDate);
 
                 });
 
@@ -2560,6 +2662,208 @@
         // Grouping change
         $('#modalBillCountGrouping').on('change', function () {
             $('#modalBillCountApply').click();
+        });
+
+        function renderWeekdayPerformanceChart(startDate, endDate) {
+            fetch(`/weekday-performance?startDate=${startDate}&endDate=${endDate}`)
+                .then(res => res.json())
+                .then(data => {
+
+                    const labels = data.map(d => d.weekday);
+                    const sales = data.map(d => d.totalSales);
+                    const bills = data.map(d => d.billCount);
+
+                    const totalSales = sales.reduce((a, b) => a + b, 0);
+                    const totalBills = bills.reduce((a, b) => a + b, 0);
+                    const salesPercent = sales.map(val => (val / totalSales) * 100);
+                    const billPercent = bills.map(val => (val / totalBills) * 100);
+
+                    // Render chart
+                    const ctx = document.getElementById('weekdayBarChart').getContext('2d');
+                    if (window.weekdayChart) window.weekdayChart.destroy();
+
+                    window.weekdayChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [
+                                {
+                                    label: 'Total Sales (₹)',
+                                    data: sales,
+                                    backgroundColor: 'rgba(10, 47, 79, 0.8)',
+                                    yAxisID: 'y-sales',
+                                    datalabels: {
+                                        anchor: 'center',
+                                        align: 'center',
+                                        formatter: (value, context) => {
+                                            const percent = context.dataset.label === 'Total Sales (₹)'
+                                                ? salesPercent[context.dataIndex]
+                                                : billPercent[context.dataIndex];
+                                            return `${percent.toFixed(1)}%`;
+                                        },
+                                        color: '#fff',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        clamp: true
+                                    }
+                                },
+                                {
+                                    label: 'Number of Bills',
+                                    data: bills,
+                                    backgroundColor: 'rgba(25, 135, 84, 0.8)',
+                                    yAxisID: 'y-bills',
+                                    datalabels: {
+                                        anchor: 'center',
+                                        align: 'center',
+                                        formatter: (value, context) => {
+                                            const percent = context.dataset.label === 'Total Sales (₹)'
+                                                ? salesPercent[context.dataIndex]
+                                                : billPercent[context.dataIndex];
+                                            return `${percent.toFixed(1)}%`;
+                                        },
+                                        color: '#fff',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        clamp: true
+                                    }
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' },
+                                datalabels: {
+                                    display: true
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
+                                    callbacks: {
+                                        label: function (ctx) {
+                                            const label = ctx.dataset.label;
+                                            const value = ctx.raw;
+                                            let percent;
+
+                                            if (label === 'Total Sales (₹)') {
+                                                percent = salesPercent[ctx.dataIndex];
+                                                return `${label}: ₹ ${value.toLocaleString()} (${percent.toFixed(1)}%)`;
+                                            }
+
+                                            if (label === 'Number of Bills') {
+                                                percent = billPercent[ctx.dataIndex];
+                                                return `${label}: ${value} (${percent.toFixed(1)}%)`;
+                                            }
+
+                                            return `${label}: ${value}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                'y-sales': {
+                                    position: 'left',
+                                    beginAtZero: true,
+                                    title: { display: true, text: 'Total Sales (₹)' }
+                                },
+                                'y-bills': {
+                                    position: 'right',
+                                    beginAtZero: true,
+                                    grid: { drawOnChartArea: false },
+                                    title: { display: true, text: 'Number of Bills' }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+
+                    // Render table
+                    const tbody = document.querySelector('#weekdayTable tbody');
+                    tbody.innerHTML = ''; // clear
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                    <td>${row.weekday}</td>
+                    <td>${row.totalSales.toFixed(2)}</td>
+                    <td>${row.billCount}</td>
+                `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => console.error('Failed to load weekday performance:', err));
+        }
+
+        $('#weekdayChartViewBtn').on('click', function () {
+            $('#weekdayChartContainer').removeClass('d-none');
+            $('#weekdayTableContainer').addClass('d-none');
+            $('#weekdayChartViewBtn').addClass('active');
+            $('#weekdayTableViewBtn').removeClass('active');
+        });
+
+        $('#weekdayTableViewBtn').on('click', function () {
+            $('#weekdayChartContainer').addClass('d-none');
+            $('#weekdayTableContainer').removeClass('d-none');
+            $('#weekdayChartViewBtn').removeClass('active');
+            $('#weekdayTableViewBtn').addClass('active');
+        });
+
+        $('#expandWeekdayCardBtn').on('click', function () {
+            // Copy chart/table mode
+            if ($('#weekdayChartViewBtn').hasClass('active')) {
+                $('#modalWeekdayChartContainer').removeClass('d-none');
+                $('#modalWeekdayTableContainer').addClass('d-none');
+                $('#modalWeekdayChartViewBtn').addClass('active');
+                $('#modalWeekdayTableViewBtn').removeClass('active');
+            } else {
+                $('#modalWeekdayChartContainer').addClass('d-none');
+                $('#modalWeekdayTableContainer').removeClass('d-none');
+                $('#modalWeekdayChartViewBtn').removeClass('active');
+                $('#modalWeekdayTableViewBtn').addClass('active');
+            }
+
+            // Redraw chart
+            if (window.weekdayChart) {
+                const srcCanvas = document.getElementById('weekdayBarChart');
+                const destCanvas = document.getElementById('modalWeekdayBarChart');
+                const ctx = destCanvas.getContext('2d');
+
+                if (window.modalWeekdayChart) window.modalWeekdayChart.destroy();
+                window.modalWeekdayChart = new Chart(ctx, window.weekdayChart.config);
+            }
+
+            // Copy table content
+            $('#modalWeekdayTable tbody').html($('#weekdayTable tbody').html());
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('weekdayFullscreenModal'));
+            modal.show();
+        });
+
+        $('#modalWeekdayChartViewBtn').on('click', function () {
+            $('#modalWeekdayChartContainer').removeClass('d-none');
+            $('#modalWeekdayTableContainer').addClass('d-none');
+            $('#modalWeekdayChartViewBtn').addClass('active');
+            $('#modalWeekdayTableViewBtn').removeClass('active');
+
+            $('#weekdayChartContainer').removeClass('d-none');
+            $('#weekdayTableContainer').addClass('d-none');
+            $('#weekdayChartViewBtn').addClass('active');
+            $('#weekdayTableViewBtn').removeClass('active');
+        });
+
+        $('#modalWeekdayTableViewBtn').on('click', function () {
+            $('#modalWeekdayChartContainer').addClass('d-none');
+            $('#modalWeekdayTableContainer').removeClass('d-none');
+            $('#modalWeekdayChartViewBtn').removeClass('active');
+            $('#modalWeekdayTableViewBtn').addClass('active');
+
+            $('#weekdayChartContainer').addClass('d-none');
+            $('#weekdayTableContainer').removeClass('d-none');
+            $('#weekdayChartViewBtn').removeClass('active');
+            $('#weekdayTableViewBtn').addClass('active');
         });
 
         // Reusable Toast Function

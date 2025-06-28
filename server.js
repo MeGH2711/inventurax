@@ -884,6 +884,59 @@ app.get('/bill-count-stats', isAuthenticated, async (req, res) => {
     }
 });
 
+app.get('/weekday-performance', async (req, res) => {
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+        return res.status(400).json({ message: 'Start and end dates are required.' });
+    }
+
+    try {
+        const result = await Bill.aggregate([
+            {
+                $match: {
+                    billingDate: { $gte: startDate, $lte: endDate }
+                }
+            },
+            {
+                $addFields: {
+                    weekday: {
+                        $dayOfWeek: {
+                            $dateFromString: { dateString: "$billingDate" }
+                        }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$weekday",
+                    totalSales: { $sum: "$finalTotal" },
+                    billCount: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { _id: 1 } // Sunday=1 to Saturday=7
+            }
+        ]);
+
+        // Map weekday numbers to names
+        const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const salesByWeekday = weekdays.map((day, idx) => {
+            const match = result.find(r => r._id === idx + 1);
+            return {
+                weekday: day,
+                totalSales: match?.totalSales || 0,
+                billCount: match?.billCount || 0
+            };
+        });
+
+        res.json(salesByWeekday);
+    } catch (err) {
+        console.error('Error in /weekday-performance:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Routes
 
 app.get('/', (req, res) => {
