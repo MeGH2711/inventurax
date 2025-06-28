@@ -242,7 +242,12 @@
                                     </div>
                                     <div class="d-flex align-items-center gap-2 flex-row">
 
-                                        <!-- Sales Group Picker -->
+                                        <!-- Category Filter -->
+                                        <select id="tspCategoryFilter" class="form-select form-select-sm w-auto">
+                                            <option value="">All Categories</option>
+                                        </select>
+
+                                        <!-- TSP Group Picker -->
                                         <select id="tspGrouping" class="form-select form-select-sm w-auto">
                                             <option value="daily" selected>Daily</option>
                                             <option value="monthly">Monthly</option>
@@ -645,6 +650,9 @@
                     <div class="container-fluid">
                         <div class="d-flex justify-content-between align-items-center flex-row gap-2 mb-3">
                             <div class="d-flex align-items-center gap-2 flex-row">
+                                <select id="modalTspCategoryFilter" class="form-select form-select-sm w-auto">
+                                    <option value="">All Categories</option>
+                                </select>
                                 <select id="modalTspGrouping" class="form-select form-select-sm w-auto">
                                     <option value="daily">Daily</option>
                                     <option value="monthly">Monthly</option>
@@ -1029,6 +1037,26 @@
                     $('#billCountEnd').val(maxDate);
 
                     renderBillCountChart(minDate, maxDate, $('#billCountGrouping').val());
+
+                });
+
+            fetch('/get-product-categories')
+                .then(res => res.json())
+                .then(categories => {
+                    const select = document.getElementById('tspCategoryFilter');
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.name;
+                        option.textContent = cat.name;
+                        select.appendChild(option);
+                    });
+                    const modalSelect = document.getElementById('modalTspCategoryFilter');
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.name;
+                        option.textContent = cat.name;
+                        modalSelect.appendChild(option);
+                    });
 
                 });
 
@@ -1438,21 +1466,13 @@
 
         let tspViewMode = 'chart';
 
-        function renderTopProductsChart(startDate, endDate) {
-            const grouping = $('#tspGrouping').val();
-            const query = { grouping };
+        function renderTopProductsChart(start, end) {
+            const category = document.getElementById('tspCategoryFilter').value;
 
-            if (startDate && endDate) {
-                query.startDate = startDate;
-                query.endDate = endDate;
-            }
-
-            const queryString = new URLSearchParams(query).toString();
-
-            fetch(`/top-selling-products?${queryString}`)
+            fetch(`/top-selling-products?startDate=${start}&endDate=${end}&category=${encodeURIComponent(category)}`)
                 .then(res => res.json())
                 .then(data => {
-                    const labels = data.map(p => p.name);
+                    const labels = data.map(p => p._id);
                     const quantities = data.map(p => p.quantity);
 
                     // Chart rendering
@@ -1495,7 +1515,7 @@
                         tbody.append(`
                     <tr>
                         <td>${i + 1}</td>
-                        <td>${p.name}</td>
+                        <td>${p._id}</td>
                         <td>${p.quantity}</td>
                     </tr>
                 `);
@@ -1506,13 +1526,27 @@
                 });
         }
 
+        $('#tspCategoryFilter').on('change', function () {
+            const start = $('#tspStartDate').val();
+            const end = $('#tspEndDate').val();
+            if (start && end) {
+                renderTopProductsChart(start, end);
+            }
+        });
+
         function renderModalTopProductsChart(start, end, grouping) {
-            const query = new URLSearchParams({ startDate: start, endDate: end, grouping }).toString();
+            const category = document.getElementById('modalTspCategoryFilter').value;
+            const query = new URLSearchParams({
+                startDate: start,
+                endDate: end,
+                grouping,
+                category
+            }).toString();
 
             fetch(`/top-selling-products?${query}`)
                 .then(res => res.json())
                 .then(data => {
-                    const labels = data.map(p => p.name);
+                    const labels = data.map(p => p._id);
                     const quantities = data.map(p => p.quantity);
 
                     // Render Chart
@@ -1552,7 +1586,7 @@
                     // Render Table
                     const tbody = $('#modalTspTable tbody').empty();
                     data.forEach((p, i) => {
-                        tbody.append(`<tr><td>${i + 1}</td><td>${p.name}</td><td>${p.quantity}</td></tr>`);
+                        tbody.append(`<tr><td>${i + 1}</td><td>${p._id}</td><td>${p.quantity}</td></tr>`);
                     });
                 })
                 .catch(err => {
@@ -1610,6 +1644,7 @@
             $('#modalTspStartDate').val(start);
             $('#modalTspEndDate').val(end);
             $('#modalTspGrouping').val(grouping);
+            $('#modalTspCategoryFilter').val($('#tspCategoryFilter').val());
 
             renderModalTopProductsChart(start, end, grouping);
             syncTspModalViewWithMain();
@@ -1654,17 +1689,35 @@
             const start = $('#modalTspStartDate').val();
             const end = $('#modalTspEndDate').val();
             const grouping = $('#modalTspGrouping').val();
+            const category = $('#modalTspCategoryFilter').val();
 
+            // Sync back to main card
             $('#tspStartDate').val(start);
             $('#tspEndDate').val(end);
             $('#tspGrouping').val(grouping);
+            $('#tspCategoryFilter').val(category);
 
+            // Render both
             renderModalTopProductsChart(start, end, grouping);
             renderTopProductsChart(start, end);
         });
 
         $('#modalTspGrouping').on('change', function () {
             $('#modalTspApplyDateFilter').click();
+        });
+
+        $('#modalTspCategoryFilter').on('change', function () {
+            const start = $('#modalTspStartDate').val();
+            const end = $('#modalTspEndDate').val();
+            const grouping = $('#modalTspGrouping').val();
+            const category = $('#modalTspCategoryFilter').val();
+
+            $('#tspCategoryFilter').val(category);
+
+            if (start && end) {
+                renderModalTopProductsChart(start, end, grouping);
+                renderTopProductsChart(start, end);
+            }
         });
 
         // Product Distribution by Category

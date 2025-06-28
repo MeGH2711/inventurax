@@ -729,40 +729,51 @@ app.get('/customer-purchases', isAuthenticated, async (req, res) => {
 // Fetch Top Selling Products
 
 app.get('/top-selling-products', isAuthenticated, async (req, res) => {
-    const { startDate, endDate, grouping = 'daily' } = req.query;
-    const matchStage = {};
+    const { startDate, endDate, grouping = 'daily', category } = req.query;
 
+    const matchStage = {};
     if (startDate && endDate) {
         matchStage.billingDate = { $gte: startDate, $lte: endDate };
     }
 
-    const result = await Bill.aggregate([
-        { $match: matchStage },
-        { $unwind: "$products" },
-        {
-            $group: {
-                _id: {
-                    product: "$products.name",
-                    ...(grouping === 'monthly' && { month: { $substr: ["$billingDate", 0, 7] } }),
-                    ...(grouping === 'yearly' && { year: { $substr: ["$billingDate", 0, 4] } }),
-                    ...(grouping === 'daily' && { day: "$billingDate" })
-                },
-                totalQuantity: { $sum: "$products.quantity" }
-            }
-        },
-        {
-            $group: {
-                _id: "$_id.product",
-                totalQuantity: { $sum: "$totalQuantity" }
-            }
-        },
-        { $sort: { totalQuantity: -1, _id: 1 } },
-    ]);
+    try {
+        const result = await Bill.aggregate([
+            { $match: matchStage },
+            { $unwind: "$products" },
 
-    res.json(result.map(p => ({
-        name: p._id,
-        quantity: p.totalQuantity
-    })));
+            // Join with Products collection to get category
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "products.name",
+                    foreignField: "name",
+                    as: "productDetails"
+                }
+            },
+            { $unwind: "$productDetails" },
+
+            // Apply category filter if provided
+            ...(category ? [{
+                $match: {
+                    "productDetails.category": category
+                }
+            }] : []),
+
+            {
+                $group: {
+                    _id: "$products.name",
+                    quantity: { $sum: "$products.quantity" },
+                    category: { $first: "$productDetails.category" }
+                }
+            },
+            { $sort: { quantity: -1 } }
+        ]);
+
+        res.json(result);
+    } catch (err) {
+        console.error("Error fetching top-selling products:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 // Product Distribution by Category
