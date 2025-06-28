@@ -1,20 +1,21 @@
 :root {
-  --main-page-bg: #f8f9fa;
-  --main-bg: rgb(10, 47, 79);
+  --mainThemeBackground: #f8f9fa;
+  --mainThemeColor: rgb(10, 47, 79);
+  --mainThemeColorLighterShade: rgb(19, 85, 141);
   --white: #ffffff;
   --black: #000000;
   --danger-color: #ff0000;
-  --table-alternate-row: #e5f2ff;
+  --tableAlternateRow: #e5f2ff;
 }
 
 body {
-  background-color: var(--main-page-bg);
+  background-color: var(--mainThemeBackground);
 }
 
 /* Sidebar */
 
 #sidebar-wrapper {
-  background-color: var(--main-bg);
+  background-color: var(--mainThemeColor);
   color: var(--white);
 }
 
@@ -32,14 +33,14 @@ body {
 }
 
 .list-group-item-sidebar {
-  background-color: var(--main-bg);
+  background-color: var(--mainThemeColor);
   color: var(--white);
 }
 
 .list-group-item-sidebar.active,
 .list-group-item-sidebar:hover {
   background-color: var(--white);
-  color: var(--main-bg);
+  color: var(--mainThemeColor);
 }
 
 /* Bootstrap Classes */
@@ -47,7 +48,7 @@ body {
 /* Background */
 
 .bg-darkblue {
-  background-color: var(--main-bg);
+  background-color: var(--mainThemeColor);
 }
 
 /* Texts */
@@ -60,8 +61,8 @@ body {
 
 .btn-darkblue {
   --bs-btn-color: var(--white);
-  --bs-btn-bg: var(--main-bg);
-  --bs-btn-border-color: var(--main-bg);
+  --bs-btn-bg: var(--mainThemeColor);
+  --bs-btn-border-color: var(--mainThemeColor);
   --bs-btn-hover-color: var(--white);
   --bs-btn-hover-bg: #09406b;
   --bs-btn-hover-border-color: #09406b;
@@ -72,8 +73,8 @@ body {
 }
 
 .btn-outline-darkblue {
-  --bs-btn-color: var(--main-bg);
-  --bs-btn-border-color: var(--main-bg);
+  --bs-btn-color: var(--mainThemeColor);
+  --bs-btn-border-color: var(--mainThemeColor);
   --bs-btn-hover-color: #fff;
   --bs-btn-hover-bg: #09406b;
   --bs-btn-hover-border-color: #09406b;
@@ -82,8 +83,8 @@ body {
   --bs-btn-active-bg: #0c4e82;
   --bs-btn-active-border-color: #0c4e82;
   background-color: transparent;
-  color: var(--main-bg);
-  border: 1px solid var(--main-bg);
+  color: var(--mainThemeColor);
+  border: 1px solid var(--mainThemeColor);
 }
 
 .btn-darkblue2 {
@@ -121,7 +122,7 @@ body {
 /* Cards */
 
 .gradient-card {
-  background: linear-gradient(135deg, var(--main-bg), #13558D);
+  background: linear-gradient(135deg, var(--mainThemeColor), var(--mainThemeColorLighterShade));
   color: var(--white);
 }
 
@@ -144,13 +145,13 @@ body {
 .dailyStatsCard,
 .latestProductsCard,
 .latestBillsCard {
-  background: linear-gradient(135deg, var(--main-bg), #13558D);
+  background: linear-gradient(135deg, var(--mainThemeColor), var(--mainThemeColorLighterShade));
   color: var(--white);
 }
 
 .product-card {
   background: linear-gradient(135deg, #B3D4FC, #6FA8DC);
-  color: var(--main-bg);
+  color: var(--mainThemeColor);
 }
 
 .product-card:hover {
@@ -174,7 +175,7 @@ body {
 /* Profile Button */
 
 .profileButton ul {
-  background-color: var(--main-page-bg);
+  background-color: var(--mainThemeBackground);
 }
 
 .profileButton ul li a {
@@ -192,7 +193,7 @@ body {
 /* Modal */
 
 .modal-content {
-  background-color: var(--main-page-bg);
+  background-color: var(--mainThemeBackground);
 }
 
 /* Table */
@@ -204,7 +205,7 @@ table tbody tr td {
 
 .productListingTable tbody tr:nth-of-type(even) td,
 #customerTable tbody tr:nth-of-type(even) td {
-  background-color: var(--table-alternate-row) !important;
+  background-color: var(--tableAlternateRow) !important;
 }
 
 /* Form Control & Form Select */
@@ -231,6 +232,6 @@ table tbody tr td {
 /* Final Total Box Billing Page */
 
 #finalTotalFixedBox {
-  background-color: var(--main-bg);
+  background-color: var(--mainThemeColor);
   box-shadow: -2px -2px 8px rgba(0, 0, 0, 0.2);
 }
