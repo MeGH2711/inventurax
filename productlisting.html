@@ -106,11 +106,11 @@
                             <table class="table table-sm table-bordered mb-0 roundedTable" id="productTable">
                                 <thead>
                                     <tr>
-                                        <th class="text-center ps-2">Name</th>
-                                        <th class="text-center ps-2">Weight</th>
-                                        <th class="text-center ps-2">Category</th>
-                                        <th class="text-center ps-2">Price</th>
-                                        <th colspan="2" class="text-center ps-2">Action</th>
+                                        <th class="text-center ps-2 w-40">Name</th>
+                                        <th class="text-center ps-2 w-10">Weight</th>
+                                        <th class="text-center ps-2 w-20">Category</th>
+                                        <th class="text-center ps-2 w-10">Price</th>
+                                        <th colspan="2" class="text-center ps-2 w-20">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="productTableBody">
@@ -682,17 +682,17 @@
 
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td class="ps-2 text-center">${highlightMatch(product.name, nameFilter)}</td>
-                            <td class="ps-2 text-center">${product.weight}gm</td>
-                            <td class="ps-2 text-center">${product.category}</td>
-                            <td class="ps-2 text-center">₹${product.price.toFixed(2)}</td>
-                            <td class="ps-2 text-center">
+                            <td class="ps-2 text-center w-40">${highlightMatch(product.name, nameFilter)}</td>
+                            <td class="ps-2 text-center w-10">${product.weight}gm</td>
+                            <td class="ps-2 text-center w-20">${product.category}</td>
+                            <td class="ps-2 text-center w-10">₹${product.price.toFixed(2)}</td>
+                            <td class="ps-2 text-center w-10">
                                 <button class="btn btn-sm btn-darkblue2 w-100"
                                     onclick="openEditProductModal('${product._id}', '${product.name}', '${product.weight}', '${product.category}', ${product.price})">
                                     Edit
                                 </button>
                             </td>
-                            <td class="ps-2 text-center">
+                            <td class="ps-2 text-center w-10">
                                 <button class="btn btn-sm btn-danger w-100"
                                     onclick="confirmDeleteProduct('${product._id}', '${product.name.replace(/'/g, "\\'")}')">
                                     Delete

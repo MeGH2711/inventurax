@@ -370,9 +370,14 @@
 
                         nameFilter = document.getElementById("productName").value;
 
+                        function escapeRegex(string) {
+                            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        }
+
                         const highlightMatch = (text, searchTerm) => {
                             if (!searchTerm) return text;
-                            const regex = new RegExp(`(${searchTerm})`, 'gi');
+                            const escaped = escapeRegex(searchTerm);
+                            const regex = new RegExp(`(${escaped})`, 'gi');
                             return text.replace(regex, '<span class="highlightedTextDropdown">$1</span>');
                         };
 
@@ -413,6 +418,7 @@
                 // Fetch product details from server
                 $.get(`/search-products?q=${encodeURIComponent(productName)}`, function (products) {
                     const product = products.find(p => p.name.toLowerCase() === productName.toLowerCase());
+                    console.log(products);
                     if (!product) {
                         showToast('Product not found', 'text-bg-danger');
                         return;
@@ -720,20 +726,31 @@
                 });
             });
 
-            // Handle Ctrl + S to save bill directly
             $(document).on('keydown', function (e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault(); // Prevent browser save
+                // Save Bill on Ctrl + S
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
 
                     const hasProducts = $('#productTable tbody tr').not('#noProductRow').length > 0;
-
                     if (!hasProducts) {
                         showToast('Please enter items into cart', 'text-bg-danger');
                         return;
                     }
 
-                    // Trigger direct save without confirmation modal
                     $('#confirmSaveBtn').trigger('click');
+                }
+
+                // Generate Bill on Ctrl + D
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+                    e.preventDefault();
+
+                    const hasProducts = $('#productTable tbody tr').not('#noProductRow').length > 0;
+                    if (!hasProducts) {
+                        showToast('Please enter items into cart', 'text-bg-danger');
+                        return;
+                    }
+
+                    $('#generateBillBtn').trigger('click');
                 }
             });
 

@@ -230,14 +230,24 @@ app.get('/get-products', async (req, res) => {
 
 app.get('/search-products', async (req, res) => {
     const query = req.query.q;
+    if (!query) return res.json([]);
+
     try {
-        const products = await Product.find({ name: { $regex: query, $options: 'i' } }).limit(10);
+        const escapedQuery = escapeRegex(query.trim());
+        const products = await Product.find({
+            name: { $regex: escapedQuery, $options: 'i' }
+        }).limit(10);
+
         res.json(products);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // Update Product
 
@@ -759,32 +769,22 @@ app.get('/top-selling-products', isAuthenticated, async (req, res) => {
 
 app.get('/product-category-distribution', isAuthenticated, async (req, res) => {
     try {
-        const result = await Bill.aggregate([
-            { $unwind: "$products" },
-            {
-                $lookup: {
-                    from: "products",
-                    localField: "products.name",
-                    foreignField: "name",
-                    as: "productDetails"
-                }
-            },
-            { $unwind: "$productDetails" },
+        const result = await Product.aggregate([
             {
                 $group: {
-                    _id: "$productDetails.category",
-                    totalQuantity: { $sum: "$products.quantity" }
+                    _id: "$category",
+                    productCount: { $sum: 1 }
                 }
             },
-            { $sort: { totalQuantity: -1 } }
+            { $sort: { productCount: -1 } }
         ]);
 
         res.json(result.map(c => ({
             category: c._id,
-            quantity: c.totalQuantity
+            count: c.productCount
         })));
     } catch (err) {
-        console.error("Error fetching category distribution:", err);
+        console.error("Error fetching product category distribution:", err);
         res.status(500).json({ message: "Server error" });
     }
 });

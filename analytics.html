@@ -243,7 +243,7 @@
                                     <div class="d-flex align-items-center gap-2 flex-row">
 
                                         <!-- Sales Group Picker -->
-                                        <select id="tspGrouping" class="form-select form-select-sm w-auto ms-2">
+                                        <select id="tspGrouping" class="form-select form-select-sm w-auto">
                                             <option value="daily" selected>Daily</option>
                                             <option value="monthly">Monthly</option>
                                             <option value="yearly">Yearly</option>
@@ -1675,24 +1675,22 @@
             fetch('/product-category-distribution')
                 .then(res => res.json())
                 .then(data => {
-
                     const tbody = $('#categoryTableBody').empty();
-                    const total = data.reduce((sum, c) => sum + c.quantity, 0);
+                    const total = data.reduce((sum, c) => sum + c.count, 0);
                     data.forEach((c, i) => {
-                        const percent = ((c.quantity / total) * 100).toFixed(1);
+                        const percent = ((c.count / total) * 100).toFixed(1);
                         tbody.append(`
                             <tr>
                                 <td>${i + 1}</td>
                                 <td>${c.category}</td>
-                                <td>${c.quantity}</td>
+                                <td>${c.count}</td>
                                 <td>${percent}%</td>
                             </tr>
                         `);
                     });
 
                     const labels = data.map(c => c.category);
-                    const quantities = data.map(c => c.quantity);
-
+                    const counts = data.map(c => c.count);
                     const colors = labels.map((_, i) => `rgba(10, 47, 79, ${1 - (i * 0.05)})`);
 
                     const ctx = document.getElementById('categoryPieChart').getContext('2d');
@@ -1703,7 +1701,7 @@
                         data: {
                             labels: labels,
                             datasets: [{
-                                data: quantities,
+                                data: counts,
                                 backgroundColor: colors,
                                 borderColor: '#ffffff',
                                 borderWidth: 1
@@ -1750,23 +1748,22 @@
             fetch('/product-category-distribution')
                 .then(res => res.json())
                 .then(data => {
-
                     const tbody = $('#modalCategoryTableBody').empty();
-                    const total = data.reduce((sum, c) => sum + c.quantity, 0);
+                    const total = data.reduce((sum, c) => sum + c.count, 0);
                     data.forEach((c, i) => {
-                        const percent = ((c.quantity / total) * 100).toFixed(1);
+                        const percent = ((c.count / total) * 100).toFixed(1);
                         tbody.append(`
                             <tr>
                                 <td>${i + 1}</td>
                                 <td>${c.category}</td>
-                                <td>${c.quantity}</td>
+                                <td>${c.count}</td>
                                 <td>${percent}%</td>
                             </tr>
                         `);
                     });
 
                     const labels = data.map(c => c.category);
-                    const quantities = data.map(c => c.quantity);
+                    const counts = data.map(c => c.count);
                     const colors = labels.map((_, i) => `rgba(10, 47, 79, ${1 - (i * 0.05)})`);
 
                     const ctx = document.getElementById('modalCategoryPieChart').getContext('2d');
@@ -1775,9 +1772,9 @@
                     window.modalCategoryChart = new Chart(ctx, {
                         type: 'pie',
                         data: {
-                            labels,
+                            labels: labels,
                             datasets: [{
-                                data: quantities,
+                                data: counts,
                                 backgroundColor: colors,
                                 borderColor: '#ffffff',
                                 borderWidth: 1
