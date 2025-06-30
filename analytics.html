@@ -1370,7 +1370,13 @@
                         }
                     },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { beginAtZero: true },
+                        x: {
+                            ticks: {
+                                minRotation: 0,
+                                maxRotation: 90
+                            }
+                        }
                     }
                 }
             });
@@ -1451,7 +1457,15 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: {
+                            ticks: {
+                                minRotation: 0,
+                                maxRotation: 90
+                            }
+                        }
+                    },
                     plugins: {
                         title: {
                             display: true,
@@ -1670,6 +1684,12 @@
                             scales: {
                                 y: {
                                     beginAtZero: true
+                                },
+                                x: {
+                                    ticks: {
+                                        minRotation: 0,
+                                        maxRotation: 90
+                                    }
                                 }
                             },
                             plugins: {
@@ -1747,6 +1767,12 @@
                             scales: {
                                 y: {
                                     beginAtZero: true
+                                },
+                                x: {
+                                    ticks: {
+                                        minRotation: 0,
+                                        maxRotation: 90
+                                    }
                                 }
                             },
                             plugins: {
@@ -2582,7 +2608,15 @@
                     },
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: {
+                            ticks: {
+                                minRotation: 0,
+                                maxRotation: 90
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -2662,7 +2696,15 @@
                     },
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: {
+                            ticks: {
+                                minRotation: 0,
+                                maxRotation: 90
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -2939,6 +2981,12 @@
                                     beginAtZero: true,
                                     grid: { drawOnChartArea: false },
                                     title: { display: true, text: 'Number of Bills' }
+                                },
+                                x: {
+                                    ticks: {
+                                        minRotation: 0,
+                                        maxRotation: 90
+                                    }
                                 }
                             }
                         },
