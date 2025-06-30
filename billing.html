@@ -944,7 +944,23 @@
             doc.setFont(undefined, 'normal');
             doc.text(number, startX + boldWidth, 61);
 
-            let y = 75;
+            let y = 70;
+
+            const fssaiText = "FSSAI No: 10722999000768";
+            const boxX = 10;
+            const boxWidth = 190;
+            let boxHeight = 10;
+
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setDrawColor(0);
+            doc.setTextColor(0, 0, 0);
+
+            doc.rect(boxX, y, boxWidth, boxHeight);
+
+            doc.text(fssaiText, boxX + boxWidth / 2, y + 6.5, { align: 'center' });
+
+            y += boxHeight + 10;
 
             const billNumber = document.getElementById('billNumber').value;
             const customerName = document.getElementById('customerName').value;
@@ -969,9 +985,7 @@
             const finalTotal = document.getElementById('finalTotalInput').value;
 
             doc.setFontSize(11);
-
-            const boxX = 10;
-            const boxWidth = 190;
+            
             const contentStartY = y;
 
             y += 2;
@@ -1029,7 +1043,7 @@
 
             y += 7;
 
-            const boxHeight = y - contentStartY;
+            boxHeight = y - contentStartY;
 
             doc.setDrawColor(0);
             doc.rect(boxX, contentStartY - 6, boxWidth, boxHeight + 4);
@@ -1052,7 +1066,7 @@
 
             // Draw the table
             let currentY = y;
-            const firstPageRows = 15;
+            const firstPageRows = 17;
             const nextPageRows = 25;
 
             const totalRows = productRows.length;
@@ -1178,15 +1192,19 @@
             doc.setFont(undefined, 'bold');
             doc.text(upi, x, qrTextBox);
 
-            qrTextBox = qrTextBox + 8;
+            if (modeOfDelivery === 'Home Delivery') {
 
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'bold');
-            doc.text("Kindly share the payment confirmation screenshot once the payment is completed,", leftMargin, qrTextBox);
+                qrTextBox = qrTextBox + 8;
 
-            qrTextBox = qrTextBox + 6;
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.text("Kindly share the payment confirmation screenshot once the payment is completed,", leftMargin, qrTextBox);
 
-            doc.text("so we can proceed with processing your order.", leftMargin, qrTextBox);
+                qrTextBox = qrTextBox + 6;
+
+                doc.text("so we can proceed with processing your order.", leftMargin, qrTextBox);
+
+            }
 
             doc.addImage(qrBase64, 'PNG', 160, currentY, 40, 40);
 

@@ -684,7 +684,23 @@
                 doc.setFont(undefined, 'normal');
                 doc.text(number, startX + boldWidth, 61);
 
-                let y = 75;
+            let y = 70;
+
+            const fssaiText = "FSSAI No: 10722999000768";
+            const boxX = 10;
+            const boxWidth = 190;
+            let boxHeight = 10;
+
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setDrawColor(0);
+            doc.setTextColor(0, 0, 0);
+
+            doc.rect(boxX, y, boxWidth, boxHeight);
+
+            doc.text(fssaiText, boxX + boxWidth / 2, y + 6.5, { align: 'center' });
+
+            y += boxHeight + 10;
 
                 const billNumber = bill.billNumber.toString();
                 const customerName = bill.customerName;
@@ -710,8 +726,6 @@
 
                 doc.setFontSize(11);
 
-                const boxX = 10;
-                const boxWidth = 190;
                 const contentStartY = y;
 
                 y += 2;
@@ -769,7 +783,7 @@
 
                 y += 7;
 
-                const boxHeight = y - contentStartY;
+                boxHeight = y - contentStartY;
 
                 doc.setDrawColor(0);
                 doc.rect(boxX, contentStartY - 6, boxWidth, boxHeight + 4);
@@ -791,7 +805,7 @@
 
                 // Draw the table
                 let currentY = y;
-                const firstPageRows = 15;
+                const firstPageRows = 17;
                 const nextPageRows = 25;
 
                 const totalRows = productRows.length;
