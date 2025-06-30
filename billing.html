@@ -848,6 +848,17 @@
             toast.show();
         }
 
+        let companyDetails = {};
+
+        fetch('/get-company-details')
+            .then(res => res.json())
+            .then(data => {
+                companyDetails = data || {};
+            })
+            .catch(() => {
+                showToast('Failed to fetch company details', 'text-bg-danger');
+            });
+
         document.getElementById('generateBillBtn').addEventListener('click', async function () {
 
             const hasProducts = $('#productTable tbody tr').not('#noProductRow').length > 0;
@@ -888,21 +899,21 @@
             // YouTube Block
             const ytX = 14;
             doc.addImage(youtubeIcon, 'PNG', ytX, iconY, iconSize, iconSize);
-            doc.link(ytX, iconY, iconSize, iconSize, { url: 'https://www.youtube.com/@VimalDeBakers/' });
+            doc.link(ytX, iconY, iconSize, iconSize, { url: companyDetails.youtubeLink || 'N/A' });
 
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
-            doc.textWithLink('@VimalDeBakers', ytX + iconSize + spacing, iconY + textYOffset, {
-                url: 'https://www.youtube.com/@VimalDeBakers/'
+            doc.textWithLink(companyDetails.youtubeProfileName || 'N/A', ytX + iconSize + spacing, iconY + textYOffset, {
+                url: companyDetails.youtubeLink || 'N/A'
             });
 
             // Instagram Block
             const igX = ytX + iconSize + spacing + doc.getTextWidth('YouTube') + columnGap;
             doc.addImage(instaIcon, 'PNG', igX, iconY, iconSize, iconSize);
-            doc.link(igX, iconY, iconSize, iconSize, { url: 'https://www.instagram.com/de.bakers.and.more/' });
+            doc.link(igX, iconY, iconSize, iconSize, { url: companyDetails.instagramLink || 'N/A' });
 
-            doc.textWithLink('@de.bakers.and.more', igX + iconSize + spacing, iconY + textYOffset, {
-                url: 'https://www.instagram.com/de.bakers.and.more/'
+            doc.textWithLink(companyDetails.instagramProfileName || 'N/A', igX + iconSize + spacing, iconY + textYOffset, {
+                url: companyDetails.instagramLink || 'N/A'
             });
 
             const logo = await fetch('images/billLogo.png')
@@ -918,24 +929,28 @@
             doc.setFontSize(25);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(40, 7, 0);
-            doc.text("Vekaria Foods", 195, 25, { align: 'right' });
+            doc.text(companyDetails.companyName || '', 195, 25, { align: 'right' });
             doc.setFontSize(15);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(107, 68, 0);
-            doc.text("De Baker's & More", 195, 32, { align: 'right' });
+            doc.text(companyDetails.brandName || '', 195, 32, { align: 'right' });
             doc.setFontSize(12);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(0, 0, 0);
-            doc.text('GF-30, Shaligram Square,', 195, 42, { align: 'right' });
-            doc.text('Nr. Satyamev Vista,', 195, 48, { align: 'right' });
-            doc.text('Gota, Ahmedabad - 382481', 195, 54, { align: 'right' });
+            let addressY = 42;
+            [companyDetails.addressLine1, companyDetails.addressLine2, companyDetails.addressLine3]
+                .filter(Boolean)
+                .forEach(line => {
+                    doc.text(line, 195, addressY, { align: 'right' });
+                    addressY += 6;
+                });
             const rightX = 195;
 
             doc.setFont(undefined, 'bold');
             const boldWidth = doc.getTextWidth('Phone: ');
 
             doc.setFont(undefined, 'normal');
-            const number = '+91 9876543210';
+            const number = companyDetails.phoneNumber || 'N/A';
             const numberWidth = doc.getTextWidth(number);
 
             const totalWidth = boldWidth + numberWidth;
@@ -950,7 +965,7 @@
 
             let y = 70;
 
-            const fssaiText = "FSSAI No: 10722999000768";
+            const fssaiText = `FSSAI No: ${companyDetails.fssaiNumber || ''}`;
             const boxX = 10;
             const boxWidth = 190;
             let boxHeight = 10;
@@ -989,7 +1004,7 @@
             const finalTotal = document.getElementById('finalTotalInput').value;
 
             doc.setFontSize(11);
-            
+
             const contentStartY = y;
 
             y += 2;
@@ -1149,7 +1164,8 @@
             currentY = doc.lastAutoTable.finalY + 8;
 
             // Generate and add UPI QR code
-            const upiId = "Q355693476@ybl";
+
+            const upiId = companyDetails.upiId || 'N/A';
             const payeeName = "PhonePeMerchant";
             const upiAmount = finalTotal;
 
@@ -1174,9 +1190,9 @@
             qrTextBox = qrTextBox + 8;
 
             const part1 = "OR Pay Directly on ";
-            const phone = "+91 9879718228";
+            const phone = companyDetails.upiNumber || 'N/A';
             const part2 = " or on UPI ID : ";
-            const upi = "Q355693476@ybl";
+            const upi = companyDetails.upiId || 'N/A';
 
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
@@ -1239,7 +1255,7 @@
                 doc.setTextColor(100);
                 doc.setFont(undefined, 'bold');
                 doc.text("This is a computer-generated bill and does not require any signature or stamp.", 105, 283, { align: 'center' });
-                doc.text("In case of any query, contact +91 9879718228", 105, 290, { align: 'center' });
+                doc.text(`In case of any query, contact ${companyDetails.phoneNumber || 'us'}`, 105, 290, { align: 'center' });
             }
 
             // Development

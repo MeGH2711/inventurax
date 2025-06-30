@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Inventurax | Dashboard</title>
+    <title>Inventurax | Company Details</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <link rel="stylesheet" href="css/style.css">
@@ -90,53 +90,61 @@
                 <form id="companyDetailsForm" class="needs-validation" novalidate>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="companyName" class="form-label">Company Name</label>
+                            <label for="companyName" class="form-label fw-bold">Company Name</label>
                             <input type="text" class="form-control" id="companyName" name="companyName" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="brandName" class="form-label">Brand Name</label>
+                            <label for="brandName" class="form-label fw-bold">Brand Name</label>
                             <input type="text" class="form-control" id="brandName" name="brandName">
                         </div>
                         <div class="col-md-4">
-                            <label for="addressLine1" class="form-label">Address Line 1</label>
+                            <label for="addressLine1" class="form-label fw-bold">Address Line 1</label>
                             <input type="text" class="form-control" id="addressLine1" name="addressLine1"
                                 placeholder="Address Line 1">
                         </div>
                         <div class="col-md-4">
-                            <label for="addressLine2" class="form-label">Address Line 2</label>
+                            <label for="addressLine2" class="form-label fw-bold">Address Line 2</label>
                             <input type="text" class="form-control" id="addressLine2" name="addressLine2"
                                 placeholder="Address Line 2">
                         </div>
                         <div class="col-md-4">
-                            <label for="addressLine3" class="form-label">Address Line 3</label>
+                            <label for="addressLine3" class="form-label fw-bold">Address Line 3</label>
                             <input type="text" class="form-control" id="addressLine3" name="addressLine3"
                                 placeholder="Address Line 3">
                         </div>
 
                         <div class="col-md-6">
-                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <label for="phoneNumber" class="form-label fw-bold">Phone Number</label>
                             <input type="text" class="form-control" id="phoneNumber" name="phoneNumber">
                         </div>
                         <div class="col-md-6">
-                            <label for="fssaiNumber" class="form-label">FSSAI Number</label>
+                            <label for="fssaiNumber" class="form-label fw-bold">FSSAI Number</label>
                             <input type="text" class="form-control" id="fssaiNumber" name="fssaiNumber">
                         </div>
 
                         <div class="col-md-6">
-                            <label for="upiNumber" class="form-label">UPI Number</label>
+                            <label for="upiNumber" class="form-label fw-bold">UPI Number</label>
                             <input type="text" class="form-control" id="upiNumber" name="upiNumber">
                         </div>
                         <div class="col-md-6">
-                            <label for="upiId" class="form-label">UPI ID</label>
+                            <label for="upiId" class="form-label fw-bold">UPI ID</label>
                             <input type="text" class="form-control" id="upiId" name="upiId">
                         </div>
-
                         <div class="col-md-6">
-                            <label for="youtubeLink" class="form-label">YouTube Channel Link</label>
+                            <label for="youtubeProfileName" class="form-label fw-bold">YouTube Profile Name</label>
+                            <input type="text" class="form-control" id="youtubeProfileName" name="youtubeProfileName">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="instagramProfileName" class="form-label fw-bold">Instagram Profile Name</label>
+                            <input type="text" class="form-control" id="instagramProfileName"
+                                name="instagramProfileName">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="youtubeLink" class="form-label fw-bold">YouTube Channel Link</label>
                             <input type="url" class="form-control" id="youtubeLink" name="youtubeLink">
                         </div>
                         <div class="col-md-6">
-                            <label for="instagramLink" class="form-label">Instagram Profile Link</label>
+                            <label for="instagramLink" class="form-label fw-bold">Instagram Profile Link</label>
                             <input type="url" class="form-control" id="instagramLink" name="instagramLink">
                         </div>
                     </div>
@@ -211,6 +219,13 @@
                         document.querySelector(`[name="${key}"]`).value = data[key];
                     }
                 }
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                document.getElementById('companyDetailsForm').requestSubmit();
             }
         });
 

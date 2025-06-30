@@ -451,6 +451,8 @@ const companyDetailsSchema = new mongoose.Schema({
     fssaiNumber: String,
     upiNumber: String,
     upiId: String,
+    youtubeProfileName: String,
+    instagramProfileName: String,
     youtubeLink: String,
     instagramLink: String
 });
