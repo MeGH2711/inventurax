@@ -45,7 +45,7 @@ const User = mongoose.model('User', userSchema);
 // Create New User
 app.get('/create-user', async (req, res) => {
     try {
-        const username = 'Megh';
+        const username = 'Developer';
         const plainPassword = 'Megh123';
         const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
@@ -435,6 +435,53 @@ app.get('/get-whatsapp-message', async (req, res) => {
         res.json({ message: latest?.message || '' });
     } catch (err) {
         console.error('Failed to fetch message:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Company Details
+
+const companyDetailsSchema = new mongoose.Schema({
+    companyName: String,
+    brandName: String,
+    addressLine1: String,
+    addressLine2: String,
+    addressLine3: String,
+    phoneNumber: String,
+    fssaiNumber: String,
+    upiNumber: String,
+    upiId: String,
+    youtubeLink: String,
+    instagramLink: String
+});
+
+const CompanyDetails = mongoose.model('CompanyDetails', companyDetailsSchema);
+
+// Save or Update Company Details
+app.post('/save-company-details', async (req, res) => {
+    try {
+        const existing = await CompanyDetails.findOne();
+        if (existing) {
+            Object.assign(existing, req.body);
+            await existing.save();
+            return res.json({ message: 'Company details updated successfully' });
+        }
+
+        const newDetails = new CompanyDetails(req.body);
+        await newDetails.save();
+        res.json({ message: 'Company details saved successfully' });
+    } catch (err) {
+        console.error('Error saving company details:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/get-company-details', async (req, res) => {
+    try {
+        const details = await CompanyDetails.findOne();
+        res.json(details || {});
+    } catch (err) {
+        console.error('Error fetching company details:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -968,6 +1015,10 @@ app.get('/analytics', isAuthenticated, (req, res) => {
 
 app.get('/customers', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'customers.html'));
+});
+
+app.get('/companydetails', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'companydetails.html'));
 });
 
 // Start server
