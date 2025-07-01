@@ -96,7 +96,10 @@
                     <div class="col-md-4">
                         <div class="card gradient-card shadow">
                             <div class="card-body">
-                                <h5 class="card-title dashboardCardTitle">Customer Count</h5>
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title dashboardCardTitle">Customer Count</h5>
+                                    <small id="salesDateRangeCustomerCount" class="text-light fw-light">Loading range...</small>
+                                </div>
                                 <p id="newCustomersCount" class="card-text dashboardCardText display-6">--</p>
                             </div>
                         </div>
@@ -248,13 +251,16 @@
                     const fromText = formatMonthYear(data.from);
                     const toText = formatMonthYear(data.to);
                     document.getElementById('salesDateRange').textContent = `${fromText} - ${toText}`;
+                    document.getElementById('salesDateRangeCustomerCount').textContent = `${fromText} - ${toText}`;
                 } else {
                     document.getElementById('salesDateRange').textContent = 'No data available';
+                    document.getElementById('salesDateRangeCustomerCount').textContent = 'No data available';
                 }
             })
             .catch(err => {
                 console.error('Error fetching sales date range:', err);
                 document.getElementById('salesDateRange').textContent = 'Error loading range';
+                document.getElementById('salesDateRangeCustomerCount').textContent = 'Error loading range';
             });
 
         fetch('/unique-customers-count')
