@@ -90,10 +90,18 @@
                         <div>
                             <h1 class="pageHeader">Customers</h1>
                         </div>
-                        <div>
+                        <div class="d-flex justify-content-end gap-2">
                             <button class="btn btn-sm btn-outline-darkblue" onclick="toggleFilterCard()">
                                 Filter <i id="filterToggleIcon" class="gsymbols-round gicon-keyboard_arrow_down"></i>
                             </button>
+                            <div class="btn-group" role="group" aria-label="View Toggle">
+                                <button id="cardViewBtn" class="btn btn-sm btn-outline-darkblue">
+                                    <i class="gsymbols-round gicon-view_carousel"></i>
+                                </button>
+                                <button id="tableViewBtn" class="btn btn-sm btn-outline-darkblue active">
+                                    <i class="gsymbols-round gicon-table"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-12 mb-3" id="filterCard" style="display: none;">
@@ -127,7 +135,10 @@
                 </div>
                 <div class="row">
                     <div class="col-12" id="customerLogContainer">
-                        <div class="card roundedTableCard" id="customerTableCard"></div>
+                        <div id="customerTableView" class="card roundedTableCard">
+                            <div class="roundedTableCard"></div>
+                        </div>
+                        <div id="customerCardView" class="row g-3" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -140,6 +151,7 @@
             </footer>
 
         </div>
+
     </div>
 
     <!-- Modals -->
@@ -237,7 +249,7 @@
                 allCustomers = customers;
                 applyFiltersAndSorting();
 
-                const container = document.getElementById('customerTableCard');
+                const container = document.getElementById('customerTableView');
                 if (!customers.length) {
                     container.innerHTML = '<div class="alert alert-info">No customer records found.</div>';
                     return;
@@ -304,7 +316,7 @@
                 container.appendChild(table);
             } catch (err) {
                 console.error("Failed to load customers:", err);
-                document.getElementById('customerTableCard').innerHTML =
+                document.getElementById('customerTableView').innerHTML =
                     '<div class="alert alert-danger">Error loading customer data.</div>';
             }
 
@@ -359,7 +371,11 @@
                     break;
             }
 
-            renderCustomerTable(filtered);
+            if (document.getElementById('tableViewBtn').classList.contains('active')) {
+                renderCustomerTable(filtered);
+            } else {
+                renderCustomerCards(filtered);
+            }
         }
 
         function renderCustomerTable(customers) {
@@ -367,7 +383,7 @@
             const nameFilter = document.getElementById('filterCustomerName').value.toLowerCase();
             const numberFilter = document.getElementById('filterCustomerNumber').value.toLowerCase();
 
-            const container = document.getElementById('customerTableCard');
+            const container = document.getElementById('customerTableView');
 
             if (!customers.length) {
                 container.classList.add("border-0");
@@ -451,6 +467,24 @@
         }
 
         window.addEventListener('DOMContentLoaded', loadCustomers);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedView = localStorage.getItem('customerView') || 'card';
+
+            if (savedView === 'table') {
+                document.getElementById('customerTableView').style.display = 'block';
+                document.getElementById('customerCardView').style.display = 'none';
+                document.getElementById('tableViewBtn').classList.add('active');
+                document.getElementById('cardViewBtn').classList.remove('active');
+            } else {
+                document.getElementById('customerTableView').style.display = 'none';
+                document.getElementById('customerCardView').style.display = 'flex';
+                document.getElementById('cardViewBtn').classList.add('active');
+                document.getElementById('tableViewBtn').classList.remove('active');
+            }
+
+            loadCustomers();
+        });
 
         document.addEventListener('click', async (e) => {
             if (e.target.closest('.send-whatsapp-btn')) {
@@ -1189,6 +1223,104 @@
         }
 
         window.addEventListener('DOMContentLoaded', updateNotepadButtonStyle);
+
+        document.getElementById('tableViewBtn').addEventListener('click', () => {
+            localStorage.setItem('customerView', 'table');
+            document.getElementById('customerTableView').style.display = 'block';
+            document.getElementById('customerCardView').style.display = 'none';
+            document.getElementById('tableViewBtn').classList.add('active');
+            document.getElementById('cardViewBtn').classList.remove('active');
+        });
+
+        document.getElementById('cardViewBtn').addEventListener('click', () => {
+            localStorage.setItem('customerView', 'card');
+            document.getElementById('customerTableView').style.display = 'none';
+            document.getElementById('customerCardView').style.display = 'flex';
+            document.getElementById('cardViewBtn').classList.add('active');
+            document.getElementById('tableViewBtn').classList.remove('active');
+            renderCustomerCards(allCustomers);
+        });
+
+        function renderCustomerCards(customers) {
+
+            const nameFilter = document.getElementById('filterCustomerName').value.toLowerCase();
+            const numberFilter = document.getElementById('filterCustomerNumber').value.toLowerCase();
+
+            const container = document.getElementById('customerCardView');
+            container.innerHTML = '';
+
+            if (!customers.length) {
+                container.innerHTML = '<div class="alert alert-info text-center w-100">No matching customer records found.</div>';
+                return;
+            }
+
+            customers.forEach(c => {
+                const fullAddress = c.address || "Unknown";
+                const showTooltip = fullAddress.length > 45 && fullAddress.toLowerCase() !== "unknown";
+                const shortAddress = showTooltip ? fullAddress.slice(0, 45) + '...' : fullAddress;
+
+                const tooltipAttr = showTooltip ? `title="${fullAddress}" data-bs-toggle="tooltip" data-bs-placement="right"` : '';
+
+                const highlightMatch = (text, searchTerm) => {
+                    if (!searchTerm) return text;
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    return text.replace(regex, '<span class="highlightedText">$1</span>');
+                };
+
+                const card = document.createElement('div');
+                card.className = 'col-md-6 col-lg-4 mb-3';
+
+                card.innerHTML = `
+                    <div class="shadow-sm gradient-card2 rounded-4 p-3 h-100 bg-light border-0 font-montserrat">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="mb-1 fw-semibold text-dark">${highlightMatch(c.name, nameFilter)}</h5>
+                                <small class="text-muted">${highlightMatch(c.number, numberFilter)}</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Total Shopping</small>
+                                <span class="fw-bold text-success fs-5">₹ ${c.totalSpent.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <div ${tooltipAttr}>
+                                <i class="bi bi-geo-alt me-1"></i> ${shortAddress}
+                                ${fullAddress.toLowerCase() !== 'unknown' ? `
+                                    <i class="gsymbols-round gicon-content_paste ms-2 copy-icon"
+                                       data-address="${fullAddress}" role="button"
+                                       title="Copy to clipboard"></i>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-darkblue w-100 view-details-btn" data-name="${c.name}" data-number="${c.number}">
+                                <i class="gsymbols-round gicon-visibility me-1"></i> View
+                            </button>
+                            <button class="btn btn-sm btn-whatsapp w-100 send-whatsapp-btn" data-number="${c.number}">
+                                <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // Enable tooltips if needed
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+            document.querySelectorAll('.copy-icon').forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const address = icon.getAttribute('data-address');
+                    navigator.clipboard.writeText(address).then(() => {
+                        icon.classList.replace('gicon-content_paste', 'gicon-inventory');
+                        setTimeout(() => {
+                            icon.classList.replace('gicon-inventory', 'gicon-content_paste');
+                        }, 3000);
+                    });
+                });
+            });
+        }
 
         // Reusable Toast Function
 
