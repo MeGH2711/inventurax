@@ -1274,8 +1274,13 @@
                     <div class="shadow-sm gradient-card2 rounded-4 p-3 h-100 bg-light border-0 font-montserrat">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                <h5 class="mb-1 fw-semibold text-dark">${highlightMatch(c.name, nameFilter)}</h5>
-                                <small class="text-muted">${highlightMatch(c.number, numberFilter)}</small>
+                                <h5 class="mb-1 fw-semibold text-dark d-flex align-items-center">
+                                    <i class="gsymbols-round gicon-account_circle me-2 fs-5 text-secondary"></i>
+                                    ${highlightMatch(c.name, nameFilter)}
+                                </h5>
+                                <small class="text-muted">
+                                    <i class="gsymbols-round gicon-call me-2"></i>${highlightMatch(c.number, numberFilter)}
+                                </small>
                             </div>
                             <div class="text-end">
                                 <small class="text-muted d-block">Total Shopping</small>
