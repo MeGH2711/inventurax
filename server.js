@@ -313,7 +313,7 @@ const Bill = mongoose.model('Bill', billSchema);
 
 app.post('/save-bill', async (req, res) => {
     try {
-        const { customerName, customerNumber, customerAddress } = req.body;
+        const { customerName, customerNumber, customerAddress, billingDate, billingTime, finalTotal, modeOfPayment } = req.body;
 
         // Get next bill number
         const latestBill = await Bill.findOne().sort({ billNumber: -1 });
@@ -326,10 +326,22 @@ app.post('/save-bill', async (req, res) => {
         });
         await newBill.save();
 
-        res.status(200).json({ message: 'Bill saved successfully', billNumber: nextBillNumber });
+        // Also save transaction (category: 'In' for customer)
+        const newTransaction = new Transaction({
+            finalAmount: finalTotal,
+            billingDate,
+            billingTime,
+            customerName,
+            contactNumber: customerNumber,
+            modeOfPayment,
+            transactionType: 'Income'
+        });
+        await newTransaction.save();
+
+        res.status(200).json({ message: 'Bill and transaction saved successfully', billNumber: nextBillNumber });
     } catch (err) {
-        console.error('Error saving bill:', err);
-        res.status(500).json({ message: 'Error saving bill' });
+        console.error('Error saving bill/transaction:', err);
+        res.status(500).json({ message: 'Error saving bill and transaction' });
     }
 });
 
@@ -459,7 +471,6 @@ const companyDetailsSchema = new mongoose.Schema({
 
 const CompanyDetails = mongoose.model('CompanyDetails', companyDetailsSchema);
 
-// Save or Update Company Details
 app.post('/save-company-details', async (req, res) => {
     try {
         const existing = await CompanyDetails.findOne();
@@ -484,6 +495,61 @@ app.get('/get-company-details', async (req, res) => {
         res.json(details || {});
     } catch (err) {
         console.error('Error fetching company details:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Transactions
+
+const transactionSchema = new mongoose.Schema({
+    finalAmount: { type: Number, required: true },
+    billingDate: { type: String, required: true },
+    billingTime: { type: String, required: true },
+    customerName: { type: String, required: true },
+    contactNumber: { type: String, required: true },
+    modeOfPayment: { type: String, required: true },
+    transactionType: { type: String, enum: ['Income', 'Expense'], required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Transaction = mongoose.model('Transaction', transactionSchema);
+
+app.post('/add-transaction', async (req, res) => {
+    try {
+        const {
+            finalAmount,
+            billingDate,
+            billingTime,
+            customerName,
+            contactNumber,
+            modeOfPayment,
+            category
+        } = req.body;
+
+        const newTransaction = new Transaction({
+            finalAmount,
+            billingDate,
+            billingTime,
+            customerName,
+            contactNumber,
+            modeOfPayment,
+            category
+        });
+
+        await newTransaction.save();
+        res.status(200).json({ message: 'Transaction saved successfully' });
+    } catch (err) {
+        console.error('Error saving transaction:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/get-transactions', async (req, res) => {
+    try {
+        const transactions = await Transaction.find().sort({ createdAt: -1 });
+        res.json(transactions);
+    } catch (err) {
+        console.error('Error fetching transactions:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -1021,6 +1087,10 @@ app.get('/customers', isAuthenticated, (req, res) => {
 
 app.get('/companydetails', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'companydetails.html'));
+});
+
+app.get('/transactions', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'transactions.html'));
 });
 
 // Start server
