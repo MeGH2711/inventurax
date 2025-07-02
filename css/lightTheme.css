@@ -5,7 +5,6 @@
   --white: #ffffff;
   --black: #000000;
   --danger-color: #ff0000;
-  --tableAlternateRow: #e5f2ff;
 }
 
 body {
@@ -201,11 +200,6 @@ body {
 table thead tr th,
 table tbody tr td {
   background-color: transparent !important;
-}
-
-.productListingTable tbody tr:nth-of-type(even) td,
-#customerTable tbody tr:nth-of-type(even) td {
-  background-color: var(--tableAlternateRow) !important;
 }
 
 /* Form Control & Form Select */

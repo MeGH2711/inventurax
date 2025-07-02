@@ -1256,8 +1256,8 @@
 
             customers.forEach(c => {
                 const fullAddress = c.address || "Unknown";
-                const showTooltip = fullAddress.length > 45 && fullAddress.toLowerCase() !== "unknown";
-                const shortAddress = showTooltip ? fullAddress.slice(0, 45) + '...' : fullAddress;
+                const showTooltip = fullAddress.length > 40 && fullAddress.toLowerCase() !== "unknown";
+                const shortAddress = showTooltip ? fullAddress.slice(0, 40) + '...' : fullAddress;
 
                 const tooltipAttr = showTooltip ? `title="${fullAddress}" data-bs-toggle="tooltip" data-bs-placement="right"` : '';
 
@@ -1274,7 +1274,7 @@
                     <div class="shadow-sm gradient-card2 rounded-4 p-3 h-100 bg-light border-0 font-montserrat">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                <h5 class="mb-1 fw-semibold text-dark d-flex align-items-center">
+                                <h5 class="mb-1 fw-bold text-dark d-flex align-items-center">
                                     <i class="gsymbols-round gicon-account_circle me-2 fs-5 text-secondary"></i>
                                     ${highlightMatch(c.name, nameFilter)}
                                 </h5>
@@ -1299,10 +1299,10 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-darkblue w-100 view-details-btn" data-name="${c.name}" data-number="${c.number}">
+                            <button class="btn btn-darkblue w-100 view-details-btn" data-name="${c.name}" data-number="${c.number}">
                                 <i class="gsymbols-round gicon-visibility me-1"></i> View
                             </button>
-                            <button class="btn btn-sm btn-whatsapp w-100 send-whatsapp-btn" data-number="${c.number}">
+                            <button class="btn btn-whatsapp w-100 send-whatsapp-btn" data-number="${c.number}">
                                 <i class="bi bi-whatsapp me-1"></i> WhatsApp
                             </button>
                         </div>
