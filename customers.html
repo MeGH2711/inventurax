@@ -19,48 +19,7 @@
     <div class="d-flex" id="wrapper">
 
         <!-- Sidebar -->
-        <div class="shadow-sm" id="sidebar-wrapper">
-            <div class="sidebar-heading p-3 d-flex justify-content-between align-items-center">
-                <img id="sidebarLogoFull" src="images/inventuraxLogoWhite.png" alt="Full Logo" class="img-fluid">
-                <img id="sidebarLogoIcon" src="images/inventuraxIconWhite.png" alt="Icon Logo" class="img-fluid d-none">
-            </div>
-
-            <!-- Scrollable content wrapper -->
-            <div class="sidebar-content">
-                <div class="list-group list-group-flush flex-grow-1">
-                    <a href="/dashboard" class="list-group-item list-group-item-sidebar" title="Dashboard">
-                        <i class="gsymbols-round gicon-home fs-5"></i><span class="link-text">Dashboard</span>
-                    </a>
-                    <a href="/companydetails" class="list-group-item list-group-item-sidebar" title="Company Details">
-                        <i class="gsymbols-round gicon-corporate_fare fs-5"></i><span class="link-text">Company
-                            Details</span>
-                    </a>
-                    <a href="/productlisting" class="list-group-item list-group-item-sidebar" title="Product Listing">
-                        <i class="gsymbols-round gicon-inventory fs-5"></i><span class="link-text">Product
-                            Listing</span>
-                    </a>
-                    <a href="/billing" class="list-group-item list-group-item-sidebar" title="Billing">
-                        <i class="gsymbols-round gicon-receipt_long fs-5"></i><span class="link-text">Billing</span>
-                    </a>
-                    <a href="billlogs" class="list-group-item list-group-item-sidebar" title="Bill Logs">
-                        <i class="gsymbols-round gicon-auto_stories fs-5"></i><span class="link-text">Bill Logs</span>
-                    </a>
-                    <a href="/analytics" class="list-group-item list-group-item-sidebar" title="Analytics">
-                        <i class="gsymbols-round gicon-insights fs-5"></i><span class="link-text">Analytics</span>
-                    </a>
-                    <a class="list-group-item list-group-item-sidebar active" title="Customers">
-                        <i class="gsymbols-round gicon-group fs-5"></i><span class="link-text">Customers</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Bottom Toggle Button -->
-            <div class="text-center p-3 sidebar-toggle-wrapper">
-                <button class="btn btn-outline-light w-100" id="toggleSidebar">
-                    <i class="gsymbols-round gicon-chevron_left" id="toggleIcon"></i>
-                </button>
-            </div>
-        </div>
+        <div class="shadow-sm" id="sidebar-wrapper"></div>
 
         <!-- Main Page content -->
         <div id="mainPageContent" class="p-4 flex-grow-1">
@@ -236,6 +195,7 @@
                     window.location.href = '/';
                 } else {
                     document.querySelector('.profileButton .dropdown-toggle').textContent = data.username;
+                    populateSidebar('customers');
                 }
             })
             .catch(() => {
