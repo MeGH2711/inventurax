@@ -50,7 +50,7 @@
                 <div class="card roundedTableCard">
                     <div class="table-responsive">
                         <table class="table table-bordered mb-0 roundedTable" id="transactionsTable">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
                                     <th class="text-center align-middle">Type</th>
                                     <th class="text-center align-middle">Date</th>
@@ -93,13 +93,47 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Customer:</strong> <span id="modalCustomerName"></span></p>
-                    <p><strong>Contact:</strong> <span id="modalContactNumber"></span></p>
-                    <p><strong>Date:</strong> <span id="modalBillingDate"></span></p>
-                    <p><strong>Time:</strong> <span id="modalBillingTime"></span></p>
-                    <p><strong>Amount:</strong> <span id="modalFinalAmount"></span></p>
-                    <p><strong>Payment Mode:</strong> <span id="modalModeOfPayment"></span></p>
-                    <p><strong>Type:</strong> <span id="modalTransactionType"></span></p>
+                    <div class="card m-0 border-0">
+
+                        <div class="card-body px-4 py-3">
+
+                            <div class="row mb-3">
+                                <div class="col-5 fw-semibold text-muted">Name</div>
+                                <div class="col-7 text-dark" id="modalCustomerName"></div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-5 fw-semibold text-muted">Phone Number</div>
+                                <div class="col-7 text-dark" id="modalContactNumber"></div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-5 fw-semibold text-muted">Date</div>
+                                <div class="col-7 text-dark" id="modalBillingDate"></div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-5 fw-semibold text-muted">Time</div>
+                                <div class="col-7 text-dark" id="modalBillingTime"></div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-5 fw-semibold text-muted">Amount</div>
+                                <div class="col-7 fw-bold" id="modalFinalAmount"></div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-5 fw-semibold text-muted">Payment Mode</div>
+                                <div class="col-7 text-dark" id="modalModeOfPayment"></div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-5 fw-semibold text-muted">Transaction Type</div>
+                                <div class="col-7 fw-bold" id="modalTransactionType"></div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,13 +178,23 @@
                     data.forEach(tx => {
                         const tr = document.createElement('tr');
 
+                        const dateObj = new Date(tx.billingDate);
+                        const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}/${dateObj.toLocaleString('en-US', { month: 'short' })}/${dateObj.getFullYear()}`;
+
+                        const timeObj = new Date(`1970-01-01T${tx.billingTime}`);
+                        const formattedTime = timeObj.toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+
                         const isIncome = tx.transactionType === 'Income';
                         tr.classList.toggle('income-row', isIncome);
 
                         tr.innerHTML = `
                             <td class="text-center align-middle ${isIncome ? 'income-type text-success' : ''}">${tx.transactionType}</td>
-                            <td class="text-center align-middle">${tx.billingDate}</td>
-                            <td class="text-center align-middle">${tx.billingTime}</td>
+                            <td class="text-center align-middle">${formattedDate}</td>
+                            <td class="text-center align-middle">${formattedTime}</td>
                             <td class="text-center align-middle">${tx.customerName}</td>
                             <td class="text-center align-middle">${tx.contactNumber}</td>
                             <td class="text-center align-middle">₹${tx.finalAmount}</td>
