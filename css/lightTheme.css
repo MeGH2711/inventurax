@@ -71,6 +71,15 @@ body {
   --bs-btn-active-border-color: #0c4e82;
 }
 
+.btn-darkblue:disabled,
+.btn-darkblue.disabled {
+  background-color: #b0c4d6;
+  border-color: #b0c4d6;
+  color: var(--mainThemeColor);
+  opacity: 1;
+  pointer-events: none;
+}
+
 .btn-outline-darkblue {
   --bs-btn-color: var(--mainThemeColor);
   --bs-btn-border-color: var(--mainThemeColor);

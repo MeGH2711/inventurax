@@ -180,6 +180,44 @@
                     }
                 }
             }
+
+            const form = document.getElementById('companyDetailsForm');
+            const saveBtn = document.getElementById('saveDetailsBtn');
+            const inputs = form.querySelectorAll('input');
+
+            let originalData = {};
+
+            if (data) {
+                for (const key in data) {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        input.value = data[key];
+                        originalData[key] = data[key];
+                    }
+                }
+            }
+
+            // Disable save button by default
+            saveBtn.disabled = true;
+
+            // Function to check if form has changed
+            const checkChanges = () => {
+                for (const input of inputs) {
+                    const name = input.name;
+                    const original = originalData[name] || '';
+                    const current = input.value;
+                    if (original !== current) {
+                        saveBtn.disabled = false;
+                        return;
+                    }
+                }
+                saveBtn.disabled = true;
+            };
+
+            inputs.forEach(input => {
+                input.addEventListener('input', checkChanges);
+            });
+
         });
 
         document.addEventListener('keydown', function (e) {

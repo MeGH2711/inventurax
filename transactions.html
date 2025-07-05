@@ -37,7 +37,29 @@
             </div>
 
             <div class="container-fluid my-3">
-                
+                <div class="card">
+                    <div class="card-header bg-darkblue text-white">
+                        Transactions
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0" id="transactionsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Customer</th>
+                                    <th>Contact</th>
+                                    <th>Amount</th>
+                                    <th>Payment</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Transactions will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Footer Section -->
@@ -49,6 +71,30 @@
 
         </div>
 
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Transaction Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-darkblue text-white">
+                    <h5 class="modal-title" id="detailsModalLabel">Transaction Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Customer:</strong> <span id="modalCustomerName"></span></p>
+                    <p><strong>Contact:</strong> <span id="modalContactNumber"></span></p>
+                    <p><strong>Date:</strong> <span id="modalBillingDate"></span></p>
+                    <p><strong>Time:</strong> <span id="modalBillingTime"></span></p>
+                    <p><strong>Amount:</strong> <span id="modalFinalAmount"></span></p>
+                    <p><strong>Payment Mode:</strong> <span id="modalModeOfPayment"></span></p>
+                    <p><strong>Type:</strong> <span id="modalTransactionType"></span></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Toast -->
@@ -81,6 +127,51 @@
             .catch(() => {
                 window.location.href = '/';
             });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/get-transactions')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector('#transactionsTable tbody');
+                    data.forEach(tx => {
+                        const tr = document.createElement('tr');
+
+                        tr.innerHTML = `
+                            <td>${tx.billingDate}</td>
+                            <td>${tx.billingTime}</td>
+                            <td>${tx.customerName}</td>
+                            <td>${tx.contactNumber}</td>
+                            <td>₹${tx.finalAmount}</td>
+                            <td>${tx.modeOfPayment}</td>
+                            <td><button class="btn btn-sm btn-outline-primary" data-id="${tx._id}" data-bs-toggle="modal" data-bs-target="#detailsModal">View More</button></td>
+                        `;
+
+                        tbody.appendChild(tr);
+                    });
+
+                    // Modal data population
+                    document.querySelector('#transactionsTable').addEventListener('click', async (e) => {
+                        if (e.target.tagName === 'BUTTON') {
+                            const id = e.target.dataset.id;
+                            const tx = data.find(t => t._id === id);
+
+                            if (tx) {
+                                document.getElementById('modalCustomerName').textContent = tx.customerName;
+                                document.getElementById('modalContactNumber').textContent = tx.contactNumber;
+                                document.getElementById('modalBillingDate').textContent = tx.billingDate;
+                                document.getElementById('modalBillingTime').textContent = tx.billingTime;
+                                document.getElementById('modalFinalAmount').textContent = `₹${tx.finalAmount}`;
+                                document.getElementById('modalModeOfPayment').textContent = tx.modeOfPayment;
+                                document.getElementById('modalTransactionType').textContent = tx.transactionType;
+                            }
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error('Failed to fetch transactions:', err);
+                    showToast('Failed to load transactions', 'text-bg-danger');
+                });
+        });
 
         // Reusable Toast Function
 
