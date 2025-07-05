@@ -238,3 +238,13 @@ table tbody tr td {
   background-color: var(--mainThemeColor);
   box-shadow: -2px -2px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* Income Row */
+
+.income-row {
+  background-color: #e6f4ea !important;
+}
+
+.income-type {
+  font-weight: 600;
+}
