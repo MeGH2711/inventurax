@@ -23,13 +23,13 @@ function populateSidebar(activePage = '') {
 
     const links = [
         { href: '/dashboard', icon: 'gicon-home', text: 'Dashboard', key: 'dashboard' },
-        { href: '/companydetails', icon: 'gicon-corporate_fare', text: 'Company Details', key: 'companydetails' },
-        { href: '/productlisting', icon: 'gicon-inventory', text: 'Product Listing', key: 'productlisting' },
+        { href: '/companydetails', icon: 'gicon-business', text: 'Company Details', key: 'companydetails' },
+        { href: '/productlisting', icon: 'gicon-shopping_bag', text: 'Product Listing', key: 'productlisting' },
         { href: '/billing', icon: 'gicon-receipt_long', text: 'Billing', key: 'billing' },
         { href: '/billlogs', icon: 'gicon-auto_stories', text: 'Bill Logs', key: 'billlogs' },
         { href: '/analytics', icon: 'gicon-insights', text: 'Analytics', key: 'analytics' },
         { href: '/customers', icon: 'gicon-group', text: 'Customers', key: 'customers' },
-        { href: '/transactions', icon: 'gicon-payments', text: 'Transactions', key: 'transactions' },
+        { href: '/transactions', icon: 'gicon-account_balance_wallet', text: 'Transactions', key: 'transactions' },
     ];
 
     const sidebarItems = links.map(link => {
