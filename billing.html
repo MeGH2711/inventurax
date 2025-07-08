@@ -679,6 +679,8 @@
                         $('#productName').val('');
                         $('#productQuantity').val(1);
 
+                        $('#finalTotalFixedValue').text('0.00');
+
                         if (response.billNumber) {
                             $('#billNumber').val(response.billNumber + 1);
                         } else {

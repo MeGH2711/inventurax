@@ -326,7 +326,6 @@ app.post('/save-bill', async (req, res) => {
         });
         await newBill.save();
 
-        // Also save transaction (category: 'In' for customer)
         const newTransaction = new Transaction({
             finalAmount: finalTotal,
             billingDate,
@@ -334,7 +333,8 @@ app.post('/save-bill', async (req, res) => {
             customerName,
             contactNumber: customerNumber,
             modeOfPayment,
-            transactionType: 'Income'
+            transactionType: 'Income',
+            transactionCategory: 'Sales'
         });
         await newTransaction.save();
 
@@ -509,6 +509,7 @@ const transactionSchema = new mongoose.Schema({
     contactNumber: { type: String, required: true },
     modeOfPayment: { type: String, required: true },
     transactionType: { type: String, enum: ['Income', 'Expense'], required: true },
+    transactionCategory: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -523,7 +524,8 @@ app.post('/add-transaction', async (req, res) => {
             customerName,
             contactNumber,
             modeOfPayment,
-            category
+            transactionType,
+            transactionCategory
         } = req.body;
 
         const newTransaction = new Transaction({
@@ -533,7 +535,8 @@ app.post('/add-transaction', async (req, res) => {
             customerName,
             contactNumber,
             modeOfPayment,
-            category
+            transactionType,
+            transactionCategory
         });
 
         await newTransaction.save();

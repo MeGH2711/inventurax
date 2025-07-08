@@ -52,13 +52,14 @@
                         <table class="table table-bordered mb-0 roundedTable" id="transactionsTable">
                             <thead>
                                 <tr>
-                                    <th class="text-center align-middle">Type</th>
+                                    <th class="text-center align-middle">Transaction Type</th>
+                                    <th class="text-center align-middle">Transaction Category</th>
                                     <th class="text-center align-middle">Date</th>
                                     <th class="text-center align-middle">Time</th>
-                                    <th class="text-center align-middle">Customer</th>
-                                    <th class="text-center align-middle">Contact</th>
+                                    <th class="text-center align-middle">Name</th>
+                                    <th class="text-center align-middle">Phone Number</th>
                                     <th class="text-center align-middle">Amount</th>
-                                    <th class="text-center align-middle">Payment</th>
+                                    <th class="text-center align-middle">Mode of Transaction</th>
                                     <th class="text-center align-middle">Action</th>
                                 </tr>
                             </thead>
@@ -127,9 +128,14 @@
                                 <div class="col-7 text-dark" id="modalModeOfPayment"></div>
                             </div>
 
-                            <div class="row">
+                            <div class="row mb-3">
                                 <div class="col-5 fw-semibold text-muted">Transaction Type</div>
                                 <div class="col-7 fw-bold" id="modalTransactionType"></div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-5 fw-semibold text-muted">Transaction Category</div>
+                                <div class="col-7 fw-bold" id="modalTransactionCategory"></div>
                             </div>
 
                         </div>
@@ -170,6 +176,28 @@
                 window.location.href = '/';
             });
 
+
+        function formatDate(dateStr) {
+            const dateObj = new Date(dateStr);
+            if (isNaN(dateObj)) return dateStr;
+
+            const day = dateObj.getDate().toString().padStart(2, '0');
+            const month = dateObj.toLocaleString('en-US', { month: 'short' });
+            const year = dateObj.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function formatTime(timeStr) {
+            const timeObj = new Date(`1970-01-01T${timeStr}`);
+            if (isNaN(timeObj)) return timeStr;
+
+            return timeObj.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             fetch('/get-transactions')
                 .then(res => res.json())
@@ -179,20 +207,17 @@
                         const tr = document.createElement('tr');
 
                         const dateObj = new Date(tx.billingDate);
-                        const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}/${dateObj.toLocaleString('en-US', { month: 'short' })}/${dateObj.getFullYear()}`;
+                        const formattedDate = formatDate(tx.billingDate);
 
                         const timeObj = new Date(`1970-01-01T${tx.billingTime}`);
-                        const formattedTime = timeObj.toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        });
+                        const formattedTime = formatTime(tx.billingTime);
 
                         const isIncome = tx.transactionType === 'Income';
                         tr.classList.toggle('income-row', isIncome);
 
                         tr.innerHTML = `
                             <td class="text-center align-middle ${isIncome ? 'income-type text-success' : ''}">${tx.transactionType}</td>
+                            <td class="text-center align-middle">${tx.transactionCategory}</td>
                             <td class="text-center align-middle">${formattedDate}</td>
                             <td class="text-center align-middle">${formattedTime}</td>
                             <td class="text-center align-middle">${tx.customerName}</td>
@@ -214,11 +239,12 @@
                             if (tx) {
                                 document.getElementById('modalCustomerName').textContent = tx.customerName;
                                 document.getElementById('modalContactNumber').textContent = tx.contactNumber;
-                                document.getElementById('modalBillingDate').textContent = tx.billingDate;
-                                document.getElementById('modalBillingTime').textContent = tx.billingTime;
+                                document.getElementById('modalBillingDate').textContent = formatDate(tx.billingDate);
+                                document.getElementById('modalBillingTime').textContent = formatTime(tx.billingTime);
                                 document.getElementById('modalFinalAmount').textContent = `₹${tx.finalAmount}`;
                                 document.getElementById('modalModeOfPayment').textContent = tx.modeOfPayment;
                                 document.getElementById('modalTransactionType').textContent = tx.transactionType;
+                                document.getElementById('modalTransactionCategory').textContent = tx.transactionCategory;
                             }
                         }
                     });
