@@ -186,6 +186,7 @@
     <script src="js/jspdf.plugin.autotable.min.js"></script>
     <script src="js/sidebar.js"></script>
     <script src="js/qrcode.min.js"></script>
+    <script src="js/script.js"></script>
 
     <script>
         fetch('/session-check')
@@ -504,23 +505,6 @@
                 const totalSpent = purchases.reduce((sum, p) => sum + (p.finalTotal || 0), 0);
                 const averageBill = totalSpent / purchases.length || 0;
                 const lastVisitDate = formatDate(latestBill?.billingDate);
-
-                function formatDate(dateStr) {
-                    const date = new Date(dateStr);
-                    const day = date.getDate();
-                    const month = date.toLocaleString('default', { month: 'long' });
-                    const year = date.getFullYear();
-                    return `${day}/${month}/${year}`;
-                }
-
-                function formatTime(timeStr) {
-                    const [hourStr, minuteStr] = timeStr.split(':');
-                    let hour = parseInt(hourStr, 10);
-                    const minute = parseInt(minuteStr, 10);
-                    const ampm = hour >= 12 ? 'PM' : 'AM';
-                    hour = hour % 12 || 12;
-                    return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
-                }
 
                 const billCardHTML = latestBill ? `
                     <div class="col-lg-6 mb-2">
