@@ -52,10 +52,10 @@
                         <table class="table table-bordered mb-0 roundedTable" id="transactionsTable">
                             <thead>
                                 <tr>
-                                    <th class="text-center align-middle">Transaction Type</th>
-                                    <th class="text-center align-middle">Transaction Category</th>
                                     <th class="text-center align-middle">Date</th>
                                     <th class="text-center align-middle">Time</th>
+                                    <th class="text-center align-middle">Transaction Type</th>
+                                    <th class="text-center align-middle">Transaction Category</th>
                                     <th class="text-center align-middle">Name</th>
                                     <th class="text-center align-middle">Phone Number</th>
                                     <th class="text-center align-middle">Amount</th>
@@ -94,7 +94,7 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="card m-0 border-0">
+                    <div class="card gradient-card3 m-0 border-0">
 
                         <div class="card-body px-4 py-3">
 
@@ -195,13 +195,13 @@
                         tr.classList.toggle('income-row', isIncome);
 
                         tr.innerHTML = `
-                            <td class="text-center align-middle ${isIncome ? 'income-type text-success' : ''}">${tx.transactionType}</td>
-                            <td class="text-center align-middle">${tx.transactionCategory}</td>
                             <td class="text-center align-middle">${formattedDate}</td>
                             <td class="text-center align-middle">${formattedTime}</td>
+                            <td class="text-center align-middle ${isIncome ? 'income-type text-success' : ''}">${tx.transactionType}</td>
+                            <td class="text-center align-middle">${tx.transactionCategory}</td>
                             <td class="text-center align-middle">${tx.customerName}</td>
                             <td class="text-center align-middle">${tx.contactNumber}</td>
-                            <td class="text-center align-middle">₹${tx.finalAmount}</td>
+                            <td class="text-center align-middle">₹ ${tx.finalAmount}</td>
                             <td class="text-center align-middle">${tx.modeOfPayment}</td>
                             <td class="text-center align-middle"><button class="btn btn-sm btn-darkblue w-100" data-id="${tx._id}" data-bs-toggle="modal" data-bs-target="#detailsModal">View More</button></td>
                         `;
@@ -220,7 +220,7 @@
                                 document.getElementById('modalContactNumber').textContent = tx.contactNumber;
                                 document.getElementById('modalBillingDate').textContent = formatDate(tx.billingDate);
                                 document.getElementById('modalBillingTime').textContent = formatTime(tx.billingTime);
-                                document.getElementById('modalFinalAmount').textContent = `₹${tx.finalAmount}`;
+                                document.getElementById('modalFinalAmount').textContent = `₹ ${tx.finalAmount}`;
                                 document.getElementById('modalModeOfPayment').textContent = tx.modeOfPayment;
                                 document.getElementById('modalTransactionType').textContent = tx.transactionType;
                                 document.getElementById('modalTransactionCategory').textContent = tx.transactionCategory;
